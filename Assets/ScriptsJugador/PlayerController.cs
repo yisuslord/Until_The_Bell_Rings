@@ -11,6 +11,12 @@ public class PlayerController : MonoBehaviour
     private Vector2 movementInput;
     private bool isRunning;
 
+    [Header("Noise System")]
+    [SerializeField] private float noiseRadius = 5f;
+    [SerializeField] private LayerMask enemyLayer;
+    private float noiseTimer;
+    [SerializeField] private float noiseInterval = 0.5f;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -38,9 +44,25 @@ public class PlayerController : MonoBehaviour
 
         rb.linearVelocity = movementInput * speed;
 
-        if (movementInput != Vector2.zero)
+        if (movementInput != Vector2.zero && isRunning)
         {
-            // 🔊 Sistema de ruido YISUS
+            noiseTimer -= Time.fixedDeltaTime;
+            if (noiseTimer <= 0)
+            {
+                EmitNoise();
+                noiseTimer = noiseInterval;
+            }
+        }
+    }
+    private void EmitNoise()
+    {
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(transform.position, noiseRadius, enemyLayer);
+        foreach (var hit in hitEnemies)
+        {
+            if (hit.TryGetComponent(out IStimulusReceiver receiver))
+            {
+                receiver.OnStimulusReceived(transform.position, StimulusType.Noise);
+            }
         }
     }
 }
