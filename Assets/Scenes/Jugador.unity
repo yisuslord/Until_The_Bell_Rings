@@ -244,9 +244,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentState: 0
+  playertransform: {fileID: 1199170521}
   wanderRadius: 7
   waitTimeAtPoint: 2
   investigationDuration: 3
+  detectionRadius: 4
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 1
 --- !u!58 &6616431
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -742,7 +750,7 @@ GameObject:
   - component: {fileID: 1199170517}
   - component: {fileID: 1199170523}
   - component: {fileID: 1199170522}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}

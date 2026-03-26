@@ -3,8 +3,9 @@ using UnityEngine.AI;
 
 public class Sensible : MonoBehaviour, IStimulusReceiver
 {
-    private enum State { Wandering, Investigating }
+    private enum State { Wandering, Investigating, Chasing }
     [SerializeField] private State currentState = State.Wandering;
+    public Transform playertransform;
 
     private NavMeshAgent agent;
 
@@ -16,6 +17,12 @@ public class Sensible : MonoBehaviour, IStimulusReceiver
     [Header("Stimulus Settings")]
     [SerializeField] private float investigationDuration = 3f;
     private float investigationTimer;
+
+    [Header("Detection Settings")]
+    [SerializeField] private float detectionRadius = 4f; // Tamaño del círculo de detección
+    [SerializeField] private LayerMask playerLayer;
+    [SerializeField] private LayerMask obstacleLayer;
+
 
     private void Awake()
     {
@@ -34,7 +41,44 @@ public class Sensible : MonoBehaviour, IStimulusReceiver
             case State.Investigating:
                 HandleInvestigation();
                 break;
+            case State.Chasing:
+                HandleChasing();
+                break;
         }
+    }
+
+    private void CheckForPlayerProximity()
+    {
+        // Creamos un círculo invisible que detecta la capa del jugador
+        Collider2D playerCollider = Physics2D.OverlapCircle(transform.position, detectionRadius, playerLayer);
+
+        if (playerCollider != null)
+        {
+            Debug.Log("<color=orange>¡Jugador detectado en el área!</color>");
+            currentState = State.Chasing;
+        }
+    }
+
+    // --- LÓGICA DE PERSECUCIÓN Y ATAQUE ---
+    private void HandleChasing()
+    {
+        if (playertransform == null) return;
+
+        agent.SetDestination(playertransform.position);
+
+        // Si está lo suficientemente cerca para "tocar" al jugador
+        if (!agent.pathPending && agent.remainingDistance < 0.8f)
+        {
+            Attack();
+        }
+    }
+
+    private void Attack()
+    {
+        Debug.Log("<color=red>JUGADOR DAÑADO</color>");
+
+        // Desactivar el NPC como pediste
+        gameObject.SetActive(false);
     }
 
     // --- LÓGICA DE PATRULLA ALEATORIA ---
@@ -66,18 +110,31 @@ public class Sensible : MonoBehaviour, IStimulusReceiver
     // --- LÓGICA DE ESTÍMULO ---
     public void OnStimulusReceived(Vector2 position, StimulusType type)
     {
+        if (currentState == State.Chasing) return; // Si ya está persiguiendo, ignora luces
+
         Debug.Log($"<color=yellow>¡Estímulo {type} detectado!</color> Yendo a {position}");
+
 
         currentState = State.Investigating;
         investigationTimer = investigationDuration;
         agent.SetDestination(position);
+        
+    }
+    // --- VISUALIZACIÓN EN EL EDITOR ---
+    private void OnDrawGizmosSelected()
+    {
+        // Dibuja el círculo de detección en la ventana Scene para que puedas ajustarlo
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawWireSphere(transform.position, detectionRadius);
     }
 
     private void HandleInvestigation()
     {
+        
         // Si ya llegó al punto del estímulo
         if (!agent.pathPending && agent.remainingDistance < 0.5f)
         {
+            CheckForPlayerProximity();
             investigationTimer -= Time.deltaTime;
 
             if (investigationTimer <= 0)
@@ -87,4 +144,6 @@ public class Sensible : MonoBehaviour, IStimulusReceiver
             }
         }
     }
+
+    
 }
