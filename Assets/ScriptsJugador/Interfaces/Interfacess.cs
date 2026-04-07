@@ -15,3 +15,10 @@ public interface IHideable
     void Hide(Transform player);
     void Unhide(Transform player);
 }
+
+public interface ICorruptible
+{
+    bool IsCorrupted { get; }
+    void Corrupt();
+    void Restore();
+}

@@ -1,5 +1,5 @@
 using UnityEngine;
-public enum StimulusType { Noise, Light }
+public enum StimulusType { Noise, Light, Corruptible, Darkness }
 
 public interface IStimulusReceiver
 {

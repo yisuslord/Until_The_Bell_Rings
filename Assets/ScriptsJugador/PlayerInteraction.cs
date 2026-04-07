@@ -19,6 +19,13 @@ public class PlayerInteraction : MonoBehaviour
 
         if (hit != null)
         {
+            // Verificamos si el objeto es corruptible Y si está corrompido
+            if (hit.TryGetComponent(out ICorruptible corruptible) && corruptible.IsCorrupted)
+            {
+                Debug.Log("No puedes interactuar con esto, está corrompido.");
+                return; // Bloqueamos la interacción
+            }
+
             Debug.Log("Detectó: " + hit.name);
 
             IInteractable interactable = hit.GetComponent<IInteractable>();

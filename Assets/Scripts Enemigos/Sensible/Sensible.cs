@@ -1,35 +1,21 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-public class Sensible : MonoBehaviour, IStimulusReceiver
+public class Sensible : EnemyBase, IStimulusReceiver
 {
-    private enum State { Wandering, Investigating, Chasing }
-    [SerializeField] private State currentState = State.Wandering;
     public Transform playertransform;
 
-    private NavMeshAgent agent;
-
     [Header("Patrol Settings")]
-    [SerializeField] private float wanderRadius = 7f;
-    [SerializeField] private float waitTimeAtPoint = 2f;
-    private float wanderTimer;
+   
 
-    [Header("Stimulus Settings")]
+    /*[Header("Stimulus Settings")]
     [SerializeField] private float investigationDuration = 3f;
-    private float investigationTimer;
+    private float investigationTimer;*/
 
     [Header("Detection Settings")]
     [SerializeField] private float detectionRadius = 4f; // Tamaño del círculo de detección
     [SerializeField] private LayerMask playerLayer;
     [SerializeField] private LayerMask obstacleLayer;
-
-
-    private void Awake()
-    {
-        agent = GetComponent<NavMeshAgent>();
-        agent.updateRotation = false;
-        agent.updateUpAxis = false;
-    }
 
     private void Update()
     {
@@ -62,27 +48,25 @@ public class Sensible : MonoBehaviour, IStimulusReceiver
     // --- LÓGICA DE PERSECUCIÓN Y ATAQUE ---
     private void HandleChasing()
     {
-        if (playertransform == null) return;
+        
 
-        agent.SetDestination(playertransform.position);
-
-        // Si está lo suficientemente cerca para "tocar" al jugador
-        if (!agent.pathPending && agent.remainingDistance < 0.8f)
+        if (player != null)
         {
-            Attack();
+            MoveTo(player.position);
+            CheckAttack();
         }
     }
 
-    private void Attack()
+    /*private void Attack()
     {
         Debug.Log("<color=red>JUGADOR DAÑADO</color>");
 
         // Desactivar el NPC como pediste
         gameObject.SetActive(false);
-    }
+    }*/
 
     // --- LÓGICA DE PATRULLA ALEATORIA ---
-    private void HandleWandering()
+    /*private void HandleWandering()
     {
         if (!agent.pathPending && agent.remainingDistance < 0.5f)
         {
@@ -93,9 +77,9 @@ public class Sensible : MonoBehaviour, IStimulusReceiver
                 wanderTimer = waitTimeAtPoint;
             }
         }
-    }
+    }*/
 
-    private void SetRandomDestination()
+    /*private void SetRandomDestination()
     {
         Vector2 randomDir = Random.insideUnitCircle * wanderRadius;
         Vector3 targetPos = transform.position + new Vector3(randomDir.x, randomDir.y, 0);
@@ -105,10 +89,10 @@ public class Sensible : MonoBehaviour, IStimulusReceiver
         {
             agent.SetDestination(hit.position);
         }
-    }
+    }*/
 
     // --- LÓGICA DE ESTÍMULO ---
-    public void OnStimulusReceived(Vector2 position, StimulusType type)
+    /*public void OnStimulusReceived(Vector2 position, StimulusType type)
     {
         if (currentState == State.Chasing) return; // Si ya está persiguiendo, ignora luces
 
@@ -119,7 +103,7 @@ public class Sensible : MonoBehaviour, IStimulusReceiver
         investigationTimer = investigationDuration;
         agent.SetDestination(position);
         
-    }
+    }*/
     // --- VISUALIZACIÓN EN EL EDITOR ---
     private void OnDrawGizmosSelected()
     {
