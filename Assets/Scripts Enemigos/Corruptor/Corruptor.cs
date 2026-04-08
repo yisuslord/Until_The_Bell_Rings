@@ -10,7 +10,15 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
 
     private bool isAttempting = false;
 
+    // Dentro de CorruptorEnemy.cs
+    public override void OnStimulusReceived(Vector2 position, StimulusType type)
+    {
+        // Si el estímulo NO es corruptible, lo ignoramos por completo
+        if (type != StimulusType.Corruptible) return;
 
+        // Si sí es corruptible, ejecutamos el comportamiento base (ir a investigar)
+        base.OnStimulusReceived(position, type);
+    }
 
 
     private void Update()

@@ -1,24 +1,19 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.AI;
 
-public class Sensible : EnemyBase, IStimulusReceiver
+public class Sensible : EnemyBase
 {
-    public Transform playertransform;
-
-    [Header("Patrol Settings")]
-   
-
-    /*[Header("Stimulus Settings")]
-    [SerializeField] private float investigationDuration = 3f;
-    private float investigationTimer;*/
-
     [Header("Detection Settings")]
-    [SerializeField] private float detectionRadius = 4f; // Tamaño del círculo de detección
-    [SerializeField] private LayerMask playerLayer;
-    [SerializeField] private LayerMask obstacleLayer;
+    [SerializeField] private float detectionRadius = 4f;
+
+    [Header("Combat Settings")]
+    [SerializeField] private float cooldownTime = 3f;
+    private bool isStunned = false;
 
     private void Update()
     {
+        if (isStunned) return;
+
         switch (currentState)
         {
             case State.Wandering:
@@ -33,89 +28,58 @@ public class Sensible : EnemyBase, IStimulusReceiver
         }
     }
 
-    private void CheckForPlayerProximity()
-    {
-        // Creamos un círculo invisible que detecta la capa del jugador
-        Collider2D playerCollider = Physics2D.OverlapCircle(transform.position, detectionRadius, playerLayer);
-
-        if (playerCollider != null)
-        {
-            Debug.Log("<color=orange>¡Jugador detectado en el área!</color>");
-            currentState = State.Chasing;
-        }
-    }
-
-    // --- LÓGICA DE PERSECUCIÓN Y ATAQUE ---
     private void HandleChasing()
     {
-        
-
-        if (player != null)
+        if (PlayerController.Instance != null)
         {
-            MoveTo(player.position);
+            // ðŸ”¥ LA SOLUCIÃ“N: Revisamos si el jugador tiene el script y estÃ¡ escondido
+            PlayerHide playerHide = PlayerController.Instance.GetComponent<PlayerHide>();
+
+            if (playerHide != null && playerHide.IsHidden)
+            {
+                Debug.Log("El jugador se escondiÃ³. Sensible se rinde y vuelve a patrullar.");
+                currentState = State.Wandering; // Lo regresamos a patrullar
+                return; // Cortamos aquÃ­ para que no ejecute el MoveTo ni el CheckAttack
+            }
+
+            // 1. Se mueve hacia el jugador tranquilamente (pueden superponerse)
+            MoveTo(PlayerController.Instance.transform.position);
+
+            // 2. En cada frame, lanza el radar para ver si ya lo estÃ¡ tocando
             CheckAttack();
         }
     }
 
-    /*private void Attack()
+    private void CheckAttack()
     {
-        Debug.Log("<color=red>JUGADOR DAÑADO</color>");
+        // El OverlapCircle funciona perfecto aunque la matriz de colisiones estÃ© apagada
+        // Solo necesita que la variable 'playerLayer' estÃ© bien asignada en el inspector
+        Collider2D hit = Physics2D.OverlapCircle(transform.position, attackDistance, playerLayer);
 
-        // Desactivar el NPC como pediste
-        gameObject.SetActive(false);
-    }*/
-
-    // --- LÓGICA DE PATRULLA ALEATORIA ---
-    /*private void HandleWandering()
-    {
-        if (!agent.pathPending && agent.remainingDistance < 0.5f)
+        if (hit != null && hit.TryGetComponent(out IDamageable damageable))
         {
-            wanderTimer -= Time.deltaTime;
-            if (wanderTimer <= 0)
-            {
-                SetRandomDestination();
-                wanderTimer = waitTimeAtPoint;
-            }
+            damageable.TakeDamage(attackDamage);
+            Debug.Log("<color=red>Â¡Sensible golpeÃ³ al jugador!</color>");
+
+            StartCoroutine(AttackCooldown());
         }
-    }*/
+    }
 
-    /*private void SetRandomDestination()
+    private System.Collections.IEnumerator AttackCooldown()
     {
-        Vector2 randomDir = Random.insideUnitCircle * wanderRadius;
-        Vector3 targetPos = transform.position + new Vector3(randomDir.x, randomDir.y, 0);
+        isStunned = true;
+        agent.isStopped = true;
 
-        // Verificamos que el punto esté dentro del NavMesh
-        if (NavMesh.SamplePosition(targetPos, out NavMeshHit hit, wanderRadius, 1))
-        {
-            agent.SetDestination(hit.position);
-        }
-    }*/
+        Debug.Log($"Sensible descansando por {cooldownTime} segundos...");
+        yield return new WaitForSeconds(cooldownTime);
 
-    // --- LÓGICA DE ESTÍMULO ---
-    /*public void OnStimulusReceived(Vector2 position, StimulusType type)
-    {
-        if (currentState == State.Chasing) return; // Si ya está persiguiendo, ignora luces
-
-        Debug.Log($"<color=yellow>¡Estímulo {type} detectado!</color> Yendo a {position}");
-
-
-        currentState = State.Investigating;
-        investigationTimer = investigationDuration;
-        agent.SetDestination(position);
-        
-    }*/
-    // --- VISUALIZACIÓN EN EL EDITOR ---
-    private void OnDrawGizmosSelected()
-    {
-        // Dibuja el círculo de detección en la ventana Scene para que puedas ajustarlo
-        Gizmos.color = Color.magenta;
-        Gizmos.DrawWireSphere(transform.position, detectionRadius);
+        isStunned = false;
+        agent.isStopped = false;
+        currentState = State.Wandering; // Vuelve a patrullar
     }
 
     private void HandleInvestigation()
     {
-        
-        // Si ya llegó al punto del estímulo
         if (!agent.pathPending && agent.remainingDistance < 0.5f)
         {
             CheckForPlayerProximity();
@@ -123,11 +87,24 @@ public class Sensible : EnemyBase, IStimulusReceiver
 
             if (investigationTimer <= 0)
             {
-                Debug.Log("Investigación terminada. Volviendo a patrulla.");
                 currentState = State.Wandering;
             }
         }
     }
 
-    
+    private void CheckForPlayerProximity()
+    {
+        Collider2D hit = Physics2D.OverlapCircle(transform.position, detectionRadius, playerLayer);
+        if (hit != null) currentState = State.Chasing;
+    }
+
+    // Esto te ayudarÃ¡ a ver la distancia de ataque real en la escena (un cÃ­rculo rojo)
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawWireSphere(transform.position, detectionRadius);
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, attackDistance);
+    }
 }

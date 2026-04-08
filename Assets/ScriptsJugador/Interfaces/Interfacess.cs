@@ -22,3 +22,8 @@ public interface ICorruptible
     void Corrupt();
     void Restore();
 }
+
+public interface IDamageable
+{
+    void TakeDamage(int amount);
+}
