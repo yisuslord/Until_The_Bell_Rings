@@ -1,18 +1,24 @@
 using UnityEngine;
 
-public class Manifestado : EnemyBase 
+public class Manifestado : EnemyBase
 {
     protected override void Awake()
     {
         base.Awake();
-        // En cuanto spawnea, su único objetivo es el jugador
+        currentState = State.Chasing;
     }
 
     private void Update()
     {
-        if (player != null)
+
+        if (PlayerController.Instance != null)
         {
-            MoveTo(player.position);
+            Transform target = PlayerController.Instance.transform;
+
+       
+            agent.stoppingDistance = attackDistance;
+
+            MoveTo(target.position);
             CheckAttack();
         }
     }
