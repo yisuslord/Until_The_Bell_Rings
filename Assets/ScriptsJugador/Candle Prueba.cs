@@ -1,21 +1,41 @@
 using UnityEngine;
 using System.Collections;
 
-
 public class Candle : MonoBehaviour, IInteractable, ICorruptible
 {
-    private bool isLit = false;
-    private bool isCorrupted = false; // Implementación de ICorruptible
+    [Header("Initial State")]
+    [SerializeField] private bool startLit = false; // El "Switch" en el Inspector
+
+    [Header("Settings")]
     [SerializeField] private float lightRadius = 8f;
-    [SerializeField] private LayerMask enemyLayer; // Configura esto a la capa "Enemies"
-    [SerializeField] private float corruptionDuration = 60f; // 1 minuto por defecto
+    [SerializeField] private LayerMask enemyLayer;
+    [SerializeField] private float corruptionDuration = 60f;
+
+    private bool isLit = false;
+    private bool isCorrupted = false;
+    private Altar altar;
+
     public bool IsCorrupted => isCorrupted;
+    public bool IsLit => isLit;
+
+    private IEnumerator Start()
+    {
+        altar = Object.FindFirstObjectByType<Altar>();
+
+        // Esperamos un frame para que los enemigos estén listos
+        yield return null;
+
+        if (startLit)
+        {
+            LightCandle();
+        }
+    }
 
     public void Interact()
     {
         if (isCorrupted)
         {
-            Debug.Log("La vela está impregnada de malicia y no puede encenderse.");
+            Debug.Log("La vela está impregnada de malicia.");
             return;
         }
         if (!isLit)
@@ -27,9 +47,14 @@ public class Candle : MonoBehaviour, IInteractable, ICorruptible
     private void LightCandle()
     {
         isLit = true;
-        Debug.Log("Vela Encendida");
+        Debug.Log($"{gameObject.name}: Encendida");
+
+        NotifyAltar();
+
+        // Emitimos estímulos: 
+        // 1. Luz para el Sensible.
+        // 2. Corruptible para que el Corruptor sepa que puede atacarla.
         EmitStimulus(StimulusType.Light);
-        // También emitimos un estímulo para que el Corruptor sepa que esta vela es un objetivo
         EmitStimulus(StimulusType.Corruptible);
     }
 
@@ -38,17 +63,22 @@ public class Candle : MonoBehaviour, IInteractable, ICorruptible
         if (isCorrupted) return;
 
         isCorrupted = true;
-        isLit = false; // Apaga la vela
-        Debug.Log("<color=purple>Vela Corrompida por el NPC</color>");
+        isLit = false;
+        Debug.Log("<color=purple>Vela Corrompida</color>");
 
-        // Podrías cambiar el color del sprite aquí a morado
+        NotifyAltar();
         StartCoroutine(RestoreTimer());
     }
 
     public void Restore()
     {
         isCorrupted = false;
-        Debug.Log("La vela ya no está corrompida.");
+        NotifyAltar();
+    }
+
+    private void NotifyAltar()
+    {
+        if (altar != null) altar.UpdateAltarHealth();
     }
 
     private IEnumerator RestoreTimer()

@@ -6,37 +6,66 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
     [Range(0, 100)]
     [SerializeField] private float successChance = 50f; // 50% de probabilidad por defecto
     [SerializeField] private float waitBeforeAttempt = 4f; // Tiempo que "tarda" en corromper
-    
+
+    [Header("Scanning Settings")]
+    [SerializeField] private float scanInterval = 2f; // Tiempo entre escaneos
+    private float scanTimer; // El contador interno
+
+    [Header("Memory")]
+    private ICorruptible lastAttemptedObject; // Guardamos el último objeto que intentamos corromper
+
 
     private bool isAttempting = false;
+
+
 
     // Dentro de CorruptorEnemy.cs
     public override void OnStimulusReceived(Vector2 position, StimulusType type)
     {
-        // Si el estímulo NO es corruptible, lo ignoramos por completo
+        // 1. Si no es corruptible, ignorar.
         if (type != StimulusType.Corruptible) return;
 
-        // Si sí es corruptible, ejecutamos el comportamiento base (ir a investigar)
+        // 2. FILTRO DE MEMORIA: Buscamos qué objeto hay en esa posición
+        Collider2D hit = Physics2D.OverlapPoint(position);
+        if (hit != null && hit.TryGetComponent(out ICorruptible target))
+        {
+            // Si el objeto en esa posición es el que acabamos de fallar, BLOQUEAMOS el estímulo
+            if (target == lastAttemptedObject)
+            {
+                // Debug.Log("Ignorando estímulo de vela fallida recientemente.");
+                return;
+            }
+        }
+
+        // 3. Solo si pasó los filtros, dejamos que la base lo mande a investigar
         base.OnStimulusReceived(position, type);
     }
 
 
     private void Update()
     {
-        // Solo si no estamos intentando corromper, procesamos los estados normales
-        if (!isAttempting)
+        if (isAttempting) return; // Si está trabajando, no hace nada más
+
+        if (currentState == State.Wandering)
         {
-            if (currentState == State.Wandering)
+            HandleWandering();
+
+            // Escaneo de "radar" constante
+            scanTimer -= Time.deltaTime;
+            if (scanTimer <= 0)
             {
-                HandleWandering();
+                PassiveScan();
+                scanTimer = scanInterval;
             }
-            else if (currentState == State.Investigating)
+        }
+        else if (currentState == State.Investigating)
+        {
+            // Si ya llegó a la vela...
+            if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance + 0.3f)
             {
-                // Comprobamos si ya llegamos al punto del estímulo
-                if (!agent.pathPending && agent.remainingDistance < 0.7f && agent.hasPath)
-                {
-                    StartCoroutine(CorruptionProcess());
-                }
+                // Iniciamos el proceso y nos aseguramos de no entrar aquí dos veces
+                isAttempting = true;
+                StartCoroutine(CorruptionProcess());
             }
         }
     }
@@ -46,27 +75,28 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
     {
         isAttempting = true;
         agent.isStopped = true;
-        // Cambiamos el estado a Investigating explícitamente para que nada más lo mueva
-        currentState = State.Investigating;
 
-        Debug.Log("Iniciando espera de " + waitBeforeAttempt + " segundos...");
+        // Detectamos qué objeto tenemos enfrente justo ahora para guardarlo en memoria
+        Collider2D hit = Physics2D.OverlapCircle(transform.position, 1.5f);
+        if (hit != null && hit.TryGetComponent(out ICorruptible target))
+        {
+            lastAttemptedObject = target; // Guardamos la interfaz, no el collider
+        }
 
+        Debug.Log("Iniciando intento de sabotaje...");
         yield return new WaitForSeconds(waitBeforeAttempt);
 
-        // Si llegamos aquí, la corrutina sigue viva
-        Debug.Log("Espera terminada. Calculando probabilidad...");
-
         float roll = Random.Range(0f, 100f);
-        Debug.Log($"Roll: {roll} / SuccessChance: {successChance}");
 
         if (roll <= successChance)
         {
             ExecuteCorruption();
-            Debug.Log("kjdckj");
+            // Si tiene éxito, podemos limpiar la memoria porque el objeto ya está desactivado
+            lastAttemptedObject = null;
         }
         else
         {
-            Debug.Log("<color=cyan>¡El Corruptor falló en su intento!</color>");
+            Debug.Log("<color=cyan>¡Falló! Recordaré este objeto para no repetir de inmediato.</color>");
             FinishAction();
         }
     }
@@ -110,7 +140,51 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
     {
         isAttempting = false;
         agent.isStopped = false;
+
+        // 1. FUNDAMENTAL: Borramos la ruta actual. 
+        // Si no hacemos esto, el agente cree que su destino sigue siendo la vela donde está parado.
+        agent.ResetPath();
+
+        // 2. Volvemos al estado inicial
         currentState = State.Wandering;
-        //gameObject.SetActive(false);
+
+        Debug.Log("<color=white>Acción terminada. Volviendo a patrullar...</color>");
+
+        // 3. Le damos un pequeño empujón para que no se quede quieto
+        // Esto lo obliga a buscar un nuevo punto de patrulla inmediatamente
+        Invoke("ForceNewWanderPoint", 0.1f);
+    }
+
+    private void ForceNewWanderPoint()
+    {
+        if (currentState == State.Wandering)
+        {
+            HandleWandering(); // Obligamos a elegir un destino de patrulla
+        }
+    }
+    private void PassiveScan()
+    {
+        Collider2D[] objects = Physics2D.OverlapCircleAll(transform.position, 15f);
+
+        foreach (var obj in objects)
+        {
+            if (obj.TryGetComponent(out ICorruptible corruptibleTarget))
+            {
+                // Verificamos si es una vela para ver si está encendida
+                if (obj.TryGetComponent(out Candle vela))
+                {
+                    // REGLA DE ORO: 
+                    // 1. Debe estar encendida.
+                    // 2. No debe estar corrompida.
+                    // 3. NO DEBE SER LA MISMA QUE ACABAMOS DE INTENTAR (si fallamos).
+                    if (vela.IsLit && !vela.IsCorrupted && corruptibleTarget != lastAttemptedObject)
+                    {
+                        Debug.Log($"¡Vela nueva detectada! Yendo a {obj.name}");
+                        OnStimulusReceived(obj.transform.position, StimulusType.Corruptible);
+                        return;
+                    }
+                }
+            }
+        }
     }
 }
