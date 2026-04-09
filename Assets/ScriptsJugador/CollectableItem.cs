@@ -38,9 +38,16 @@ public class CollectibleItem : MonoBehaviour, IInteractable, ICorruptible
             return;
         }
 
-        // Si no está corrompido, se añade al inventario y desaparece
+        // Si no está corrompido, se añade al inventario y oculta de la escena
         Object.FindFirstObjectByType<PlayerInventory>().AddItem(itemName);
-        Destroy(gameObject);
+
+        // Se anade el objeto al inventario del jugador y se desactiva de la escena
+        if (Object.FindFirstObjectByType<Inventario>().addItem(gameObject.GetComponent<IInventoryItem>()))
+        {
+            gameObject.SetActive(false);
+        }
+
+        
     }
 
     public void Corrupt()
