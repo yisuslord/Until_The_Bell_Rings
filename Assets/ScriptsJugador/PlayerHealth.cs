@@ -28,6 +28,6 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     {
         Debug.Log("El jugador ha muerto");
         OnPlayerDeath?.Invoke();
-        // Aquí podrías desactivar el movimiento o recargar escena
+        
     }
 }

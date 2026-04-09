@@ -251,7 +251,7 @@ MonoBehaviour:
   playerLayer:
     serializedVersion: 2
     m_Bits: 256
-  investigationDuration: 3
+  investigationDuration: 2
   detectionRadius: 4
   cooldownTime: 3
 --- !u!58 &6616431
@@ -481,7 +481,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &144959548
 MonoBehaviour:
   m_ObjectHideFlags: 0

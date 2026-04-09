@@ -32,28 +32,27 @@ public class Sensible : EnemyBase
     {
         if (PlayerController.Instance != null)
         {
-            // 🔥 LA SOLUCIÓN: Revisamos si el jugador tiene el script y está escondido
+           
             PlayerHide playerHide = PlayerController.Instance.GetComponent<PlayerHide>();
 
             if (playerHide != null && playerHide.IsHidden)
             {
                 Debug.Log("El jugador se escondió. Sensible se rinde y vuelve a patrullar.");
                 currentState = State.Wandering; // Lo regresamos a patrullar
-                return; // Cortamos aquí para que no ejecute el MoveTo ni el CheckAttack
+                return; 
             }
 
-            // 1. Se mueve hacia el jugador tranquilamente (pueden superponerse)
+            
             MoveTo(PlayerController.Instance.transform.position);
 
-            // 2. En cada frame, lanza el radar para ver si ya lo está tocando
+            
             CheckAttack();
         }
     }
 
     private void CheckAttack()
     {
-        // El OverlapCircle funciona perfecto aunque la matriz de colisiones esté apagada
-        // Solo necesita que la variable 'playerLayer' esté bien asignada en el inspector
+        
         Collider2D hit = Physics2D.OverlapCircle(transform.position, attackDistance, playerLayer);
 
         if (hit != null && hit.TryGetComponent(out IDamageable damageable))
@@ -75,9 +74,19 @@ public class Sensible : EnemyBase
 
         isStunned = false;
         agent.isStopped = false;
-        currentState = State.Wandering; // Vuelve a patrullar
+        currentState = State.Wandering; 
     }
+    public override void OnStimulusReceived(Vector2 position, StimulusType type)
+    {
+        // Si el estímulo es de un objeto corruptible, el Sensible se hace el sordo y lo ignora
+        if (type == StimulusType.Corruptible)
+        {
+            return;
+        }
 
+        // Si es cualquier otro estímulo (ruido del jugador, pasos, etc.), hace el comportamiento normal (Investigar)
+        base.OnStimulusReceived(position, type);
+    }
     private void HandleInvestigation()
     {
         if (!agent.pathPending && agent.remainingDistance < 0.5f)
@@ -98,7 +107,6 @@ public class Sensible : EnemyBase
         if (hit != null) currentState = State.Chasing;
     }
 
-    // Esto te ayudará a ver la distancia de ataque real en la escena (un círculo rojo)
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.magenta;

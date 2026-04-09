@@ -73,10 +73,10 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
 
     private void ExecuteCorruption()
     {
-        // Aumentamos un poco el radio para ser más generosos
+        
         float scanRadius = 1.5f;
 
-        // Escaneamos TODO en ese radio para debuguear
+       
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, scanRadius);
 
         Debug.Log($"ExecuteCorruption: Se encontraron {hits.Length} colisionadores cerca.");
@@ -84,7 +84,7 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
         bool foundTarget = false;
         foreach (var hit in hits)
         {
-            // Ignoramos si el colisionador es el del propio NPC
+           
             if (hit.gameObject == gameObject) continue;
 
             Debug.Log($"Analizando objeto: {hit.name}");
@@ -94,7 +94,7 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
                 target.Corrupt();
                 Debug.Log("<color=purple>¡SABOTAJE EXITOSO en " + hit.name + "!</color>");
                 foundTarget = true;
-                break; // Ya encontramos el objetivo, no hace falta seguir
+                break; 
             }
         }
 
@@ -110,8 +110,6 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
     {
         isAttempting = false;
         agent.isStopped = false;
-        // Aquí decides: ¿Desaparece tras un intento o vuelve a patrullar?
-        // De momento lo desactivamos para que no lo intente infinitamente en el mismo frame
         currentState = State.Wandering;
         //gameObject.SetActive(false);
     }

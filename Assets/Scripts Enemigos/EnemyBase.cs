@@ -34,13 +34,11 @@ public abstract class EnemyBase : MonoBehaviour, IStimulusReceiver
         if (agent.isOnNavMesh) agent.SetDestination(destination);
     }
 
-    // Lo hacemos PROTECTED VIRTUAL para que sus hijos puedan usarlo o cambiarlo.
-    // Usamos el Singleton (PlayerController.Instance) para saber dónde está el jugador.
     protected virtual void CheckAttack()
     {
         if (PlayerController.Instance == null) return;
 
-        // Calculamos la distancia real entre este enemigo y el jugador
+        
         float distanceToPlayer = Vector2.Distance(transform.position, PlayerController.Instance.transform.position);
 
         if (!agent.pathPending && distanceToPlayer <= attackDistance)
@@ -49,8 +47,7 @@ public abstract class EnemyBase : MonoBehaviour, IStimulusReceiver
         }
     }
 
-    // El ataque por defecto: Golpea y desaparece (ideal para el Manifestado/Corruptor)
-    // El Sensible NO usará esto, porque él usa su propio Hitbox.
+    
     protected virtual void PerformAttack()
     {
         Collider2D hit = Physics2D.OverlapCircle(transform.position, attackDistance, playerLayer);
@@ -60,7 +57,7 @@ public abstract class EnemyBase : MonoBehaviour, IStimulusReceiver
             damageable.TakeDamage(attackDamage);
             Debug.Log($"<color=red>JUGADOR DAÑADO por {gameObject.name}</color>");
 
-            gameObject.SetActive(false); // Por defecto, desaparecen al golpear
+            gameObject.SetActive(false); 
         }
     }
 
