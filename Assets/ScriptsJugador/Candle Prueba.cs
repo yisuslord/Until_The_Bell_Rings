@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 
 public class Candle : MonoBehaviour, IInteractable, ICorruptible
@@ -11,6 +11,12 @@ public class Candle : MonoBehaviour, IInteractable, ICorruptible
     [SerializeField] private LayerMask enemyLayer;
     [SerializeField] private float corruptionDuration = 60f;
 
+    // 🔥 NUEVO: Configuración visual (Solo Encendido y Apagado)
+    [Header("Visuals")]
+    [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private Color litColor = Color.white; // Color cuando está prendida
+    [SerializeField] private Color unlitColor = Color.gray; // Color cuando está apagada
+
     private bool isLit = false;
     private bool isCorrupted = false;
     private Altar altar;
@@ -18,11 +24,20 @@ public class Candle : MonoBehaviour, IInteractable, ICorruptible
     public bool IsCorrupted => isCorrupted;
     public bool IsLit => isLit;
 
+    private void Awake()
+    {
+        // Buscamos el componente automáticamente por si olvidas asignarlo
+        if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
+    }
+
     private IEnumerator Start()
     {
         altar = Object.FindFirstObjectByType<Altar>();
 
-        // Esperamos un frame para que los enemigos est�n listos
+        // Establecemos el color inicial
+        UpdateColor();
+
+        // Esperamos un frame para que los enemigos estén listos
         yield return null;
 
         if (startLit)
@@ -33,13 +48,10 @@ public class Candle : MonoBehaviour, IInteractable, ICorruptible
 
     public void Interact()
     {
-        if (isCorrupted)
-        {
-            Debug.Log("La vela est� impregnada de malicia.");
-            return;
-        }
+        // Si está apagada, la prendemos y limpiamos cualquier estado de corrupción
         if (!isLit)
         {
+            isCorrupted = false;
             LightCandle();
         }
     }
@@ -49,9 +61,10 @@ public class Candle : MonoBehaviour, IInteractable, ICorruptible
         isLit = true;
         Debug.Log($"{gameObject.name}: Encendida");
 
+        UpdateColor(); // 🔥 Cambia a color Encendida
         NotifyAltar();
 
-        // Emitimos est�mulos: 
+        // Emitimos estímulos: 
         // 1. Luz para el Sensible.
         // 2. Corruptible para que el Corruptor sepa que puede atacarla.
         EmitStimulus(StimulusType.Light);
@@ -64,8 +77,9 @@ public class Candle : MonoBehaviour, IInteractable, ICorruptible
 
         isCorrupted = true;
         isLit = false;
-        Debug.Log("<color=purple>Vela Corrompida</color>");
+        Debug.Log("<color=purple>Vela apagada por el Corruptor</color>");
 
+        UpdateColor(); // 🔥 Cambia a color Apagada
         NotifyAltar();
         StartCoroutine(RestoreTimer());
     }
@@ -78,7 +92,7 @@ public class Candle : MonoBehaviour, IInteractable, ICorruptible
 
     private void NotifyAltar()
     {
-        if (altar != null) altar.UpdateAltarHealth();
+        if (altar != null) altar.NotifyCandleChanged();
     }
 
     private IEnumerator RestoreTimer()
@@ -94,6 +108,22 @@ public class Candle : MonoBehaviour, IInteractable, ICorruptible
         {
             if (hit.TryGetComponent(out IStimulusReceiver receiver))
                 receiver.OnStimulusReceived(transform.position, type);
+        }
+    }
+
+    // 🔥 NUEVO: Lógica de colores simplificada
+    private void UpdateColor()
+    {
+        if (spriteRenderer == null) return;
+
+        if (isLit)
+        {
+            spriteRenderer.color = litColor;
+        }
+        else
+        {
+            // Tanto si está apagada normal como si la apagó el Corruptor, usa el mismo color
+            spriteRenderer.color = unlitColor;
         }
     }
 }

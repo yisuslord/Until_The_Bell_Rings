@@ -1,44 +1,84 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
-public class Altar : MonoBehaviour
+public class Altar : MonoBehaviour, IDamageable
 {
     [Header("Altar Stats")]
-    [SerializeField] private float currentHealth;
-    [SerializeField] private float maxHealth;
+    [SerializeField] private int currentHealth = 100;
+    [SerializeField] private int maxHealth = 100;
 
-    [Header("Detection Settings")]
+    [Header("Attack Settings")]
+    [SerializeField] private float drainInterval = 5f; // Cada cuántos segundos pierde vida
+    [SerializeField] private int damagePerUnlitCandle = 2; // Cuánto daño hace cada vela apagada
+
     private List<Candle> allCandlesInScene = new List<Candle>();
+    private bool isGameOver = false;
 
     private void Awake()
     {
         Candle[] foundCandles = Object.FindObjectsByType<Candle>(FindObjectsSortMode.None);
         allCandlesInScene.AddRange(foundCandles);
-        maxHealth = allCandlesInScene.Count;
-
-        // Quitamos el UpdateAltarHealth de aquí para evitar el check instantáneo
+        currentHealth = maxHealth;
     }
 
     private void Start()
     {
-        // Ejecutamos el primer chequeo un frame después o al final del Start
-        UpdateAltarHealth();
+        StartCoroutine(DrainHealthRoutine());
+        UIManager.Instance.UpdateAltarHealth(currentHealth, maxHealth);
+        UpdateCandlesUI();
     }
 
-    public void UpdateAltarHealth()
+    private IEnumerator DrainHealthRoutine()
     {
-        int activeLights = 0;
-        foreach (Candle candle in allCandlesInScene)
+        while (!isGameOver)
         {
-            if (candle.IsLit && !candle.IsCorrupted) activeLights++;
+            yield return new WaitForSeconds(drainInterval);
+
+            int unlitCount = 0;
+            foreach (Candle candle in allCandlesInScene)
+            {
+                if (!candle.IsLit || candle.IsCorrupted) unlitCount++;
+            }
+
+            if (unlitCount > 0)
+            {
+                int totalDamage = unlitCount * damagePerUnlitCandle;
+                TakeDamage(totalDamage);
+                Debug.Log($"<color=orange>El altar pierde {totalDamage} de vida por la oscuridad.</color>");
+            }
         }
+    }
 
-        currentHealth = activeLights;
-        Debug.Log($"<color=cyan>Altar Salud: {currentHealth}/{maxHealth}</color>");
+    // El Altar avisa a la UI cuando una vela cambia de estado
+    public void NotifyCandleChanged()
+    {
+        UpdateCandlesUI();
+    }
 
-        // Solo activamos el Game Over si ya pasó el arranque inicial
-        // Y verificamos que realmente no haya luces
-        if (currentHealth <= 0 && maxHealth > 0 && Time.timeSinceLevelLoad > 0.1f)
+    private void UpdateCandlesUI()
+    {
+        int lit = 0;
+        int unlit = 0;
+        foreach (Candle c in allCandlesInScene)
+        {
+            if (c.IsLit && !c.IsCorrupted) lit++;
+            else unlit++;
+        }
+        UIManager.Instance.UpdateCandleCount(lit, unlit);
+    }
+
+    // Aquí recibe el golpe físico del Asechador o el daño por oscuridad
+    public void TakeDamage(int amount)
+    {
+        if (isGameOver) return;
+
+        currentHealth -= amount;
+        if (currentHealth < 0) currentHealth = 0;
+
+        UIManager.Instance.UpdateAltarHealth(currentHealth, maxHealth);
+
+        if (currentHealth <= 0)
         {
             TriggerGameOver();
         }
@@ -46,11 +86,8 @@ public class Altar : MonoBehaviour
 
     private void TriggerGameOver()
     {
+        isGameOver = true;
         Debug.Log("<color=red>EL ALTAR SE HA EXTINGUIDO. LA OSCURIDAD REINA.</color>");
-
-        // Detenemos el tiempo (puedes cambiar esto por tu lógica de UI de derrota)
         Time.timeScale = 0f;
-
-        // Nota: Aquí podrías disparar un evento para que el jugador deje de moverse
     }
 }
