@@ -30,4 +30,17 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         OnPlayerDeath?.Invoke();
         
     }
+
+    public void Heal(int amount)
+    {
+        currentHealth += amount;
+
+        // Si la curación supera el máximo, la igualamos al máximo
+        if (currentHealth > maxHealth)
+        {
+            currentHealth = maxHealth;
+        }
+
+        Debug.Log($"Jugador curado. Vida actual: {currentHealth}");
+    }
 }

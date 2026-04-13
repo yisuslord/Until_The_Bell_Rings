@@ -1,8 +1,5 @@
-using UnityEngine;
-
 public interface IInventoryItem
 {
-    public void Action();
-    public void Added();
-    public void Removed();
+    string ItemName { get; }
+    void Use(); // La acción principal (Curar, Escudo, Onda)
 }

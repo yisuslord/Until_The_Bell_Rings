@@ -93,4 +93,53 @@ public abstract class EnemyBase : MonoBehaviour, IStimulusReceiver
         investigationTimer = investigationDuration;
         agent.SetDestination(position);
     }
+
+    public virtual void GetRepelled(Vector2 shockwaveSource, float force)
+    {
+        Debug.Log($"{gameObject.name} ha sido repelido por una onda sagrada.");
+
+        // 1. Calculamos la dirección opuesta a la onda
+        Vector2 pushDirection = ((Vector2)transform.position - shockwaveSource).normalized;
+
+        // 2. Paramos al agente para que no intente luchar contra el empuje
+        if (agent != null)
+        {
+            agent.isStopped = true;
+            agent.velocity = pushDirection * force; // Aplicamos un impulso físico inicial
+        }
+
+        // 3. Cambiamos el estado a Wandering para que "olvide" su persecución actual
+        currentState = State.Wandering;
+
+        // 4. Hacemos que recupere el control después de un segundo
+        Invoke("RecoverFromPush", 1.5f);
+    }
+
+    protected virtual void RecoverFromPush()
+    {
+        if (agent != null)
+        {
+            agent.isStopped = false;
+            agent.ResetPath(); // Obligamos a recalcular ruta
+        }
+    }
+
+    public virtual void Die()
+    {
+        Debug.Log($"{gameObject.name} ha sido desterrado.");
+
+        // Aquí disparamos el efecto visual de "muerte"
+        // Si tienes un script que maneje partículas, lo llamamos aquí
+        PlayDeathEffect();
+
+        // En lugar de destruir el objeto (que causa lag), lo desactivamos
+        gameObject.SetActive(false);
+    }
+
+    protected void PlayDeathEffect()
+    {
+        // Buscamos un manejador de efectos en la escena o usamos uno local
+        // Por ahora, un simple log, pero aquí irá la lógica de partículas
+        Debug.Log("Partículas de ceniza apareciendo...");
+    }
 }

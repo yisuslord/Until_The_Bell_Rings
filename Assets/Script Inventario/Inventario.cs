@@ -1,124 +1,120 @@
 using System.Collections.Generic;
-using UnityEditorInternal.Profiling.Memory.Experimental;
 using UnityEngine;
 
 public class Inventario : MonoBehaviour
 {
+    [Header("Settings")]
+    public BaseItem defaultItem; // Cambiado a BaseItem para consistencia
+    public int maxItems = 5;
 
-    public ItemNull defaultItem; // Item por defecto en el inventario - Placeholder en el inventario
-
-    public int maxItems = 5;    // Cantidad maxima de items en el inventario
-
-    public int actItemIndex = 0;    // Index del Item activo inicializado en 0
-    public IInventoryItem actItem;  // Item Activo
-
-    public List<IInventoryItem> Inventory;  // Lista de Items en el Inventario
+    [Header("Current Status")]
+    public int actItemIndex = 0;
+    public IInventoryItem actItem;
+    public List<IInventoryItem> Inventory;
 
     void Start()
     {
-        Inventory = new List<IInventoryItem>(); // Al iniciar se crea la lista vacía
-        populateInventory();    // Se llena el inventario de items nulos
-        actItem= Inventory[actItemIndex];
+        Inventory = new List<IInventoryItem>();
+        PopulateInventory();
+        actItem = Inventory[actItemIndex];
     }
 
-    // Update is called once per frame
     void Update()
     {
-
-        // Se asignan a los botones de numero su item correspondiente en el inventario
+        // Selección de items (Teclas 1-5)
         for (int i = 0; i < maxItems; i++)
         {
             if (Input.GetKeyDown(KeyCode.Alpha1 + i))
             {
-                chooseItem(i);
+                ChooseItem(i);
             }
         }
 
-        // Se asigna a "Q" la accion del objeto activo
+        // Usar objeto activo (Tecla Q)
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            actItem.Action();
-            Debug.Log("Action " + actItemIndex);
+            UseActiveItem();
         }
 
-        // Se asigna a "R" el remover el objeto activo del inventario
+        // Soltar objeto activo (Tecla R)
         if (Input.GetKeyDown(KeyCode.R))
         {
-            removeItem(actItem);
-            actItem = Inventory[actItemIndex];
+            RemoveItem(actItem);
         }
-
     }
 
-    public void chooseItem(int index)
+    private void UseActiveItem()
+    {
+        // Si el objeto actual no es el vacío/default
+        if (actItem != null && actItem != (IInventoryItem)defaultItem)
+        {
+            actItem.Use(); // Llamamos al Use() de BaseItem
+
+            // Si es un consumible (como la poción), lo eliminamos tras usarlo
+            RemoveItem(actItem);
+            Debug.Log($"Item en slot {actItemIndex} usado y consumido.");
+        }
+    }
+
+    public void ChooseItem(int index)
     {
         if (index >= Inventory.Count) return;
-
         actItemIndex = index;
         actItem = Inventory[index];
-
-        Debug.Log("Active Item is at index " + actItemIndex);
-
+        Debug.Log("Item activo: Slot " + actItemIndex);
     }
 
     public bool addItem(IInventoryItem newItem)
     {
-        if (newItem == actItem) return false;
-
-
-        for (int index = 0; index < Inventory.Count; index++)
+        for (int i = 0; i < Inventory.Count; i++)
         {
-            if (Inventory[index] == defaultItem)
+            // Buscamos un slot que tenga el item por defecto
+            if (Inventory[i] == (IInventoryItem)defaultItem)
             {
-
-
-                // Se obtiene el mb del item nuevo para poder tener el GameObject
                 MonoBehaviour itemMB = newItem as MonoBehaviour;
-                // Se anade el item como hijo del player, por si se requiere su uso posterior
-                itemMB.gameObject.transform.SetParent(gameObject.transform);
+                itemMB.gameObject.transform.SetParent(transform);
+                itemMB.gameObject.SetActive(false); // Nos aseguramos de que no se vea en el mundo
 
-                // Se anade el item al inventario
-                Inventory[index] = newItem;
-                newItem.Added();
-
-                // Se establece como el objeto activo
-                actItemIndex = index;
-                actItem = Inventory[index];
-
-                Debug.Log("New Item in Inventory. Pos: " + index);
-
-
-
+                Inventory[i] = newItem;
+                ChooseItem(i); // Lo seleccionamos automáticamente al recogerlo
                 return true;
             }
         }
-
-        Debug.Log("Full Inventory");
+        Debug.Log("Inventario lleno");
         return false;
     }
 
-    public void removeItem(IInventoryItem oldItem)
+    public void RemoveItem(IInventoryItem oldItem)
     {
+        if (oldItem == (IInventoryItem)defaultItem) return;
+
         int index = Inventory.IndexOf(oldItem);
+        if (index == -1) return;
 
-        // Se obtiene el mb del item nuevo para poder tener el GameObject
         MonoBehaviour itemMB = oldItem as MonoBehaviour;
-        // Se elimina el objeto de los hijos del jugador
-        itemMB.gameObject.transform.SetParent(null);
 
-        oldItem.Removed();
+        // Si lo soltamos con R (no por uso), lo devolvemos al mundo
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            itemMB.gameObject.transform.SetParent(null);
+            itemMB.gameObject.SetActive(true);
+            itemMB.gameObject.transform.position = transform.position + (Vector3)Random.insideUnitCircle;
+        }
+        else
+        {
+            // Si se usó (Q), podrías destruirlo o simplemente dejarlo desactivado
+            // Destroy(itemMB.gameObject); 
+        }
 
-        Inventory[index] = defaultItem;
-
-        Debug.Log("Objeto Removido del inventario en " + index);
+        Inventory[index] = (IInventoryItem)defaultItem;
+        actItem = Inventory[actItemIndex];
     }
 
-    public void populateInventory()
+    private void PopulateInventory()
     {
         while (Inventory.Count < maxItems)
         {
-            Inventory.Add(defaultItem);
+            Inventory.Add((IInventoryItem)defaultItem);
         }
     }
-
 }

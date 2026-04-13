@@ -481,7 +481,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &144959548
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -505,6 +505,7 @@ MonoBehaviour:
   investigationDuration: 3
   successChance: 100
   waitBeforeAttempt: 4
+  scanInterval: 2
 --- !u!195 &144959549
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -1319,7 +1320,7 @@ MonoBehaviour:
   m_BuildHeightMesh: 0
   m_MinRegionArea: 0
   m_HideEditorLogs: 0
-  m_NavMeshData: {fileID: 23800000, guid: c0faac429a132724c9de4ed2d592e57d, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: 1b58af88a31f7d645a8bba358b5c4f3e, type: 2}
 --- !u!1 &1658800682
 GameObject:
   m_ObjectHideFlags: 0
@@ -1679,11 +1680,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f255b4ea7f95fd47ad9542aef26c579, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  startLit: 0
   lightRadius: 20
   enemyLayer:
     serializedVersion: 2
     m_Bits: 128
   corruptionDuration: 10
+  spriteRenderer: {fileID: 0}
+  litColor: {r: 1, g: 1, b: 1, a: 1}
+  unlitColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
 --- !u!212 &1693377632
 SpriteRenderer:
   m_ObjectHideFlags: 0
