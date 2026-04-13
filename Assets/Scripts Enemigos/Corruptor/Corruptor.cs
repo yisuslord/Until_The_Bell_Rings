@@ -187,4 +187,15 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
             }
         }
     }
+
+    // Dentro de CorruptorEnemy.cs
+
+    public override void GetRepelled(Vector2 shockwaveSource, float force)
+    {
+        // El Corruptor es más débil a la luz sagrada/onda
+        Debug.Log("<color=purple>El Corruptor se disuelve ante la onda...</color>");
+
+        // Llamamos al método Die que ya configuramos en la base
+        Die();
+    }
 }

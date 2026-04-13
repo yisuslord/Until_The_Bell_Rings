@@ -124,15 +124,22 @@ public abstract class EnemyBase : MonoBehaviour, IStimulusReceiver
         }
     }
 
+    // En EnemyBase.cs
+
     public virtual void Die()
     {
-        Debug.Log($"{gameObject.name} ha sido desterrado.");
-
-        // Aquí disparamos el efecto visual de "muerte"
-        // Si tienes un script que maneje partículas, lo llamamos aquí
+        // 1. Efecto visual de muerte (si lo tienes configurado)
         PlayDeathEffect();
 
-        // En lugar de destruir el objeto (que causa lag), lo desactivamos
+        // 2. Detener lógica de IA
+        if (agent != null)
+        {
+            agent.isStopped = true;
+            agent.enabled = false;
+        }
+
+        // 3. Desactivar el objeto
+        // Si usas un sistema de respawn, aquí podrías mandarlo a un pool
         gameObject.SetActive(false);
     }
 
