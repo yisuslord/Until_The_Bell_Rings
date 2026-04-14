@@ -58,6 +58,8 @@ public class LevelManager : MonoBehaviour
         currentState = GameState.Night;
         timer = nightDuration;
 
+        if (flashlight != null) flashlight.SetActive(true);
+
         // Configuración de enemigos por nivel
         foreach (var enemy in allEnemies)
         {
