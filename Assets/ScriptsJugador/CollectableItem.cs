@@ -1,70 +1,66 @@
 using UnityEngine;
-using System.Collections;
 
-public class CollectibleItem : MonoBehaviour, IInteractable, ICorruptible
+public class CollectibleItem : MonoBehaviour
 {
-    [SerializeField] private string itemName;
-    [SerializeField] private float detectionRadius = 10f; // Rango para avisar al Corruptor
-    [SerializeField] private LayerMask enemyLayer;
+    [Header("Ajustes de Item")]
+    [SerializeField] private GameObject itemLogicPrefab;
+    public bool isCorrupted = false;
 
-    private bool isCorrupted = false;
-    public bool IsCorrupted => isCorrupted;
+    private bool playerInRange = false; // Nueva variable para saber si el player está cerca
+    private PlayerInventory tempInventory; // Referencia temporal al inventario
 
-    private void Start()
+    private void Update()
     {
-        // En cuanto el objeto "nace" en la iglesia, avisa a los corruptores cercanos
-        EmitPresence();
+        // Si el jugador está en el rango, no está corrompido y presiona E
+        if (playerInRange && !isCorrupted && Input.GetKeyDown(KeyCode.E))
+        {
+            RecogerObjeto();
+        }
     }
 
-    public void EmitPresence()
+    private void RecogerObjeto()
     {
-        if (isCorrupted) return;
-
-        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(transform.position, detectionRadius, enemyLayer);
-        foreach (var hit in hitEnemies)
+        if (tempInventory != null)
         {
-            if (hit.TryGetComponent(out IStimulusReceiver receiver))
+            GameObject logicObj = Instantiate(itemLogicPrefab);
+            IInventoryItem item = logicObj.GetComponent<IInventoryItem>();
+
+            if (item != null)
             {
-                receiver.OnStimulusReceived(transform.position, StimulusType.Corruptible);
+                tempInventory.AddItem(item);
+
+                logicObj.transform.SetParent(tempInventory.transform);
+                logicObj.SetActive(false);
+
+                Debug.Log("<color=green>Item recogido con E.</color>");
+                Destroy(gameObject);
             }
         }
     }
 
-    public void Interact()
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        if (isCorrupted)
+        if (other.CompareTag("Player"))
         {
-            Debug.Log("El objeto está corrompido y no puedes tocarlo.");
-            return;
+            playerInRange = true;
+            tempInventory = other.GetComponent<PlayerInventory>();
+
+            // Opcional: Podrías activar aquí un mensaje de "Presiona E para recoger"
         }
+    }
 
-        // Si no está corrompido, se añade al inventario y oculta de la escena
-        Object.FindFirstObjectByType<PlayerInventory>().AddItem(itemName);
-
-        // Se anade el objeto al inventario del jugador y se desactiva de la escena
-        if (Object.FindFirstObjectByType<Inventario>().addItem(gameObject.GetComponent<IInventoryItem>()))
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.CompareTag("Player"))
         {
-            gameObject.SetActive(false);
+            playerInRange = false;
+            tempInventory = null;
         }
-
-        
     }
 
     public void Corrupt()
     {
         isCorrupted = true;
-        Debug.Log($"<color=purple>{itemName} ha sido corrompido.</color>");
-        StartCoroutine(RestoreTimer());
-    }
-
-    public void Restore()
-    {
-        isCorrupted = false;
-    }
-
-    private IEnumerator RestoreTimer()
-    {
-        yield return new WaitForSeconds(120f); // 2 minutos bloqueado
-        Restore();
+        if (TryGetComponent(out SpriteRenderer sr)) sr.color = Color.magenta;
     }
 }

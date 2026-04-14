@@ -15,6 +15,8 @@ public abstract class BaseItem : MonoBehaviour, IInteractable, ICorruptible, IIn
     public bool IsCorrupted => isCorrupted;
     public string ItemName => itemName;
 
+    public Sprite InventoryIcon;
+
     // Al nacer en la escena, el objeto "emite su presencia"
     protected virtual void Start()
     {
