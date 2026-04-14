@@ -6,9 +6,11 @@ public class PlayerController : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private float walkSpeed = 3f;
     [SerializeField] private float runSpeed = 6f;
+    public Animator anim;
     private PlayerHide playerHide;
     private Rigidbody2D rb;
     private Vector2 movementInput;
+    private bool isMoving;
     private bool isRunning;
 
     [Header("Noise System")]
@@ -27,6 +29,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        Animate();
         if (playerHide != null && playerHide.IsHidden)
         {
             movementInput = Vector2.zero;
@@ -65,6 +68,17 @@ public class PlayerController : MonoBehaviour
             {
                 receiver.OnStimulusReceived(transform.position, StimulusType.Noise);
             }
+        }
+    }
+
+    private void Animate()
+    {
+        isMoving = movementInput != Vector2.zero;
+        anim.SetBool("Moving", isMoving);
+        if (isMoving)
+        {
+            anim.SetFloat("X", movementInput.x);
+            anim.SetFloat("Y", movementInput.y);
         }
     }
 }

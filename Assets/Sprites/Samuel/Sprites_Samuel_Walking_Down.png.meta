@@ -1,31 +1,31 @@
 fileFormatVersion: 2
-guid: 7108a46a56dd10043b394d36b5b6b0c4
+guid: c911c1d0af4d69943994be9ee19b835e
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3455083409578170875
-    second: Sprites_Samuel_Walking_Up_0
+      213: -3739564994713795216
+    second: Sprites_Samuel_Walking_Down_0
   - first:
-      213: 9021029743498549800
-    second: Sprites_Samuel_Walking_Up_1
+      213: -5572097407410869659
+    second: Sprites_Samuel_Walking_Down_1
   - first:
-      213: 4514312801101640445
-    second: Sprites_Samuel_Walking_Up_2
+      213: 5384613552060247448
+    second: Sprites_Samuel_Walking_Down_2
   - first:
-      213: 3786785182215790421
-    second: Sprites_Samuel_Walking_Up_3
+      213: -185180088795843562
+    second: Sprites_Samuel_Walking_Down_3
   - first:
-      213: 6909255557882332202
-    second: Sprites_Samuel_Walking_Up_4
+      213: -6606939783825397134
+    second: Sprites_Samuel_Walking_Down_4
   - first:
-      213: -7154253890595326582
-    second: Sprites_Samuel_Walking_Up_5
+      213: -7485346419001008868
+    second: Sprites_Samuel_Walking_Down_5
   - first:
-      213: 7125159741529174133
-    second: Sprites_Samuel_Walking_Up_6
+      213: 7212023866896273934
+    second: Sprites_Samuel_Walking_Down_6
   - first:
-      213: 6806150754849958506
-    second: Sprites_Samuel_Walking_Up_7
+      213: -2159169112295504830
+    second: Sprites_Samuel_Walking_Down_7
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -121,10 +121,10 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Sprites_Samuel_Walking_Up_0
+      name: Sprites_Samuel_Walking_Down_0
       rect:
         serializedVersion: 2
-        x: 8
+        x: 9
         y: 0
         width: 14
         height: 24
@@ -136,19 +136,19 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: bf990412e0ce2ff20800000000000000
-      internalID: 3455083409578170875
+      spriteID: 075499b43756a1cc0800000000000000
+      internalID: -3739564994713795216
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Sprites_Samuel_Walking_Up_1
+      name: Sprites_Samuel_Walking_Down_1
       rect:
         serializedVersion: 2
-        x: 40
+        x: 41
         y: 0
-        width: 15
+        width: 14
         height: 25
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -158,14 +158,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 82ad67991c2213d70800000000000000
-      internalID: 9021029743498549800
+      spriteID: 56a66612eeeeba2b0800000000000000
+      internalID: -5572097407410869659
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Sprites_Samuel_Walking_Up_2
+      name: Sprites_Samuel_Walking_Down_2
       rect:
         serializedVersion: 2
         x: 71
@@ -180,14 +180,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: df279a2239f06ae30800000000000000
-      internalID: 4514312801101640445
+      spriteID: 89d2e472f7df9ba40800000000000000
+      internalID: 5384613552060247448
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Sprites_Samuel_Walking_Up_3
+      name: Sprites_Samuel_Walking_Down_3
       rect:
         serializedVersion: 2
         x: 104
@@ -202,17 +202,17 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 55f5faa5f0d5d8430800000000000000
-      internalID: 3786785182215790421
+      spriteID: 61439dbb0bb1e6df0800000000000000
+      internalID: -185180088795843562
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Sprites_Samuel_Walking_Up_4
+      name: Sprites_Samuel_Walking_Down_4
       rect:
         serializedVersion: 2
-        x: 136
+        x: 137
         y: 0
         width: 14
         height: 24
@@ -224,19 +224,19 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a2448f5b25b92ef50800000000000000
-      internalID: 6909255557882332202
+      spriteID: 27ae0bc854f6f44a0800000000000000
+      internalID: -6606939783825397134
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Sprites_Samuel_Walking_Up_5
+      name: Sprites_Samuel_Walking_Down_5
       rect:
         serializedVersion: 2
-        x: 168
+        x: 169
         y: 0
-        width: 15
+        width: 14
         height: 25
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -246,14 +246,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a85fb1acdfbf6bc90800000000000000
-      internalID: -7154253890595326582
+      spriteID: c1dd3ba4715be1890800000000000000
+      internalID: -7485346419001008868
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Sprites_Samuel_Walking_Up_6
+      name: Sprites_Samuel_Walking_Down_6
       rect:
         serializedVersion: 2
         x: 199
@@ -268,14 +268,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 570b2c1c807a1e260800000000000000
-      internalID: 7125159741529174133
+      spriteID: e02ddf9fe71461460800000000000000
+      internalID: 7212023866896273934
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Sprites_Samuel_Walking_Up_7
+      name: Sprites_Samuel_Walking_Down_7
       rect:
         serializedVersion: 2
         x: 232
@@ -290,8 +290,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a6aa69e0d0e447e50800000000000000
-      internalID: 6806150754849958506
+      spriteID: 24481a3d1271902e0800000000000000
+      internalID: -2159169112295504830
       vertices: []
       indices: 
       edges: []
@@ -310,14 +310,14 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Sprites_Samuel_Walking_Up_0: 3455083409578170875
-      Sprites_Samuel_Walking_Up_1: 9021029743498549800
-      Sprites_Samuel_Walking_Up_2: 4514312801101640445
-      Sprites_Samuel_Walking_Up_3: 3786785182215790421
-      Sprites_Samuel_Walking_Up_4: 6909255557882332202
-      Sprites_Samuel_Walking_Up_5: -7154253890595326582
-      Sprites_Samuel_Walking_Up_6: 7125159741529174133
-      Sprites_Samuel_Walking_Up_7: 6806150754849958506
+      Sprites_Samuel_Walking_Down_0: -3739564994713795216
+      Sprites_Samuel_Walking_Down_1: -5572097407410869659
+      Sprites_Samuel_Walking_Down_2: 5384613552060247448
+      Sprites_Samuel_Walking_Down_3: -185180088795843562
+      Sprites_Samuel_Walking_Down_4: -6606939783825397134
+      Sprites_Samuel_Walking_Down_5: -7485346419001008868
+      Sprites_Samuel_Walking_Down_6: 7212023866896273934
+      Sprites_Samuel_Walking_Down_7: -2159169112295504830
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
