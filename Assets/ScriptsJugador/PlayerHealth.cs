@@ -27,6 +27,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         pSource.PlayOneShot(clipDano);
 
         currentHealth -= amount;
+        UIManager.Instance.UpdatePlayerHealth(currentHealth, maxHealth);
         Debug.Log($"Jugador dañado. Vida restante: {currentHealth}");
 
         if (currentHealth <= 0)
@@ -44,22 +45,29 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 
     public void Heal(int amount)
     {
-        // Cambiamos InParent por GetComponent normal, ya que el AudioSource vive en el mismo Player
         AudioSource pSource = GetComponent<AudioSource>();
 
+        // 1. Sumamos la vida primero
         currentHealth += amount;
 
-        if (pSource != null && clipCurar != null)
-        {
-            pSource.PlayOneShot(clipCurar);
-            Debug.Log("Sonido de curación ejecutado.");
-        }
-        // Si la curación supera el máximo, la igualamos al máximo
+        // 2. IMPORTANTE: Validamos el máximo ANTES de avisar a la UI
         if (currentHealth > maxHealth)
         {
             currentHealth = maxHealth;
         }
 
+        // 3. Ahora sí, actualizamos la barra con el valor final correcto
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.UpdatePlayerHealth(currentHealth, maxHealth);
+        }
+
+        // 4. Sonido
+        if (pSource != null && clipCurar != null)
+        {
+            pSource.PlayOneShot(clipCurar);
+            Debug.Log("Sonido de curación ejecutado.");
+        }
 
         Debug.Log($"Jugador curado. Vida actual: {currentHealth}");
     }
