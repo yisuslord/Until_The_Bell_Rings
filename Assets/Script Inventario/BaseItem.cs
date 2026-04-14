@@ -89,4 +89,6 @@ public abstract class BaseItem : MonoBehaviour, IInteractable, ICorruptible, IIn
         Gizmos.color = Color.magenta;
         Gizmos.DrawWireSphere(transform.position, detectionRadius);
     }
+
+    public virtual AudioClip GetClip() { return null; }
 }

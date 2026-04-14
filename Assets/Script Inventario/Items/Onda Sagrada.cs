@@ -5,26 +5,32 @@ public class ShockwaveItem : BaseItem
     [Header("Shockwave Settings")]
     [SerializeField] private float range = 10f;
     [SerializeField] private float pushForce = 15f;
-    //[SerializeField] private LayerMask enemyLayer;
+    [SerializeField] private AudioClip clipOnda;
 
     public override void Use()
     {
-        // 1. Buscamos el efecto visual en los hijos del objeto que nos tiene (el Jugador)
-        // El Inventario hace: item.transform.SetParent(player.transform)
-        IVisualEffect effect = GetComponentInParent<IVisualEffect>();
+        // 1. Obtener el AudioSource del Jugador dinámicamente
+        // Como el item es hijo del jugador, buscamos en el padre.
+        AudioSource pSource = GetComponentInParent<AudioSource>();
 
+        if (pSource != null && clipOnda != null)
+        {
+            pSource.PlayOneShot(clipOnda);
+        }
+
+        // 2. Efecto Visual
+        IVisualEffect effect = GetComponentInParent<IVisualEffect>();
         if (effect != null)
         {
-            effect.PlayEffect(transform.parent.position); // Posición del jugador
+            effect.PlayEffect(transform.parent.position);
         }
         else
         {
-            // Plan B: Buscar en toda la escena si no somos hijos del jugador
             effect = Object.FindFirstObjectByType<Onda_Visual>();
             if (effect != null) effect.PlayEffect(transform.position);
         }
 
-        // 2. Lógica de Empuje
+        // 3. Lógica de Empuje
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(transform.position, range, enemyLayer);
         foreach (var hit in hitEnemies)
         {

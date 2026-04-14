@@ -10,6 +10,8 @@ public class Sensible : EnemyBase
     [SerializeField] private float cooldownTime = 3f;
     private bool isStunned = false;
 
+
+
     private void Update()
     {
         if (isStunned) return;

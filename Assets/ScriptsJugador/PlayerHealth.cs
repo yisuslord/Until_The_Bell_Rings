@@ -4,7 +4,7 @@ using System;
 public class PlayerHealth : MonoBehaviour, IDamageable
 {
     [Header("Audio")]
-    [SerializeField] private AudioSource playerSource;
+    //[SerializeField] private AudioSource playerSource;
     [SerializeField] private AudioClip clipDano;
     //[SerializeField] private AudioClip clipCaminar;
     [SerializeField] private AudioClip clipMorir;
@@ -22,6 +22,10 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 
     public void TakeDamage(int amount)
     {
+        // Cambiamos InParent por GetComponent normal, ya que el AudioSource vive en el mismo Player
+        AudioSource pSource = GetComponent<AudioSource>();
+        pSource.PlayOneShot(clipDano);
+
         currentHealth -= amount;
         Debug.Log($"Jugador dañado. Vida restante: {currentHealth}");
 
@@ -40,9 +44,16 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 
     public void Heal(int amount)
     {
-        playerSource.PlayOneShot(clipCurar);
+        // Cambiamos InParent por GetComponent normal, ya que el AudioSource vive en el mismo Player
+        AudioSource pSource = GetComponent<AudioSource>();
+
         currentHealth += amount;
 
+        if (pSource != null && clipCurar != null)
+        {
+            pSource.PlayOneShot(clipCurar);
+            Debug.Log("Sonido de curación ejecutado.");
+        }
         // Si la curación supera el máximo, la igualamos al máximo
         if (currentHealth > maxHealth)
         {

@@ -11,12 +11,16 @@ public class PlayerInventory : MonoBehaviour
     [Header("Estado del Inventario")]
     public List<IInventoryItem> Inventory = new List<IInventoryItem>();
 
+    [Header("Audio")]
+    [SerializeField] private AudioSource playerSource;
+    [SerializeField] private AudioClip Recoger;
     void Awake()
     {
         // Inicializamos con espacios vacíos
         for (int i = 0; i < maxItems; i++)
         {
             Inventory.Add(defaultItem);
+
         }
     }
 
@@ -54,13 +58,16 @@ public class PlayerInventory : MonoBehaviour
     {
         IInventoryItem item = Inventory[actItemIndex];
 
-        // Si el slot no está vacío
         if (item != null && item != (IInventoryItem)defaultItem)
         {
-            item.Use(); // Ejecuta la lógica del objeto (curar, onda, etc.)
+            // 1. Antes de hacer nada, disparamos el sonido si el item tiene uno
+            // Intentamos convertir el item a BaseItem para leer su clip de sonido
+            if (item is BaseItem baseItem && baseItem.GetClip() != null)
+            {
+                playerSource.PlayOneShot(baseItem.GetClip());
+            }
 
-            // Si el objeto se consume (como una poción), lo quitamos
-            // Nota: Podrías añadir un bool en IInventoryItem si quieres que algunos no se gasten
+            item.Use();
             RemoverItemActual();
         }
     }
@@ -92,6 +99,9 @@ public class PlayerInventory : MonoBehaviour
 
     public void AddItem(IInventoryItem newItem)
     {
+        //playerSource.PlayOneShot(Recoger);
+
+
         for (int i = 0; i < Inventory.Count; i++)
         {
             if (Inventory[i] == defaultItem || Inventory[i] == null)
