@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: a73d8a343e8cd3948b81927eabfc2315
+guid: aa1b2a61a85629b44989a70fe3540c7b
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1201829315139191019
-    second: Hasta que suene la campana (1)_0
+      213: -8304394480467120519
+    second: pngtree-pixel-art-trophies-vector-png-image_13598926 (1)_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,23 +113,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Hasta que suene la campana (1)_0
+      name: pngtree-pixel-art-trophies-vector-png-image_13598926 (1)_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 1536
-        height: 1024
+        x: 20
+        y: 20
+        width: 320
+        height: 320
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: be0c5810561cda010800000000000000
-      internalID: 1201829315139191019
+      spriteID: 97eea05f73dd0cc80800000000000000
+      internalID: -8304394480467120519
       vertices: []
       indices: 
       edges: []
@@ -138,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: e1366523e8bc323408aa04e1733d05a5
     internalID: 0
     vertices: []
     indices: 
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Hasta que suene la campana (1)_0: 1201829315139191019
+      pngtree-pixel-art-trophies-vector-png-image_13598926 (1)_0: -8304394480467120519
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

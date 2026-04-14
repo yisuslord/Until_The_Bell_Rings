@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: a73d8a343e8cd3948b81927eabfc2315
+guid: 77832d9ef6227ea4589e68b38d4e5824
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1201829315139191019
-    second: Hasta que suene la campana (1)_0
+      213: 81783387321917298
+    second: "\u2014Pngtree\u2014christian cross side with gold_7430066_0"
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Hasta que suene la campana (1)_0
+      name: "\u2014Pngtree\u2014christian cross side with gold_7430066_0"
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 1536
-        height: 1024
+        x: 198
+        y: 24
+        width: 814
+        height: 1142
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: be0c5810561cda010800000000000000
-      internalID: 1201829315139191019
+      spriteID: 27fd9d5be8d822100800000000000000
+      internalID: 81783387321917298
       vertices: []
       indices: 
       edges: []
@@ -147,8 +147,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      Hasta que suene la campana (1)_0: 1201829315139191019
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
