@@ -18,6 +18,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private LayerMask enemyLayer;
     private float noiseTimer;
     [SerializeField] private float noiseInterval = 0.5f;
+
+    [Header("Audio")]
+    [SerializeField] private AudioSource playerSource;
+    [SerializeField] private AudioClip clipCorrer;
+    [SerializeField] private AudioClip clipCaminar;
     public static PlayerController Instance { get; private set; }
     private void Awake()
     {
