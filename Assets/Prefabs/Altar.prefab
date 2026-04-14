@@ -101,8 +101,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9396a85ec0d5c24cb9aca2942ed5790, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  altarHealthText: {fileID: 0}
-  candlesText: {fileID: 0}
+  altarBarFill: {fileID: 0}
+  altarPercentText: {fileID: 0}
+  candlesCounterText: {fileID: 0}
+  playerHealthBarFill: {fileID: 0}
 --- !u!114 &3324377735273223356
 MonoBehaviour:
   m_ObjectHideFlags: 0

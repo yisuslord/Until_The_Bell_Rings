@@ -247,7 +247,12 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      "Alta g\xF3tica iluminada por velas_0": 9095003387622057330
+      "Alta g\xF3tica iluminada por velas_1": 1962543171356445523
+      "Alta g\xF3tica iluminada por velas_2": -8933323473055790629
+      "Alta g\xF3tica iluminada por velas_3": -1918514777126339375
+      "Alta g\xF3tica iluminada por velas_4": -5061012000534596377
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

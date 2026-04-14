@@ -3,39 +3,106 @@ using System.Collections;
 
 public class Manifestado : EnemyBase
 {
-    private Vector2 spawnPoint;
-    private bool isRetreating = false;
-    private float baseSpeed;
-    //public void SetOrigin(DarkArea area, Vector2 pos) => spawnPoint = pos;
+    [Header("Manifestado Logic")]
+    [SerializeField] private AltarZone altarZone;
+    [SerializeField] private float darknessThreshold = 3f;
+    [SerializeField] private float attackCooldown = 4f; // Un poco más de tiempo para que de miedo
+
+    private float darknessTimer;
+    private bool isHunting = false;
+    private bool isAturdido = false;
+
+    private FlashlightController playerFlashlight;
+    private SpriteRenderer spriteRenderer; // Para controlar la visibilidad
+
     protected override void Awake()
     {
         base.Awake();
-        baseSpeed = agent.speed;
-    }
-
-    protected override void OnEnable()
-    {
-        base.OnEnable();
-        agent.speed = baseSpeed;
+        playerFlashlight = Object.FindFirstObjectByType<FlashlightController>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     private void Update()
     {
-        // Si el agente no está listo, no hacemos nada
         if (!agent.enabled || !agent.isOnNavMesh) return;
 
-        // Persecución constante e implacable
-        if (PlayerController.Instance != null)
+        // 1. ZONA SEGURA: Si entra al altar, desaparece visualmente y deja de cazar
+        if (altarZone != null && altarZone.IsPlayerInside)
         {
+            StopHunting();
+            spriteRenderer.enabled = false; // Se oculta en el altar
+            return;
+        }
+
+        // 2. LÓGICA DE LINTERNA (Solo si no está aturdido)
+        bool isLightOn = (playerFlashlight != null && playerFlashlight.IsOn);
+
+        if (!isLightOn && !isAturdido)
+        {
+            darknessTimer += Time.deltaTime;
+            if (darknessTimer >= darknessThreshold)
+            {
+                isHunting = true;
+                spriteRenderer.enabled = true; // ?? APARECE cuando empieza a cazar
+            }
+        }
+        else
+        {
+            StopHunting();
+            // Si la luz está prendida y no está cazando, se desvanece
+            if (!isHunting && !isAturdido) spriteRenderer.enabled = false;
+        }
+
+        // 3. ACCIÓN DE CAZA
+        if (isHunting && PlayerController.Instance != null)
+        {
+            agent.isStopped = false;
             agent.SetDestination(PlayerController.Instance.transform.position);
             CheckAttack();
         }
+        else
+        {
+            if (agent.isOnNavMesh) agent.isStopped = true;
+        }
     }
 
-    // SOBREESCRIBIMOS para que la onda NO le haga nada
-    public override void GetRepelled(Vector2 shockwaveSource, float force)
+    protected override void PerformAttack()
     {
-        // Dejamos esto vacío. La onda no tiene efecto sobre él.
-        Debug.Log("<color=cyan>El Manifestado ignora la onda de choque.</color>");
+        Collider2D hit = Physics2D.OverlapCircle(transform.position, attackDistance, playerLayer);
+
+        if (hit != null && hit.TryGetComponent(out IDamageable damageable))
+        {
+            damageable.TakeDamage(attackDamage);
+            Debug.Log("<color=purple>El Manifestado te golpeó y se fundió en las sombras.</color>");
+
+            // Iniciar el estado de aturdimiento invisible
+            StartCoroutine(AturdimientoRoutine());
+        }
     }
+
+    private IEnumerator AturdimientoRoutine()
+    {
+        isAturdido = true;
+        isHunting = false;
+        darknessTimer = 0;
+
+        spriteRenderer.enabled = false; // ?? SE HACE INVISIBLE tras el golpe
+
+        if (agent.isOnNavMesh) agent.isStopped = true;
+
+        yield return new WaitForSeconds(attackCooldown);
+
+        isAturdido = false;
+        // No lo hacemos visible aquí, esperaremos a que el Update 
+        // detecte oscuridad de nuevo para poner spriteRenderer.enabled = true
+    }
+
+    private void StopHunting()
+    {
+        isHunting = false;
+        darknessTimer = 0;
+        if (agent.isOnNavMesh && !isAturdido) agent.isStopped = true;
+    }
+
+    public override void GetRepelled(Vector2 shockwaveSource, float force) { }
 }

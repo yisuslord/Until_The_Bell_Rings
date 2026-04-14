@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 46204cadabce8884a9c21320984cd179
+guid: 68aa200c560b4b44fa89edb44df3f98e
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -2243342565258133426
-    second: Vela pixelada con llama brillante_0
+      213: -1561130698893907808
+    second: AltarBueno_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -96,29 +96,16 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Vela pixelada con llama brillante_0
+      name: AltarBueno_0
       rect:
         serializedVersion: 2
         x: 11
         y: 0
-        width: 1502
+        width: 1403
         height: 1024
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -128,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: e40864892db0ed0e0800000000000000
-      internalID: -2243342565258133426
+      spriteID: 0a8a87c86efb55ae0800000000000000
+      internalID: -1561130698893907808
       vertices: []
       indices: 
       edges: []
@@ -147,8 +134,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      Vela pixelada con llama brillante_0: -2243342565258133426
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

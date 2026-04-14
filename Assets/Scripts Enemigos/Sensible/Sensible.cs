@@ -5,28 +5,31 @@ public class Sensible : EnemyBase
 {
     [Header("Detection Settings")]
     [SerializeField] private float detectionRadius = 4f;
+    [SerializeField] private AltarZone altarZone; // Arrastra la zona aquí
 
     [Header("Combat Settings")]
     [SerializeField] private float cooldownTime = 3f;
     private bool isStunned = false;
 
-
-
     private void Update()
     {
         if (isStunned) return;
 
+        // --- NUEVA LÓGICA DE ZONA SEGURA ---
+        if (altarZone != null && altarZone.IsPlayerInside)
+        {
+            if (currentState != State.Wandering)
+            {
+                Debug.Log("Jugador a salvo en Altar. Sensible vuelve a patrullar.");
+                currentState = State.Wandering;
+            }
+        }
+
         switch (currentState)
         {
-            case State.Wandering:
-                HandleWandering();
-                break;
-            case State.Investigating:
-                HandleInvestigation();
-                break;
-            case State.Chasing:
-                HandleChasing();
-                break;
+            case State.Wandering: HandleWandering(); break;
+            case State.Investigating: HandleInvestigation(); break;
+            case State.Chasing: HandleChasing(); break;
         }
     }
 
@@ -34,20 +37,17 @@ public class Sensible : EnemyBase
     {
         if (PlayerController.Instance != null)
         {
-           
-            PlayerHide playerHide = PlayerController.Instance.GetComponent<PlayerHide>();
+            // Si el jugador está en la zona segura, no puede ser perseguido
+            if (altarZone.IsPlayerInside) return;
 
+            PlayerHide playerHide = PlayerController.Instance.GetComponent<PlayerHide>();
             if (playerHide != null && playerHide.IsHidden)
             {
-                Debug.Log("El jugador se escondió. Sensible se rinde y vuelve a patrullar.");
-                currentState = State.Wandering; // Lo regresamos a patrullar
-                return; 
+                currentState = State.Wandering;
+                return;
             }
 
-            
             MoveTo(PlayerController.Instance.transform.position);
-
-            
             CheckAttack();
         }
     }

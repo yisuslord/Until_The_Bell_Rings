@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerFlashlight : MonoBehaviour
 {
@@ -7,18 +7,24 @@ public class PlayerFlashlight : MonoBehaviour
     [SerializeField] private LayerMask enemyLayer;
 
     private float timer;
+    private FlashlightController controller; // Referencia al padre
+
+    void Awake()
+    {
+        // Buscamos el controlador en el objeto padre
+        controller = GetComponentInParent<FlashlightController>();
+    }
 
     void Update()
     {
-        // Solo funciona si el GameObject est� encendido en el Inspector
-        if (gameObject.activeSelf)
+        // 🔥 EL CANDADO: Si el controlador dice que está apagada, no hacemos nada
+        if (controller == null || !controller.IsOn) return;
+
+        timer -= Time.deltaTime;
+        if (timer <= 0)
         {
-            timer -= Time.deltaTime;
-            if (timer <= 0)
-            {
-                EmitLightNoise();
-                timer = noiseInterval;
-            }
+            EmitLightNoise();
+            timer = noiseInterval;
         }
     }
 

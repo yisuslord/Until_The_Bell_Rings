@@ -1,25 +1,23 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class FlashlightController : MonoBehaviour
 {
-    [SerializeField] private GameObject lightVisuals; // El objeto hijo que tiene la luz y el ruido
-    private bool isOn = false;
+    [SerializeField] private GameObject lightVisuals;
+    public bool IsOn { get; private set; } // 🔥 Nueva variable pública
 
     void Update()
     {
-        // Solo funciona si es de noche
         if (LevelManager.Instance.currentState == GameState.Night)
         {
             if (Input.GetKeyDown(KeyCode.F))
             {
-                isOn = !isOn;
-                lightVisuals.SetActive(isOn);
+                IsOn = !IsOn; // Cambiamos el estado
+                lightVisuals.SetActive(IsOn);
             }
         }
-        else if (isOn)
+        else if (IsOn)
         {
-            // Si amanece, apagar autom�ticamente
-            isOn = false;
+            IsOn = false;
             lightVisuals.SetActive(false);
         }
     }

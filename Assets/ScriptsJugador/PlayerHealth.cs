@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using UnityEngine.SceneManagement;
 
 public class PlayerHealth : MonoBehaviour, IDamageable
 {
@@ -39,8 +40,17 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     private void Die()
     {
         Debug.Log("El jugador ha muerto");
+
+        // 1. Ejecutamos el evento por si otros sistemas necesitan saberlo
         OnPlayerDeath?.Invoke();
-        
+
+        // 3. Liberamos el cursor (IMPORTANTE para poder clicar los botones del menú de muerte)
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        // 4. Mandamos a la escena 2 (DeathScene)
+        // Asegúrate de que en Build Settings la escena de muerte tenga el índice 2
+        SceneManager.LoadScene(2);
     }
 
     public void Heal(int amount)
