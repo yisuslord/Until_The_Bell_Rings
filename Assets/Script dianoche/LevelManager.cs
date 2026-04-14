@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine.Rendering.Universal; // Necesario para controlar luces 2D
+using UnityEngine.Rendering.Universal; // ?? NUEVO: Necesario para controlar luces 2D
 
 public enum GameState { Day, Night }
 
@@ -14,15 +14,17 @@ public class LevelManager : MonoBehaviour
     public float nightDuration = 60f;
     private float timer;
 
-    [Header("Iluminación")]
-    public Light2D globalLight;
-    public float dayIntensity = 1.0f;
-    public float nightIntensity = 0.15f;
-    public float transitionSpeed = 2f;
+    [Header("Configuración de Luz")]
+    // ?? CAMBIO: En vez de GameObject, ahora es de tipo Light2D
+    public Light2D lightGlobal;
+    public float dayIntensity = 1.0f;     // Intensidad de día
+    public float nightIntensity = 0.15f;  // Intensidad de noche
+    public float lightTransitionSpeed = 1.5f; // Qué tan rápido se oscurece
 
     [Header("Referencias")]
-    public List<EnemyBase> allEnemies;
-    public Asechador stalker;
+    public GameObject flashlight;    // La linterna del jugador
+    public List<EnemyBase> allEnemies; // Arrastra aquí a todos tus enemigos
+    public Asechador stalker;        // Referencia específica al Acechador
 
     private void Awake() { Instance = this; }
 
@@ -33,11 +35,14 @@ public class LevelManager : MonoBehaviour
 
     private void Update()
     {
-        // Transición suave de la luz (Día/Noche)
-        float targetIntensity = (currentState == GameState.Day) ? dayIntensity : nightIntensity;
-        globalLight.intensity = Mathf.Lerp(globalLight.intensity, targetIntensity, Time.deltaTime * transitionSpeed);
+        // ?? NUEVO: Esto hace que la luz baje o suba suavemente cada frame
+        if (lightGlobal != null)
+        {
+            float targetIntensity = (currentState == GameState.Day) ? dayIntensity : nightIntensity;
+            lightGlobal.intensity = Mathf.Lerp(lightGlobal.intensity, targetIntensity, Time.deltaTime * lightTransitionSpeed);
+        }
 
-        // Temporizador de la noche
+        // Temporizador original de la noche
         if (currentState == GameState.Night)
         {
             timer -= Time.deltaTime;
@@ -56,7 +61,7 @@ public class LevelManager : MonoBehaviour
         // Configuración de enemigos por nivel
         foreach (var enemy in allEnemies)
         {
-            enemy.gameObject.SetActive(true);
+            if (enemy != null) enemy.gameObject.SetActive(true); // Agregué "if != null" por si acaso borras a alguno
         }
 
         // El Acechador solo aparece del nivel 2 en adelante
@@ -79,10 +84,12 @@ public class LevelManager : MonoBehaviour
     {
         currentState = GameState.Day;
 
+        if (flashlight != null) flashlight.SetActive(false);
+
         // Desactivar a todos los enemigos
         foreach (var enemy in allEnemies)
         {
-            enemy.gameObject.SetActive(false);
+            if (enemy != null) enemy.gameObject.SetActive(false);
         }
     }
 }

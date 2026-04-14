@@ -10,12 +10,15 @@ public class PlayerFlashlight : MonoBehaviour
 
     void Update()
     {
-        // Este script solo funciona (Update) si el GameObject está encendido por el Controller
-        timer -= Time.deltaTime;
-        if (timer <= 0)
+        // Solo funciona si el GameObject está encendido en el Inspector
+        if (gameObject.activeSelf)
         {
-            EmitLightNoise();
-            timer = noiseInterval;
+            timer -= Time.deltaTime;
+            if (timer <= 0)
+            {
+                EmitLightNoise();
+                timer = noiseInterval;
+            }
         }
     }
 
@@ -26,7 +29,6 @@ public class PlayerFlashlight : MonoBehaviour
         {
             if (hit.TryGetComponent(out IStimulusReceiver receiver))
             {
-                // Enviamos un estímulo de tipo "Noise" para atraer al Sensible
                 receiver.OnStimulusReceived(transform.position, StimulusType.Noise);
             }
         }
