@@ -1027,6 +1027,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5262284419040625647, guid: 9ebfa97f49b1aee4984f09f180aec1e5, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 8047714316032973154, guid: 3ccf130ee65f84c46bdc0d7cd8ad176f, type: 3}
+    - target: {fileID: 5262284419040625647, guid: 9ebfa97f49b1aee4984f09f180aec1e5, type: 3}
       propertyPath: m_SortingOrder
       value: 1
       objectReference: {fileID: 0}
@@ -38550,7 +38554,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
+  m_Sprite: {fileID: 3137099258877432749, guid: 5651be240b234374883717624f4cfecb, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -38632,6 +38636,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2369477619805274872, guid: 9c18ecd038677e54b9582feab9bc22a9, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 4390239406621980123, guid: de619a5b7e7b46e49b3178cd7cc236b0, type: 3}
     - target: {fileID: 2369477619805274872, guid: 9c18ecd038677e54b9582feab9bc22a9, type: 3}
       propertyPath: m_SortingOrder
       value: 1
