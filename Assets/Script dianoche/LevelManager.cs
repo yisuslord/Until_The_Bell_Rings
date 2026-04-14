@@ -1,30 +1,33 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.Rendering.Universal; // ?? NUEVO: Necesario para controlar luces 2D
-
+using TMPro;
 public enum GameState { Day, Night }
 
 public class LevelManager : MonoBehaviour
 {
     public static LevelManager Instance;
 
-    [Header("Configuración de Nivel")]
+    [Header("ConfiguraciÃ³n de Nivel")]
     public int currentLevel = 1;
     public GameState currentState = GameState.Day;
     public float nightDuration = 60f;
     private float timer;
 
-    [Header("Configuración de Luz")]
-    // ?? CAMBIO: En vez de GameObject, ahora es de tipo Light2D
+    [Header("ConfiguraciÃ³n de UI")]
+    public GameObject uiRelojContenedor; // El objeto que contiene el icono y el texto
+    public TextMeshProUGUI textoTiempo;  // El componente de texto real
+
+    [Header("ConfiguraciÃ³n de Luz")]
     public Light2D lightGlobal;
-    public float dayIntensity = 1.0f;     // Intensidad de día
-    public float nightIntensity = 0.15f;  // Intensidad de noche
-    public float lightTransitionSpeed = 1.5f; // Qué tan rápido se oscurece
+    public float dayIntensity = 1.0f;
+    public float nightIntensity = 0.15f;
+    public float lightTransitionSpeed = 1.5f;
 
     [Header("Referencias")]
-    public GameObject flashlight;    // La linterna del jugador
-    public List<EnemyBase> allEnemies; // Arrastra aquí a todos tus enemigos
-    public Asechador stalker;        // Referencia específica al Acechador
+    public GameObject flashlight;
+    public List<EnemyBase> allEnemies;
+    public Asechador stalker;
 
     private void Awake() { Instance = this; }
 
@@ -35,21 +38,40 @@ public class LevelManager : MonoBehaviour
 
     private void Update()
     {
-        // ?? NUEVO: Esto hace que la luz baje o suba suavemente cada frame
+        // Control de luz global
         if (lightGlobal != null)
         {
             float targetIntensity = (currentState == GameState.Day) ? dayIntensity : nightIntensity;
             lightGlobal.intensity = Mathf.Lerp(lightGlobal.intensity, targetIntensity, Time.deltaTime * lightTransitionSpeed);
         }
 
-        // Temporizador original de la noche
+        // Temporizador de la noche
         if (currentState == GameState.Night)
         {
             timer -= Time.deltaTime;
+
+            // ðŸ”¥ Actualizar el texto del reloj
+            ActualizarInterfazReloj();
+
             if (timer <= 0)
             {
                 EndNight();
             }
+        }
+    }
+
+    private void ActualizarInterfazReloj()
+    {
+        if (textoTiempo != null)
+        {
+            // Evitamos que el tiempo baje de 0 para el texto
+            float tiempoMostrar = Mathf.Max(0, timer);
+
+            // Formatear segundos a minutos:segundos (Ej: 01:25)
+            int minutos = Mathf.FloorToInt(tiempoMostrar / 60);
+            int segundos = Mathf.FloorToInt(tiempoMostrar % 60);
+
+            textoTiempo.text = string.Format("{0:00}:{1:00}", minutos, segundos);
         }
     }
 
@@ -58,37 +80,37 @@ public class LevelManager : MonoBehaviour
         currentState = GameState.Night;
         timer = nightDuration;
 
+        // ðŸ”¥ MOSTRAR el reloj al empezar la noche
+        if (uiRelojContenedor != null) uiRelojContenedor.SetActive(true);
+
         if (flashlight != null) flashlight.SetActive(true);
 
-        // Configuración de enemigos por nivel
         foreach (var enemy in allEnemies)
         {
-            if (enemy != null) enemy.gameObject.SetActive(true); // Agregué "if != null" por si acaso borras a alguno
+            if (enemy != null) enemy.gameObject.SetActive(true);
         }
 
-        // El Acechador solo aparece del nivel 2 en adelante
         if (currentLevel < 2 && stalker != null)
         {
             stalker.gameObject.SetActive(false);
         }
-
-        Debug.Log("Iniciando Noche del Nivel " + currentLevel);
     }
 
     public void EndNight()
     {
         currentLevel++;
         SetDay();
-        Debug.Log("Sobreviviste. Ahora es el día del Nivel " + currentLevel);
     }
 
     private void SetDay()
     {
         currentState = GameState.Day;
 
+        // ðŸ”¥ OCULTAR el reloj al hacerse de dÃ­a
+        if (uiRelojContenedor != null) uiRelojContenedor.SetActive(false);
+
         if (flashlight != null) flashlight.SetActive(false);
 
-        // Desactivar a todos los enemigos
         foreach (var enemy in allEnemies)
         {
             if (enemy != null) enemy.gameObject.SetActive(false);
