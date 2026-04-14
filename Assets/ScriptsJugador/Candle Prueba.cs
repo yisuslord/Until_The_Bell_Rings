@@ -1,21 +1,26 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Rendering.Universal; // 🔥 NECESARIO para controlar Light 2D
 
 public class Candle : MonoBehaviour, IInteractable, ICorruptible
 {
     [Header("Initial State")]
-    [SerializeField] private bool startLit = false; // El "Switch" en el Inspector
+    [SerializeField] private bool startLit = false;
 
     [Header("Settings")]
     [SerializeField] private float lightRadius = 8f;
     [SerializeField] private LayerMask enemyLayer;
     [SerializeField] private float corruptionDuration = 60f;
 
-    // 🔥 NUEVO: Configuración visual (Solo Encendido y Apagado)
     [Header("Visuals")]
     [SerializeField] private SpriteRenderer spriteRenderer;
-    [SerializeField] private Color litColor = Color.white; // Color cuando está prendida
-    [SerializeField] private Color unlitColor = Color.gray; // Color cuando está apagada
+    [SerializeField] private Color litColor = Color.white;
+    [SerializeField] private Color unlitColor = Color.gray;
+
+    // 🔥 NUEVO: Referencia al componente de luz real
+    [Header("Real Light")]
+    [SerializeField] private Light2D candleLight;
+    [SerializeField] private float lightIntensity = 1.0f; // Intensidad cuando está prendida
 
     private bool isLit = false;
     private bool isCorrupted = false;
@@ -26,18 +31,19 @@ public class Candle : MonoBehaviour, IInteractable, ICorruptible
 
     private void Awake()
     {
-        // Buscamos el componente automáticamente por si olvidas asignarlo
         if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
+
+        // Intentamos buscar la luz en los hijos si no se asignó en el inspector
+        if (candleLight == null) candleLight = GetComponentInChildren<Light2D>();
     }
 
     private IEnumerator Start()
     {
         altar = Object.FindFirstObjectByType<Altar>();
 
-        // Establecemos el color inicial
-        UpdateColor();
+        // Estado inicial
+        UpdateVisuals();
 
-        // Esperamos un frame para que los enemigos estén listos
         yield return null;
 
         if (startLit)
@@ -48,7 +54,6 @@ public class Candle : MonoBehaviour, IInteractable, ICorruptible
 
     public void Interact()
     {
-        // Si está apagada, la prendemos y limpiamos cualquier estado de corrupción
         if (!isLit)
         {
             isCorrupted = false;
@@ -59,14 +64,11 @@ public class Candle : MonoBehaviour, IInteractable, ICorruptible
     private void LightCandle()
     {
         isLit = true;
-        Debug.Log($"{gameObject.name}: Encendida");
+        Debug.Log($"{gameObject.name}: Encendida con Luz Real");
 
-        UpdateColor(); // 🔥 Cambia a color Encendida
+        UpdateVisuals();
         NotifyAltar();
 
-        // Emitimos estímulos: 
-        // 1. Luz para el Sensible.
-        // 2. Corruptible para que el Corruptor sepa que puede atacarla.
         EmitStimulus(StimulusType.Light);
         EmitStimulus(StimulusType.Corruptible);
     }
@@ -77,9 +79,9 @@ public class Candle : MonoBehaviour, IInteractable, ICorruptible
 
         isCorrupted = true;
         isLit = false;
-        Debug.Log("<color=purple>Vela apagada por el Corruptor</color>");
+        Debug.Log("<color=purple>Vela apagada y luz desactivada por Corruptor</color>");
 
-        UpdateColor(); // 🔥 Cambia a color Apagada
+        UpdateVisuals();
         NotifyAltar();
         StartCoroutine(RestoreTimer());
     }
@@ -87,13 +89,13 @@ public class Candle : MonoBehaviour, IInteractable, ICorruptible
     public void Restore()
     {
         isCorrupted = false;
+        // Si queremos que al restaurarse siga apagada hasta que el player la toque,
+        // solo actualizamos visuales. Si queremos que se prenda sola, llamamos a LightCandle().
+        UpdateVisuals();
         NotifyAltar();
     }
 
-    private void NotifyAltar()
-    {
-        if (altar != null) altar.NotifyCandleChanged();
-    }
+    private void NotifyAltar() => altar?.NotifyCandleChanged();
 
     private IEnumerator RestoreTimer()
     {
@@ -111,19 +113,27 @@ public class Candle : MonoBehaviour, IInteractable, ICorruptible
         }
     }
 
-    // 🔥 NUEVO: Lógica de colores simplificada
-    private void UpdateColor()
+    // 🔥 ACTUALIZADO: Maneja el color del Sprite Y el estado de la Luz 2D
+    private void UpdateVisuals()
     {
-        if (spriteRenderer == null) return;
-
-        if (isLit)
+        if (spriteRenderer != null)
         {
-            spriteRenderer.color = litColor;
+            spriteRenderer.color = isLit ? litColor : unlitColor;
         }
-        else
+
+        if (candleLight != null)
         {
-            // Tanto si está apagada normal como si la apagó el Corruptor, usa el mismo color
-            spriteRenderer.color = unlitColor;
+            // La luz se activa solo si está encendida
+            candleLight.enabled = isLit;
+            candleLight.intensity = isLit ? lightIntensity : 0f;
+
+            // Opcional: Si está corrompida, podrías poner la luz morada en vez de apagarla
+            /*
+            if(isCorrupted) {
+                candleLight.enabled = true;
+                candleLight.color = Color.magenta;
+            }
+            */
         }
     }
 }
