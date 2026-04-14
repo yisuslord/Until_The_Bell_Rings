@@ -5162,6 +5162,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   walkSpeed: 3
   runSpeed: 6
+  anim: {fileID: 0}
   noiseRadius: 5
   enemyLayer:
     serializedVersion: 2
@@ -5541,7 +5542,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!58 &1660095567
 CircleCollider2D:
   m_ObjectHideFlags: 0

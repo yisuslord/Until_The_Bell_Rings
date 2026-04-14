@@ -34,6 +34,33 @@ public abstract class EnemyBase : MonoBehaviour, IStimulusReceiver
         if (agent.isOnNavMesh) agent.SetDestination(destination);
     }
 
+    protected virtual void OnEnable()
+    {
+        if (agent == null) agent = GetComponent<NavMeshAgent>();
+
+        // Resetear variables de IA
+        currentState = State.Wandering;
+        investigationTimer = 0;
+
+        // Solo activamos si estamos en un NavMesh
+        if (agent.isOnNavMesh)
+        {
+            agent.isStopped = false;
+        }
+
+        if (TryGetComponent(out SpriteRenderer sr))
+        {
+            sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, 1f);
+        }
+    }
+
+    public virtual void Die()
+    {
+        PlayDeathEffect();
+        // No deshabilitamos el componente agent aquí, solo lo paramos
+        if (agent != null) agent.isStopped = true;
+        gameObject.SetActive(false);
+    }
     protected virtual void CheckAttack()
     {
         if (PlayerController.Instance == null) return;
@@ -47,7 +74,7 @@ public abstract class EnemyBase : MonoBehaviour, IStimulusReceiver
         }
     }
 
-    
+
     protected virtual void PerformAttack()
     {
         Collider2D hit = Physics2D.OverlapCircle(transform.position, attackDistance, playerLayer);
@@ -57,7 +84,8 @@ public abstract class EnemyBase : MonoBehaviour, IStimulusReceiver
             damageable.TakeDamage(attackDamage);
             Debug.Log($"<color=red>JUGADOR DAÑADO por {gameObject.name}</color>");
 
-            gameObject.SetActive(false); 
+            // Al tocar al jugador, el Manifestado cumple su misión y se desactiva
+            gameObject.SetActive(false);
         }
     }
 
@@ -126,7 +154,7 @@ public abstract class EnemyBase : MonoBehaviour, IStimulusReceiver
 
     // En EnemyBase.cs
 
-    public virtual void Die()
+    /*public virtual void Die()
     {
         // 1. Efecto visual de muerte (si lo tienes configurado)
         PlayDeathEffect();
@@ -141,7 +169,7 @@ public abstract class EnemyBase : MonoBehaviour, IStimulusReceiver
         // 3. Desactivar el objeto
         // Si usas un sistema de respawn, aquí podrías mandarlo a un pool
         gameObject.SetActive(false);
-    }
+    }*/
 
     protected void PlayDeathEffect()
     {
