@@ -1,0 +1,507 @@
+fileFormatVersion: 2
+guid: 46ef1e3e0972dc64e827b2879210437a
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -4846163037102685591
+    second: Asechador_Left_Walking_0
+  - first:
+      213: -7827829343783473657
+    second: Asechador_Left_Walking_1
+  - first:
+      213: 3638403528592569449
+    second: Asechador_Left_Walking_2
+  - first:
+      213: -2172800674859141746
+    second: Asechador_Left_Walking_3
+  - first:
+      213: 6888250802861191555
+    second: Asechador_Left_Walking_4
+  - first:
+      213: -678401001452871623
+    second: Asechador_Left_Walking_5
+  - first:
+      213: -856451104100231188
+    second: Asechador_Left_Walking_6
+  - first:
+      213: -5135320923375316403
+    second: Asechador_Left_Walking_7
+  - first:
+      213: 5258438606788481166
+    second: Asechador_Left_Walking_8
+  - first:
+      213: -4390013266267824481
+    second: Asechador_Left_Walking_9
+  - first:
+      213: -6539436498796156945
+    second: Asechador_Left_Walking_10
+  - first:
+      213: -8576849044965830323
+    second: Asechador_Left_Walking_11
+  - first:
+      213: 5956441366147325389
+    second: Asechador_Left_Walking_12
+  - first:
+      213: 2308682270741504034
+    second: Asechador_Left_Walking_13
+  - first:
+      213: 2157486214907123243
+    second: Asechador_Left_Walking_14
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 32
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Asechador_Left_Walking_0
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 5
+        width: 55
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 962cdd1d468febcb0800000000000000
+      internalID: -4846163037102685591
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Asechador_Left_Walking_1
+      rect:
+        serializedVersion: 2
+        x: 52
+        y: 25
+        width: 13
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 70e28697fa6fd5390800000000000000
+      internalID: -7827829343783473657
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Asechador_Left_Walking_2
+      rect:
+        serializedVersion: 2
+        x: 69
+        y: 5
+        width: 56
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 964b94f6bb43e7230800000000000000
+      internalID: 3638403528592569449
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Asechador_Left_Walking_3
+      rect:
+        serializedVersion: 2
+        x: 115
+        y: 26
+        width: 13
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e85ba475c49a8d1e0800000000000000
+      internalID: -2172800674859141746
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Asechador_Left_Walking_4
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 5
+        width: 62
+        height: 57
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 38137541c9bf79f50800000000000000
+      internalID: 6888250802861191555
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Asechador_Left_Walking_5
+      rect:
+        serializedVersion: 2
+        x: 195
+        y: 5
+        width: 59
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 930e12d22e5d596f0800000000000000
+      internalID: -678401001452871623
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Asechador_Left_Walking_6
+      rect:
+        serializedVersion: 2
+        x: 243
+        y: 26
+        width: 13
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ce75d9c22464d14f0800000000000000
+      internalID: -856451104100231188
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Asechador_Left_Walking_7
+      rect:
+        serializedVersion: 2
+        x: 261
+        y: 5
+        width: 57
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d42559a04dcabb8b0800000000000000
+      internalID: -5135320923375316403
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Asechador_Left_Walking_8
+      rect:
+        serializedVersion: 2
+        x: 308
+        y: 25
+        width: 13
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e80d3de6d0ab9f840800000000000000
+      internalID: 5258438606788481166
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Asechador_Left_Walking_9
+      rect:
+        serializedVersion: 2
+        x: 325
+        y: 5
+        width: 56
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f9e9ad0913a8313c0800000000000000
+      internalID: -4390013266267824481
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Asechador_Left_Walking_10
+      rect:
+        serializedVersion: 2
+        x: 371
+        y: 26
+        width: 13
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fe7e70ad6214f35a0800000000000000
+      internalID: -6539436498796156945
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Asechador_Left_Walking_11
+      rect:
+        serializedVersion: 2
+        x: 386
+        y: 5
+        width: 60
+        height: 57
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d41d9a65c39e8f880800000000000000
+      internalID: -8576849044965830323
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Asechador_Left_Walking_12
+      rect:
+        serializedVersion: 2
+        x: 435
+        y: 26
+        width: 13
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dcd57aa2dd789a250800000000000000
+      internalID: 5956441366147325389
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Asechador_Left_Walking_13
+      rect:
+        serializedVersion: 2
+        x: 451
+        y: 5
+        width: 59
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2202ac61b461a0020800000000000000
+      internalID: 2308682270741504034
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Asechador_Left_Walking_14
+      rect:
+        serializedVersion: 2
+        x: 499
+        y: 26
+        width: 13
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b265757184ee0fd10800000000000000
+      internalID: 2157486214907123243
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Asechador_Left_Walking_0: -4846163037102685591
+      Asechador_Left_Walking_1: -7827829343783473657
+      Asechador_Left_Walking_10: -6539436498796156945
+      Asechador_Left_Walking_11: -8576849044965830323
+      Asechador_Left_Walking_12: 5956441366147325389
+      Asechador_Left_Walking_13: 2308682270741504034
+      Asechador_Left_Walking_14: 2157486214907123243
+      Asechador_Left_Walking_2: 3638403528592569449
+      Asechador_Left_Walking_3: -2172800674859141746
+      Asechador_Left_Walking_4: 6888250802861191555
+      Asechador_Left_Walking_5: -678401001452871623
+      Asechador_Left_Walking_6: -856451104100231188
+      Asechador_Left_Walking_7: -5135320923375316403
+      Asechador_Left_Walking_8: 5258438606788481166
+      Asechador_Left_Walking_9: -4390013266267824481
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

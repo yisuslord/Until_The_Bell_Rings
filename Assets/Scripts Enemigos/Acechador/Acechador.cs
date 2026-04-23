@@ -3,6 +3,8 @@
 public class Asechador : EnemyBase
 {
     [Header("Asechador Settings")]
+
+    public Animator anim;
     [SerializeField] private Altar altarTarget;
     [SerializeField] private AltarZone altarZone;
     [SerializeField] private float attemptInterval = 10f; // Cada 10s piensa si atacar
@@ -10,6 +12,7 @@ public class Asechador : EnemyBase
     [SerializeField] private int altarDamage = 15; // Cuánto le quita al altar de un golpe
 
     private float attemptTimer;
+    private bool moving;
     private bool isAttackingAltar = false;
 
     protected override void Awake()
@@ -20,6 +23,8 @@ public class Asechador : EnemyBase
 
     private void Update()
     {
+        moving = agent.velocity.magnitude > 0.1f;
+        Animate();
         // Si ya decidió atacar el altar, ignoramos el patrullaje normal
         if (isAttackingAltar)
         {
@@ -94,5 +99,16 @@ public class Asechador : EnemyBase
         // El Acechador es el jefe. No le importan los ruiditos del jugador ni las velas.
         // Simplemente hacemos un 'return' vacío para que ignore todo.
         return;
+    }
+
+    private void Animate()
+    {
+        anim.SetBool("moving", moving);
+        if (moving)
+        {
+            Vector2 direction = agent.velocity.normalized;
+            anim.SetFloat("X", direction.x);
+            anim.SetFloat("Y", direction.y);
+        }
     }
 }
