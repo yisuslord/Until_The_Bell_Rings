@@ -1,13 +1,78 @@
 using UnityEngine;
+using System.Collections;
 
 public class NightNPC : MonoBehaviour, IInteractable
 {
     private bool canStartNight = false;
 
+    // Estado de poder o no interactuar para evitar interaccion extra
+    private bool canInteract = true;
+
+    // Fase de los dialogos (Que dialogo va a decir)
+    private int dialogueStep = 0;
+
+    // Dialogos
+    private string[][] dialogues =
+    {
+        // Bienvenida + Movimiento
+        new string[]
+        {
+            "PADRE: Bienvenido, tu debes ser el nuevo sacristán, Samuel verdad?",
+            "Yo soy el padre de esta parroquia, con más de 30 años de experiencia, supongo que ya conoces tu función, deberás cuidar y preservar el templo",
+            "¿Cómo lo harás? Yo te explicaré eso",
+            "Primero que nada puedes empezar por recorrer el lugar tranquilamente (Usando WASD) o si tienes prisa puedes correr (Manteniendo presionado Shift)",
+            "A lo largo de la parroquia hay varias cosas con las cuales interactuar, guardar o incluso esconderte en ellas (Usando E)",
+            "Si las recoges puedes verlas en tu inventario y usarlas en el momento que quieras (Usando Q) siempre que las hayas elegido (Usando 1-5)",
+            "Si en algún momento te quedas sin inventario puedes tirar los objetos que ya tienes (Usando R)",
+            "Adelante investiga un poco el templo y vuelve conmigo cuando estés listo."
+        },
+
+        // Explicacion enemigos
+        new string[]
+        {
+            "PADRE: Bien, ahora te contare un pequeño secreto, cuidar del altar no es tan simple como parece, deberás estar muy atento en las noches",
+            "Este lugar lleva mucho tiempo aquí y es muy especial, cuando la oscuridad cae hay criaturas intentando dañar el altar y es tu deber evitarlo" +
+            ", hasta ahora hemos identificado 3 de ellas: ",
+            "El Sensible: Patrulla en las noches y si percibe luz o sonido te perseguirá, te recomiendo no correr tanto y si te persigue escóndete (Usa E en un escondite) para que se vaya.",
+            "El Manifestado: Aparece en zonas sin luz cuando estás mucho tiempo ahí, regularmente desaparece cuando te ataca",
+            "El Corruptor: El apaga las velas y corrompe las reliquias, dejandolas inútiles por un tiempo",
+            "Tu función será la de evitar que todas las velas se apaguen, cuando una esté apagada acércate y enciendela (Usa E), pero evita que te hagan daño.",
+            "Eso es todo lo que necesitas saber por ahora, explora el entorno y habla conmigo cuando estés listo para enfrentar la noche"
+        },
+
+        // Empezar Noche
+        new string[]
+        {
+            "PADRE: ¿Estas Listo?",
+            "Estas protegiendo un templo sagrado, ten cuidado la noche se acerca",
+            "(Presiona J para empezar)"
+        }
+    };
+
+
     public void Interact()
     {
-        Debug.Log("Padre: 'Hijo, la oscuridad se acerca. ¿Estás listo? (Presiona J para empezar)'");
-        canStartNight = true;
+        if (DialogueUI.Instance.IsOpen || !canInteract)
+            return;
+
+        Debug.Log("El PADRE ESTA HABLANDO");
+        int indexToUse = Mathf.Min(dialogueStep, dialogues.Length - 1);
+
+        DialogueManager.Instance.StartDialogue(
+            dialogues[indexToUse]
+        );
+
+        if (indexToUse == dialogues.Length - 1)
+        {
+            canStartNight = true;
+        }
+        else
+        {
+            dialogueStep++;
+        }
+
+        StartCoroutine(WaitForDialogueEnd());
+
     }
 
     private void Update()
@@ -18,4 +83,17 @@ public class NightNPC : MonoBehaviour, IInteractable
             canStartNight = false;
         }
     }
+
+    IEnumerator WaitForDialogueEnd()
+    {
+        canInteract = false;
+
+        yield return new WaitUntil(() =>
+            !DialogueManager.Instance.IsDialogueActive);
+
+        yield return new WaitForSeconds(0.2f);
+
+        canInteract = true;
+    }
+
 }
