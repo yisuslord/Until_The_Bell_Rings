@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: b91e6ddb631ff424dadf43125b23efc0
+guid: d030009b987897e4ebdb223404e29de1
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 4979527989248916296
-    second: Asechador_0
+      213: -2752037709208592031
+    second: AsechadorBack_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Asechador_0
+      name: AsechadorBack_0
       rect:
         serializedVersion: 2
-        x: 3
-        y: 3
+        x: 0
+        y: 9
         width: 61
-        height: 59
+        height: 53
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 84bfb44d256da1540800000000000000
-      internalID: 4979527989248916296
+      spriteID: 161642ec84ccec9d0800000000000000
+      internalID: -2752037709208592031
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Asechador_0: 4979527989248916296
+      AsechadorBack_0: -2752037709208592031
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

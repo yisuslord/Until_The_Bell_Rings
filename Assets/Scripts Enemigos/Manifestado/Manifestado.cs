@@ -6,11 +6,14 @@ public class Manifestado : EnemyBase
     [Header("Manifestado Logic")]
     [SerializeField] private AltarZone altarZone;
     [SerializeField] private float darknessThreshold = 3f;
-    [SerializeField] private float attackCooldown = 4f; // Un poco más de tiempo para que de miedo
+    [SerializeField] private float attackCooldown = 4f; // Un poco mï¿½s de tiempo para que de miedo
 
+    public Animator anim;
     private float darknessTimer;
     private bool isHunting = false;
     private bool isAturdido = false;
+
+    private bool moving;
 
     private FlashlightController playerFlashlight;
     private SpriteRenderer spriteRenderer; // Para controlar la visibilidad
@@ -24,6 +27,8 @@ public class Manifestado : EnemyBase
 
     private void Update()
     {
+        moving  = agent.velocity.magnitude > 0.1f;
+        Animate();
         if (!agent.enabled || !agent.isOnNavMesh) return;
 
         // 1. ZONA SEGURA: Si entra al altar, desaparece visualmente y deja de cazar
@@ -34,7 +39,7 @@ public class Manifestado : EnemyBase
             return;
         }
 
-        // 2. LÓGICA DE LINTERNA (Solo si no está aturdido)
+        // 2. Lï¿½GICA DE LINTERNA (Solo si no estï¿½ aturdido)
         bool isLightOn = (playerFlashlight != null && playerFlashlight.IsOn);
 
         if (!isLightOn && !isAturdido)
@@ -49,11 +54,11 @@ public class Manifestado : EnemyBase
         else
         {
             StopHunting();
-            // Si la luz está prendida y no está cazando, se desvanece
+            // Si la luz estï¿½ prendida y no estï¿½ cazando, se desvanece
             if (!isHunting && !isAturdido) spriteRenderer.enabled = false;
         }
 
-        // 3. ACCIÓN DE CAZA
+        // 3. ACCIï¿½N DE CAZA
         if (isHunting && PlayerController.Instance != null)
         {
             agent.isStopped = false;
@@ -73,7 +78,7 @@ public class Manifestado : EnemyBase
         if (hit != null && hit.TryGetComponent(out IDamageable damageable))
         {
             damageable.TakeDamage(attackDamage);
-            Debug.Log("<color=purple>El Manifestado te golpeó y se fundió en las sombras.</color>");
+            Debug.Log("<color=purple>El Manifestado te golpeï¿½ y se fundiï¿½ en las sombras.</color>");
 
             // Iniciar el estado de aturdimiento invisible
             StartCoroutine(AturdimientoRoutine());
@@ -93,7 +98,7 @@ public class Manifestado : EnemyBase
         yield return new WaitForSeconds(attackCooldown);
 
         isAturdido = false;
-        // No lo hacemos visible aquí, esperaremos a que el Update 
+        // No lo hacemos visible aquï¿½, esperaremos a que el Update 
         // detecte oscuridad de nuevo para poner spriteRenderer.enabled = true
     }
 
@@ -102,6 +107,17 @@ public class Manifestado : EnemyBase
         isHunting = false;
         darknessTimer = 0;
         if (agent.isOnNavMesh && !isAturdido) agent.isStopped = true;
+    }
+
+    private void Animate()
+    {
+       anim.SetBool("Moving", moving);
+       if (moving)
+       {
+           Vector2 direction = agent.velocity.normalized;
+           anim.SetFloat("X", direction.x);
+           anim.SetFloat("Y", direction.y);
+       }
     }
 
     public override void GetRepelled(Vector2 shockwaveSource, float force) { }

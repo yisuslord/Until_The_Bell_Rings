@@ -9,10 +9,15 @@ public class Sensible : EnemyBase
 
     [Header("Combat Settings")]
     [SerializeField] private float cooldownTime = 3f;
+    public Animator anim;
+    private bool moving;
     private bool isStunned = false;
 
     private void Update()
     {
+        moving = agent.velocity.magnitude > 0.1f;
+        Animate();
+
         if (isStunned) return;
 
         // --- NUEVA LÓGICA DE ZONA SEGURA ---
@@ -116,5 +121,16 @@ public class Sensible : EnemyBase
 
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackDistance);
+    }
+
+    private void Animate()
+    {
+        anim.SetBool("walking", moving);
+        if (moving)
+        {
+            Vector2 direction = agent.velocity.normalized;
+            anim.SetFloat("X", direction.x);
+            anim.SetFloat("Y", direction.y);
+        }
     }
 }
