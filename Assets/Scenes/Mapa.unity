@@ -1344,7 +1344,7 @@ PrefabInstance:
     - target: {fileID: 5262284419040625647, guid: 9ebfa97f49b1aee4984f09f180aec1e5, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 8047714316032973154, guid: 3ccf130ee65f84c46bdc0d7cd8ad176f, type: 3}
+      objectReference: {fileID: -6806674512767190418, guid: 66922b24695904e40bf296da345f00a6, type: 3}
     - target: {fileID: 5262284419040625647, guid: 9ebfa97f49b1aee4984f09f180aec1e5, type: 3}
       propertyPath: m_SortingOrder
       value: 1
@@ -34824,6 +34824,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40727872624cc6e4e8ca5333db7b1550, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsDialogueActive: 0
   textSpeed: 0.03
 --- !u!1 &1399794759
 GameObject:
@@ -41247,7 +41248,7 @@ PrefabInstance:
     - target: {fileID: 2369477619805274872, guid: 9c18ecd038677e54b9582feab9bc22a9, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 4390239406621980123, guid: de619a5b7e7b46e49b3178cd7cc236b0, type: 3}
+      objectReference: {fileID: 6192245317881030728, guid: d03d35dc10f100047bf93f3d40cc9407, type: 3}
     - target: {fileID: 2369477619805274872, guid: 9c18ecd038677e54b9582feab9bc22a9, type: 3}
       propertyPath: m_SortingOrder
       value: 1
