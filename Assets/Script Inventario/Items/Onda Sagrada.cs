@@ -1,12 +1,24 @@
 using UnityEngine;
 
-public class ShockwaveItem : BaseItem
+public class OndaSagrada : BaseItem, ICorruptible
 {
     [Header("Shockwave Settings")]
     [SerializeField] private float range = 10f;
     [SerializeField] private float pushForce = 15f;
     [SerializeField] private AudioClip clipOnda;
 
+    /*private bool isCorrupted = false;
+
+    public bool IsCorrupted => isCorrupted;
+
+    public void Corrupt() {
+
+    }
+
+    public void Restore()
+    {
+
+    }*/
     public override void Use()
     {
         // 1. Obtener el AudioSource del Jugador dinámicamente

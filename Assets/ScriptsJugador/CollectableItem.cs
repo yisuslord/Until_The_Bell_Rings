@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class CollectibleItem : MonoBehaviour
+public class CollectibleItem : MonoBehaviour, ICorruptible
 {
     [Header("Ajustes de Item")]
     [SerializeField] private GameObject itemLogicPrefab;
@@ -60,7 +60,14 @@ public class CollectibleItem : MonoBehaviour
 
     public void Corrupt()
     {
+        if (isCorrupted) return; // No corromper lo ya corrompido
+
         isCorrupted = true;
-        if (TryGetComponent(out SpriteRenderer sr)) sr.color = Color.magenta;
+        Debug.Log($"<color=purple>El objeto {gameObject.name} ha sido corrompido y no puede recogerse.</color>");
+
+        if (TryGetComponent(out SpriteRenderer sr))
+            sr.color = Color.magenta;
+
+        // Opcional: Emitir un sonido o partículas de corrupción aquí
     }
 }

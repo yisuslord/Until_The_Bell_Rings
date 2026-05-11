@@ -18,9 +18,9 @@ public interface IHideable
 
 public interface ICorruptible
 {
-    bool IsCorrupted { get; }
+    //bool IsCorrupted { get; }
     void Corrupt();
-    void Restore();
+    //void Restore();
 }
 
 public interface IDamageable

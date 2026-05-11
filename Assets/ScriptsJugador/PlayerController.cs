@@ -23,7 +23,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private AudioSource playerSource;
     [SerializeField] private AudioClip clipCorrer;
     [SerializeField] private AudioClip clipCaminar;
-    [SerializeField] private float stepInterval = 0.4f; // Tiempo entre pasos
+    //[SerializeField] private float stepInterval = 0.4f; // Tiempo entre pasos
     private float stepTimer;
 
     public static PlayerController Instance { get; private set; }
