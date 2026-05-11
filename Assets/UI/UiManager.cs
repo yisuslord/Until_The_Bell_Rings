@@ -53,6 +53,7 @@ public class UIManager : MonoBehaviour
 
     [Header("Player UI")]
     [SerializeField] private Image playerHealthBarFill; // Arrastra aquí el "RellenoRojo"
+    [SerializeField] private Image playerStaminaBarFill;
 
     // ... (dentro de la clase UIManager)
 
@@ -66,6 +67,28 @@ public class UIManager : MonoBehaviour
             // Si la vida es mayor al 34% (más de 1 corazón si tienes 3), vuelve a ser roja.
             // Si es 1 corazón o menos, se pone magenta (o el color de alerta que elijas)
             playerHealthBarFill.color = (fillValue <= 0.34f) ? Color.magenta : Color.red;
+        }
+    }
+
+    public void UpdatePlayerStamina(float currentStamina, float maxStamina, bool isExhausted)
+    {
+        if (playerStaminaBarFill != null)
+        {
+            // Calculamos el porcentaje (0.0 a 1.0)
+            float fillValue = currentStamina / maxStamina;
+            playerStaminaBarFill.fillAmount = fillValue;
+
+            // FEEDBACK VISUAL:
+            // Si está agotado (isExhausted), la ponemos gris o roja para avisar que no puede correr.
+            // Si no, color cian o verde.
+            if (isExhausted)
+            {
+                playerStaminaBarFill.color = Color.gray; // O un rojo tenue
+            }
+            else
+            {
+                playerStaminaBarFill.color = Color.cyan;
+            }
         }
     }
 }

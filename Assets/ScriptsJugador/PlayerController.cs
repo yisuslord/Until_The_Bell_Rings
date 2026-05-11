@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using System;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerController : MonoBehaviour
@@ -13,6 +15,13 @@ public class PlayerController : MonoBehaviour
     private bool isMoving;
     private bool isRunning;
 
+    [Header("Stamina System")]
+    [SerializeField] private float maxStamina = 100f;
+    [SerializeField] private float staminaDrain = 20f;   // Cuánto baja por segundo al correr
+    [SerializeField] private float staminaRegen = 15f;   // Cuánto sube por segundo
+    private float currentStamina;
+    private bool isExhausted = false; // Bloqueo cuando llega a 0
+
     [Header("Noise System")]
     [SerializeField] private float noiseRadius = 5f;
     [SerializeField] private LayerMask enemyLayer;
@@ -23,7 +32,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private AudioSource playerSource;
     [SerializeField] private AudioClip clipCorrer;
     [SerializeField] private AudioClip clipCaminar;
-    //[SerializeField] private float stepInterval = 0.4f; // Tiempo entre pasos
     private float stepTimer;
 
     public static PlayerController Instance { get; private set; }
@@ -35,7 +43,8 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         playerHide = GetComponent<PlayerHide>();
 
-        // Si olvidaste asignarlo en el inspector, lo buscamos
+        currentStamina = maxStamina; // Empezamos llenos
+
         if (playerSource == null) playerSource = GetComponent<AudioSource>();
     }
 
@@ -44,7 +53,8 @@ public class PlayerController : MonoBehaviour
         if (playerHide != null && playerHide.IsHidden)
         {
             movementInput = Vector2.zero;
-            Animate(); // Para que pase a Idle si se esconde moviéndose
+            HandleStamina(); // Recuperar estamina mientras está escondido
+            Animate();
             return;
         }
 
@@ -52,46 +62,75 @@ public class PlayerController : MonoBehaviour
         float vertical = Input.GetAxisRaw("Vertical");
         movementInput = new Vector2(horizontal, vertical).normalized;
 
-        isRunning = Input.GetKey(KeyCode.LeftShift);
         isMoving = movementInput != Vector2.zero;
 
+        // Lógica de Carrera con Estamina
+        // Solo puede correr si presiona Shift, se mueve, Y NO está agotado
+        isRunning = Input.GetKey(KeyCode.LeftShift) && isMoving && !isExhausted;
+
+        HandleStamina();
         Animate();
-        HandleFootsteps(); // <--- Llamamos a la lógica de audio aquí
+        HandleFootsteps();
+    }
+
+    private void HandleStamina()
+    {
+        if (isRunning)
+        {
+            currentStamina -= staminaDrain * Time.deltaTime;
+            if (currentStamina <= 0)
+            {
+                currentStamina = 0;
+                isExhausted = true;
+            }
+        }
+        else
+        {
+            currentStamina += staminaRegen * Time.deltaTime;
+            currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
+
+            if (isExhausted && currentStamina >= maxStamina)
+            {
+                isExhausted = false;
+            }
+        }
+
+        // 🔥 LLAMADA AL UI MANAGER
+        // Asumiendo que tu UIManager tiene una instancia estática: UIManager.Instance
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.UpdatePlayerStamina(currentStamina, maxStamina, isExhausted);
+        }
     }
 
     private void HandleFootsteps()
     {
-        // Si el jugador se está moviendo y NO está escondido
         if (isMoving && !(playerHide != null && playerHide.IsHidden))
         {
-            // 1. Elegir el clip correcto (Caminar o Correr)
             AudioClip clipDeseado = isRunning ? clipCorrer : clipCaminar;
 
-            // 2. Si el clip cambió (ej. de caminar a correr) o no estaba sonando
             if (playerSource.clip != clipDeseado || !playerSource.isPlaying)
             {
                 playerSource.clip = clipDeseado;
-                playerSource.loop = true; // Hacemos que el sonido sea continuo
+                playerSource.loop = true;
                 playerSource.Play();
             }
 
-            // 3. Ajustar la velocidad del sonido (Pitch) según la acción
-            // Si corre, el sonido se reproduce más rápido
             playerSource.pitch = isRunning ? 1.3f : 1.0f;
         }
         else
         {
-            // 4. Si se detiene, cortamos el sonido inmediatamente
             if (playerSource.isPlaying)
             {
                 playerSource.Stop();
-                playerSource.clip = null; // Limpiamos para que al volver a empezar detecte el cambio
+                playerSource.clip = null;
             }
         }
     }
 
     private void FixedUpdate()
     {
+        // La velocidad depende de si realmente está corriendo (considerando estamina)
         float speed = isRunning ? runSpeed : walkSpeed;
         rb.linearVelocity = movementInput * speed;
 
@@ -129,4 +168,6 @@ public class PlayerController : MonoBehaviour
             anim.SetFloat("Y", movementInput.y);
         }
     }
+
+    // ... (Métodos EmitNoise y Animate se mantienen igual)
 }
