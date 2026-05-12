@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 92213197999277524}
   - component: {fileID: 4972941955598280843}
   - component: {fileID: 7037826347902625145}
+  - component: {fileID: -7441269052075906132}
   m_Layer: 6
   m_Name: Vela
   m_TagString: Untagged
@@ -201,3 +202,17 @@ MonoBehaviour:
   - {x: 0.5, y: -0.5, z: 0}
   - {x: 0.5, y: 0.5, z: 0}
   - {x: -0.5, y: 0.5, z: 0}
+--- !u!114 &-7441269052075906132
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8158019939854290915}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be7cbc0075e9c554e974ab60aba43978, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  indicatorPrefab: {fileID: 2448260420196313658, guid: ed79f7e08ff753140878f239ee9ef167, type: 3}
+  margin: 50
