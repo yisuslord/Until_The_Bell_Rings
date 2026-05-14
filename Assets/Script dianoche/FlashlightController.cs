@@ -9,7 +9,7 @@ public class FlashlightController : MonoBehaviour
     {
         if (LevelManager.Instance.currentState == GameState.Night)
         {
-            if (Input.GetKeyDown(KeyCode.F))
+            if (Input.GetKeyDown(KeyCode.F) || Input.GetButtonDown("Light"))
             {
                 IsOn = !IsOn; // Cambiamos el estado
                 lightVisuals.SetActive(IsOn);

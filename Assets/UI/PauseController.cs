@@ -10,7 +10,7 @@ public class PauseController : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(pauseKey))
+        if (Input.GetKeyDown(pauseKey) || Input.GetButtonDown("Pause"))
         {
             if (IsPaused) ResumeGame();
             else PauseGame();

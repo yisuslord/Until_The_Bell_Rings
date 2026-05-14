@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 63004d890cc08fb47aa2495e3b407ca7
+guid: 9a5f2fb5f799f3148bfb19d0d6851ae1
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1347651518190537476
-    second: red-exclamation-mark-in-pixel-art-style-vector-removebg-preview_0
+      213: 8354541786974452862
+    second: UI_LifebarAltar_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -96,30 +96,17 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: red-exclamation-mark-in-pixel-art-style-vector-removebg-preview_0
+      name: UI_LifebarAltar_0
       rect:
         serializedVersion: 2
-        x: 133
-        y: 146
-        width: 238
-        height: 230
+        x: 0
+        y: 13
+        width: 128
+        height: 46
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 40b43c66ae1d3b210800000000000000
-      internalID: 1347651518190537476
+      spriteID: e7cf4c1bd7b41f370800000000000000
+      internalID: 8354541786974452862
       vertices: []
       indices: 
       edges: []
@@ -147,8 +134,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      red-exclamation-mark-in-pixel-art-style-vector-removebg-preview_0: 1347651518190537476
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

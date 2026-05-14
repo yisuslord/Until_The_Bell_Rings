@@ -61,12 +61,12 @@ public class PlayerController : MonoBehaviour
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
         movementInput = new Vector2(horizontal, vertical).normalized;
-
+        
         isMoving = movementInput != Vector2.zero;
 
         // Lógica de Carrera con Estamina
         // Solo puede correr si presiona Shift, se mueve, Y NO está agotado
-        isRunning = Input.GetKey(KeyCode.LeftShift) && isMoving && !isExhausted;
+        isRunning = (Input.GetKey(KeyCode.LeftShift)||Input.GetButton("Run")) && isMoving && !isExhausted;
 
         HandleStamina();
         Animate();

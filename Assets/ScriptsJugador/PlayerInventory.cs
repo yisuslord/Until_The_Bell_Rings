@@ -30,13 +30,13 @@ public class PlayerInventory : MonoBehaviour
         ManejarSeleccion();
 
         // 2. Usar Item (Tecla Q)
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (Input.GetKeyDown(KeyCode.Q) || Input.GetButtonDown("Use"))
         {
             UsarItemActual();
         }
 
         // 3. Soltar Item (Tecla R)
-        if (Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.R) || Input.GetButtonDown("Drop"))
         {
             SoltarItemActual();
         }
@@ -49,6 +49,11 @@ public class PlayerInventory : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha3)) actItemIndex = 2;
         if (Input.GetKeyDown(KeyCode.Alpha4)) actItemIndex = 3;
         if (Input.GetKeyDown(KeyCode.Alpha5)) actItemIndex = 4;
+
+        if (Input.GetButtonDown("ObjL")) actItemIndex -= 1; Debug.Log(actItemIndex); ;
+        if (Input.GetButtonDown("ObjR")) actItemIndex += 1; Debug.Log(actItemIndex); ;
+
+        
 
         // Limitar el índice por seguridad
         actItemIndex = Mathf.Clamp(actItemIndex, 0, maxItems - 1);

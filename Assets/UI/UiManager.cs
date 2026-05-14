@@ -29,7 +29,7 @@ public class UIManager : MonoBehaviour
             altarBarFill.fillAmount = fillValue;
 
             // Cambiar color a rojo si queda poca vida (menor al 30%)
-            altarBarFill.color = (fillValue < 0.3f) ? Color.red : Color.green;
+            altarBarFill.color = (fillValue < 0.3f) ? Color.red : Color.white;
         }
 
         if (altarPercentText != null)

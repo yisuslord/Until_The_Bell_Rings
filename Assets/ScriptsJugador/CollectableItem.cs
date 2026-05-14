@@ -12,7 +12,7 @@ public class CollectibleItem : MonoBehaviour, ICorruptible
     private void Update()
     {
         // Si el jugador está en el rango, no está corrompido y presiona E
-        if (playerInRange && !isCorrupted && Input.GetKeyDown(KeyCode.E))
+        if (playerInRange && !isCorrupted && (Input.GetKeyDown(KeyCode.E)||Input.GetButtonDown("Interact")))
         {
             RecogerObjeto();
         }

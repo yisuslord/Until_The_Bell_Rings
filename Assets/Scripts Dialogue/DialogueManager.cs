@@ -41,7 +41,7 @@ public class DialogueManager : MonoBehaviour
 
     private void Update()
     {
-        if (DialogueUI.Instance.dialoguePanel.activeSelf && (Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.J)))
+        if (DialogueUI.Instance.dialoguePanel.activeSelf && (Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.J) || Input.GetButtonDown("Interact")))
         {
             if (DialogueUI.Instance.dialogueText.text ==
                 currentLines[index])
