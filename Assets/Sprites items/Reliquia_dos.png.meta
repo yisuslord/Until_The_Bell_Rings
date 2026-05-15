@@ -1,10 +1,13 @@
 fileFormatVersion: 2
-guid: aa1b2a61a85629b44989a70fe3540c7b
+guid: d191d6c800745f3468f6e8df33d6204a
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -8304394480467120519
-    second: pngtree-pixel-art-trophies-vector-png-image_13598926 (1)_0
+      213: -6761594243312649337
+    second: Reliquia_dos_0
+  - first:
+      213: 8346576019754221787
+    second: Reliquia_dos_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +40,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -51,7 +54,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 32
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -75,7 +78,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -96,40 +99,49 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: pngtree-pixel-art-trophies-vector-png-image_13598926 (1)_0
+      name: Reliquia_dos_0
       rect:
         serializedVersion: 2
-        x: 20
-        y: 20
-        width: 320
-        height: 320
+        x: 7
+        y: 0
+        width: 19
+        height: 22
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 97eea05f73dd0cc80800000000000000
-      internalID: -8304394480467120519
+      spriteID: 78bf5043cddf922a0800000000000000
+      internalID: -6761594243312649337
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Reliquia_dos_1
+      rect:
+        serializedVersion: 2
+        x: 39
+        y: 0
+        width: 19
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bd08e3cfaaef4d370800000000000000
+      internalID: 8346576019754221787
       vertices: []
       indices: 
       edges: []
@@ -138,7 +150,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: e1366523e8bc323408aa04e1733d05a5
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -148,7 +160,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      pngtree-pixel-art-trophies-vector-png-image_13598926 (1)_0: -8304394480467120519
+      Reliquia_dos_0: -6761594243312649337
+      Reliquia_dos_1: 8346576019754221787
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
