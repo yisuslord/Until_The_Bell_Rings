@@ -1,16 +1,16 @@
-using UnityEngine;
-using System.Collections;
+ï»¿using UnityEngine;
 using System.Collections.Generic;
 
 public class Altar : MonoBehaviour, IDamageable
 {
     [Header("Altar Stats")]
-    [SerializeField] private int currentHealth = 100;
-    [SerializeField] private int maxHealth = 100;
+    // ðŸ”¥ CAMBIO: Ahora son float para permitir un drenaje totalmente fluido y suave
+    [SerializeField] private float currentHealth = 100f;
+    [SerializeField] private float maxHealth = 100f;
 
-    [Header("Attack Settings")]
-    [SerializeField] private float drainInterval = 5f; // Cada cuántos segundos pierde vida
-    [SerializeField] private int damagePerUnlitCandle = 2; // Cuánto daño hace cada vela apagada
+    [Header("Continuous Drain Settings")]
+    [Tooltip("CuÃ¡nto daÃ±o por segundo hace CADA vela apagada/corrupta")]
+    [SerializeField] private float baseDamagePerSecond = 0.5f;
 
     private List<Candle> allCandlesInScene = new List<Candle>();
     private bool isGameOver = false;
@@ -24,28 +24,39 @@ public class Altar : MonoBehaviour, IDamageable
 
     private void Start()
     {
-        StartCoroutine(DrainHealthRoutine());
         UIManager.Instance.UpdateAltarHealth(currentHealth, maxHealth);
         UpdateCandlesUI();
     }
 
-    private IEnumerator DrainHealthRoutine()
+    private void Update()
     {
-        while (!isGameOver)
+        if (isGameOver) return;
+
+        // 1. Contar velas apagadas o corruptas en tiempo real
+        int unlitCount = 0;
+        foreach (Candle candle in allCandlesInScene)
         {
-            yield return new WaitForSeconds(drainInterval);
+            if (candle != null && (!candle.IsLit || candle.IsCorrupted))
+                unlitCount++;
+        }
 
-            int unlitCount = 0;
-            foreach (Candle candle in allCandlesInScene)
-            {
-                if (!candle.IsLit || candle.IsCorrupted) unlitCount++;
-            }
+        // 2. Si hay velas apagadas, aplicar daÃ±o continuo por segundo
+        if (unlitCount > 0)
+        {
+            // La velocidad de bajada escala dinÃ¡micamente con la cantidad de velas
+            float totalDamageThisFrame = unlitCount * baseDamagePerSecond * Time.deltaTime;
 
-            if (unlitCount > 0)
+            // En lugar de llamar a TakeDamage (que es para golpes secos), reducimos directo de forma suave
+            currentHealth -= totalDamageThisFrame;
+
+            if (currentHealth < 0) currentHealth = 0;
+
+            // Actualizar la interfaz constantemente
+            UIManager.Instance.UpdateAltarHealth(currentHealth, maxHealth);
+
+            if (currentHealth <= 0)
             {
-                int totalDamage = unlitCount * damagePerUnlitCandle;
-                TakeDamage(totalDamage);
-                Debug.Log($"<color=orange>El altar pierde {totalDamage} de vida por la oscuridad.</color>");
+                TriggerGameOver();
             }
         }
     }
@@ -62,13 +73,14 @@ public class Altar : MonoBehaviour, IDamageable
         int unlit = 0;
         foreach (Candle c in allCandlesInScene)
         {
+            if (c == null) continue;
             if (c.IsLit && !c.IsCorrupted) lit++;
             else unlit++;
         }
         UIManager.Instance.UpdateCandleCount(lit, unlit);
     }
 
-    // Aquí recibe el golpe físico del Asechador o el daño por oscuridad
+    // ðŸ”¥ Mantenemos este mÃ©todo intacto para los golpes secos e instantÃ¡neos del Acechador
     public void TakeDamage(int amount)
     {
         if (isGameOver) return;

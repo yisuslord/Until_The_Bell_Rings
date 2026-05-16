@@ -20,12 +20,12 @@ public class UIManager : MonoBehaviour
     }
 
     // Actualiza la barra verde
-    public void UpdateAltarHealth(int currentHealth, int maxHealth)
+    public void UpdateAltarHealth(float currentHealth, float maxHealth)
     {
         if (altarBarFill != null)
         {
-            // Calculamos el porcentaje entre 0 y 1
-            float fillValue = (float)currentHealth / maxHealth;
+            // Al ser floats, la división es directa y súper precisa
+            float fillValue = currentHealth / maxHealth;
             altarBarFill.fillAmount = fillValue;
 
             // Cambiar color a rojo si queda poca vida (menor al 30%)
@@ -34,7 +34,8 @@ public class UIManager : MonoBehaviour
 
         if (altarPercentText != null)
         {
-            altarPercentText.text = $"{((float)currentHealth / maxHealth * 100):0}%";
+            // Muestra el porcentaje sin decimales molestos usando :0
+            altarPercentText.text = $"{(currentHealth / maxHealth * 100f):0}%";
         }
     }
 
