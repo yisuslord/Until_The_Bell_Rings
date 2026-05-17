@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class OndaSagrada : BaseItem, ICorruptible, IInventoryItem
+public class OndaSagrada : BaseItem, ICorruptible
 {
     [Header("Shockwave Settings")]
     [SerializeField] private float range = 10f;
@@ -10,7 +10,7 @@ public class OndaSagrada : BaseItem, ICorruptible, IInventoryItem
     [SerializeField] private Sprite myIcon;
 
     // Devolvemos el sprite cumpliendo con la interfaz
-    public Sprite InventoryIcon => myIcon;
+    //public Sprite InventoryIcon => myIcon;
 
     
 

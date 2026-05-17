@@ -85,25 +85,19 @@ public class InventoryUI : MonoBehaviour
 
             IInventoryItem item = inventoryLogic.Inventory[i];
 
-            // Si hay un item real y no es el default
+            // Si hay un item real en el slot y no es el por defecto
             if (item != null && item != (IInventoryItem)inventoryLogic.defaultItem)
             {
-                // Intentamos convertir a BaseItem para leer el Sprite
-                if (item is BaseItem baseItem && baseItem.InventoryIcon != null)
+                // 🔥 LEEMOS DIRECTAMENTE DE LA INTERFAZ, YA NO FALLARÁ
+                if (item.InventoryIcon != null)
                 {
-                    itemIcons[i].sprite = baseItem.InventoryIcon; // Aquí se asigna la foto real
-                    itemIcons[i].enabled = true; // Encendemos el portarretratos
+                    itemIcons[i].sprite = item.InventoryIcon;
+                    itemIcons[i].enabled = true;
                 }
                 else
                 {
                     itemIcons[i].enabled = false;
                 }
-            }
-            else
-            {
-                // Slot vacío dentro de la lista
-                itemIcons[i].enabled = false;
-                itemIcons[i].sprite = null;
             }
         }
     }

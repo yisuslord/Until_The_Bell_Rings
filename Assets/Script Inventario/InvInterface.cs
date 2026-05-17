@@ -1,5 +1,8 @@
+﻿using UnityEngine;
+
 public interface IInventoryItem
 {
     string ItemName { get; }
-    void Use(); // La acci�n principal (Curar, Escudo, Onda)
+    Sprite InventoryIcon { get; } // 🔥 AÑADE ESTO
+    void Use();
 }

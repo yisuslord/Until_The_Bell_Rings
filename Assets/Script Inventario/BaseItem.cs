@@ -3,9 +3,13 @@ using System.Collections;
 
 public abstract class BaseItem : MonoBehaviour, IInteractable, ICorruptible, IInventoryItem
 {
+    // Modifica la línea de tu variable existente para que cumpla con la interfaz:
     [Header("Item Info")]
     [SerializeField] protected string itemName;
-    [SerializeField] protected float corruptionDuration = 120f;
+    [SerializeField] private Sprite inventoryIcon; // Ponlo en minúscula si quieres como variable
+
+    // Y añade esta propiedad pública para que la UI pueda leerla:
+    public Sprite InventoryIcon => inventoryIcon;
 
     [Header("Detection Settings")]
     [SerializeField] private float detectionRadius = 10f;
@@ -15,7 +19,9 @@ public abstract class BaseItem : MonoBehaviour, IInteractable, ICorruptible, IIn
     public bool IsCorrupted => isCorrupted;
     public string ItemName => itemName;
 
-    public Sprite InventoryIcon;
+    public float corruptionDuration = 10f;
+
+    //public Sprite InventoryIcon;
 
     // Al nacer en la escena, el objeto "emite su presencia"
     protected virtual void Start()

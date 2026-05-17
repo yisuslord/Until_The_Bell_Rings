@@ -105,6 +105,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemLogicPrefab: {fileID: 1277612447409189844}
   isCorrupted: 0
+  clipRecoger: {fileID: 0}
 --- !u!114 &8985969282758388476
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -118,15 +119,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemName: Onda
-  corruptionDuration: 120
+  inventoryIcon: {fileID: 997460612900281598, guid: 3ff4e3afc6a720d419fc7a2f3be646f0, type: 3}
   detectionRadius: 10
   enemyLayer:
     serializedVersion: 2
     m_Bits: 128
-  InventoryIcon: {fileID: 81783387321917298, guid: 77832d9ef6227ea4589e68b38d4e5824, type: 3}
+  corruptionDuration: 120
   range: 10
   pushForce: 15
   clipOnda: {fileID: 8300000, guid: c3685725e758d464d93ecde5c2aee08b, type: 3}
+  myIcon: {fileID: 997460612900281598, guid: 3ff4e3afc6a720d419fc7a2f3be646f0, type: 3}
 --- !u!61 &8341889319821123035
 BoxCollider2D:
   m_ObjectHideFlags: 0

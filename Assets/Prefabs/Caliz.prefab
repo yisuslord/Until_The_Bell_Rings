@@ -139,12 +139,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemName: "Curaci\xF3n"
-  corruptionDuration: 120
+  inventoryIcon: {fileID: -6761594243312649337, guid: d191d6c800745f3468f6e8df33d6204a, type: 3}
   detectionRadius: 6
   enemyLayer:
     serializedVersion: 2
     m_Bits: 128
-  InventoryIcon: {fileID: -8304394480467120519, guid: aa1b2a61a85629b44989a70fe3540c7b, type: 3}
+  corruptionDuration: 120
   healAmount: 1
 --- !u!114 &945347019009951309
 MonoBehaviour:
@@ -160,3 +160,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemLogicPrefab: {fileID: 2193468410809168146}
   isCorrupted: 0
+  clipRecoger: {fileID: 0}
