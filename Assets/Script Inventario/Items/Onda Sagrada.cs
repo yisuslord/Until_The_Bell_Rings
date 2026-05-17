@@ -1,11 +1,18 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
-public class OndaSagrada : BaseItem, ICorruptible
+public class OndaSagrada : BaseItem, ICorruptible, IInventoryItem
 {
     [Header("Shockwave Settings")]
     [SerializeField] private float range = 10f;
     [SerializeField] private float pushForce = 15f;
     [SerializeField] private AudioClip clipOnda;
+
+    [SerializeField] private Sprite myIcon;
+
+    // Devolvemos el sprite cumpliendo con la interfaz
+    public Sprite InventoryIcon => myIcon;
+
+    
 
     /*private bool isCorrupted = false;
 
@@ -21,13 +28,11 @@ public class OndaSagrada : BaseItem, ICorruptible
     }*/
     public override void Use()
     {
-        // 1. Obtener el AudioSource del Jugador dinámicamente
-        // Como el item es hijo del jugador, buscamos en el padre.
-        AudioSource pSource = GetComponentInParent<AudioSource>();
-
-        if (pSource != null && clipOnda != null)
+        /// ðŸ”¥ LLAMADA AL AUDIO MANAGER ANTES DE DESTRUIR EL OBJETO
+        if (AudioManager.Instance != null && clipOnda != null)
         {
-            pSource.PlayOneShot(clipOnda);
+            // Usamos 2D porque es un sonido de inventario/interfaz para el jugador
+            AudioManager.Instance.PlaySFX2D(clipOnda, 1f);
         }
 
         // 2. Efecto Visual
@@ -42,7 +47,7 @@ public class OndaSagrada : BaseItem, ICorruptible
             if (effect != null) effect.PlayEffect(transform.position);
         }
 
-        // 3. Lógica de Empuje
+        // 3. LÃ³gica de Empuje
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(transform.position, range, enemyLayer);
         foreach (var hit in hitEnemies)
         {

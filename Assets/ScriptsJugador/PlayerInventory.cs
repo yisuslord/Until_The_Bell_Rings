@@ -11,9 +11,7 @@ public class PlayerInventory : MonoBehaviour
     [Header("Estado del Inventario")]
     public List<IInventoryItem> Inventory = new List<IInventoryItem>();
 
-    [Header("Audio")]
-    [SerializeField] private AudioSource playerSource;
-    [SerializeField] private AudioClip Recoger;
+    
     void Awake()
     {
         // Inicializamos con espacios vacíos
@@ -65,12 +63,6 @@ public class PlayerInventory : MonoBehaviour
 
         if (item != null && item != (IInventoryItem)defaultItem)
         {
-            // 1. Antes de hacer nada, disparamos el sonido si el item tiene uno
-            // Intentamos convertir el item a BaseItem para leer su clip de sonido
-            if (item is BaseItem baseItem && baseItem.GetClip() != null)
-            {
-                playerSource.PlayOneShot(baseItem.GetClip());
-            }
 
             item.Use();
             RemoverItemActual();

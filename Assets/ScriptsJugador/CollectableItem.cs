@@ -1,4 +1,4 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 
 public class CollectibleItem : MonoBehaviour, ICorruptible
 {
@@ -6,19 +6,23 @@ public class CollectibleItem : MonoBehaviour, ICorruptible
     [SerializeField] private GameObject itemLogicPrefab;
     public bool isCorrupted = false;
 
-    private bool playerInRange = false; // Nueva variable para saber si el player est· cerca
+    private bool playerInRange = false; // Nueva variable para saber si el player est√° cerca
     private PlayerInventory tempInventory; // Referencia temporal al inventario
+
+    // üî• NUEVA VARIABLE: Aqu√≠ arrastrar√°s el sonido de "recoger" en el Inspector
+    [Header("Audio")]
+    [SerializeField] private AudioClip clipRecoger;
 
     private void Update()
     {
-        // Si el jugador est· en el rango, no est· corrompido y presiona E
+        // Si el jugador est√° en el rango, no est√° corrompido y presiona E
         if (playerInRange && !isCorrupted && (Input.GetKeyDown(KeyCode.E)||Input.GetButtonDown("Interact")))
         {
             RecogerObjeto();
         }
     }
 
-    private void RecogerObjeto()
+    public void RecogerObjeto()
     {
         if (tempInventory != null)
         {
@@ -31,6 +35,13 @@ public class CollectibleItem : MonoBehaviour, ICorruptible
 
                 logicObj.transform.SetParent(tempInventory.transform);
                 logicObj.SetActive(false);
+
+                // üî• LLAMADA AL AUDIO MANAGER ANTES DE DESTRUIR EL OBJETO
+                if (AudioManager.Instance != null && clipRecoger != null)
+                {
+                    // Usamos 2D porque es un sonido de inventario/interfaz para el jugador
+                    AudioManager.Instance.PlaySFX2D(clipRecoger, 1f);
+                }
 
                 Debug.Log("<color=green>Item recogido con E.</color>");
                 Destroy(gameObject);
@@ -45,7 +56,7 @@ public class CollectibleItem : MonoBehaviour, ICorruptible
             playerInRange = true;
             tempInventory = other.GetComponent<PlayerInventory>();
 
-            // Opcional: PodrÌas activar aquÌ un mensaje de "Presiona E para recoger"
+            // Opcional: Podr√≠as activar aqu√≠ un mensaje de "Presiona E para recoger"
         }
     }
 
@@ -68,6 +79,6 @@ public class CollectibleItem : MonoBehaviour, ICorruptible
         if (TryGetComponent(out SpriteRenderer sr))
             sr.color = Color.magenta;
 
-        // Opcional: Emitir un sonido o partÌculas de corrupciÛn aquÌ
+        // Opcional: Emitir un sonido o part√≠culas de corrupci√≥n aqu√≠
     }
 }

@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System;
 using UnityEngine.SceneManagement;
 
@@ -23,13 +23,16 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 
     public void TakeDamage(int amount)
     {
-        // Cambiamos InParent por GetComponent normal, ya que el AudioSource vive en el mismo Player
-        AudioSource pSource = GetComponent<AudioSource>();
-        pSource.PlayOneShot(clipDano);
+        // ðŸ”¥ LLAMADA AL AUDIO MANAGER ANTES DE DESTRUIR EL OBJETO
+        if (AudioManager.Instance != null && clipDano != null)
+        {
+            // Usamos 2D porque es un sonido de inventario/interfaz para el jugador
+            AudioManager.Instance.PlaySFX2D(clipDano, 1f);
+        }
 
         currentHealth -= amount;
         UIManager.Instance.UpdatePlayerHealth(currentHealth, maxHealth);
-        Debug.Log($"Jugador dañado. Vida restante: {currentHealth}");
+        Debug.Log($"Jugador daÃ±ado. Vida restante: {currentHealth}");
 
         if (currentHealth <= 0)
         {
@@ -39,44 +42,50 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 
     private void Die()
     {
+        // ðŸ”¥ LLAMADA AL AUDIO MANAGER ANTES DE DESTRUIR EL OBJETO
+        if (AudioManager.Instance != null && clipMorir != null)
+        {
+            // Usamos 2D porque es un sonido de inventario/interfaz para el jugador
+            AudioManager.Instance.PlaySFX2D(clipMorir, 1f);
+        }
         Debug.Log("El jugador ha muerto");
 
         // 1. Ejecutamos el evento por si otros sistemas necesitan saberlo
         OnPlayerDeath?.Invoke();
 
-        // 3. Liberamos el cursor (IMPORTANTE para poder clicar los botones del menú de muerte)
+        // 3. Liberamos el cursor (IMPORTANTE para poder clicar los botones del menÃº de muerte)
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
         // 4. Mandamos a la escena 2 (DeathScene)
-        // Asegúrate de que en Build Settings la escena de muerte tenga el índice 2
+        // AsegÃºrate de que en Build Settings la escena de muerte tenga el Ã­ndice 2
         SceneManager.LoadScene(2);
     }
 
     public void Heal(int amount)
     {
-        AudioSource pSource = GetComponent<AudioSource>();
+        
 
         // 1. Sumamos la vida primero
         currentHealth += amount;
 
-        // 2. IMPORTANTE: Validamos el máximo ANTES de avisar a la UI
+        // 2. IMPORTANTE: Validamos el mÃ¡ximo ANTES de avisar a la UI
         if (currentHealth > maxHealth)
         {
             currentHealth = maxHealth;
         }
 
-        // 3. Ahora sí, actualizamos la barra con el valor final correcto
+        // 3. Ahora sÃ­, actualizamos la barra con el valor final correcto
         if (UIManager.Instance != null)
         {
             UIManager.Instance.UpdatePlayerHealth(currentHealth, maxHealth);
         }
 
-        // 4. Sonido
-        if (pSource != null && clipCurar != null)
+        // ðŸ”¥ LLAMADA AL AUDIO MANAGER ANTES DE DESTRUIR EL OBJETO
+        if (AudioManager.Instance != null && clipCurar != null)
         {
-            pSource.PlayOneShot(clipCurar);
-            Debug.Log("Sonido de curación ejecutado.");
+            // Usamos 2D porque es un sonido de inventario/interfaz para el jugador
+            AudioManager.Instance.PlaySFX2D(clipCurar, 1f);
         }
 
         Debug.Log($"Jugador curado. Vida actual: {currentHealth}");

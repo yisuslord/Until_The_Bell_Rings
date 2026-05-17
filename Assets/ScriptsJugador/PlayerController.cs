@@ -29,10 +29,16 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float noiseInterval = 0.5f;
 
     [Header("Audio")]
-    [SerializeField] private AudioSource playerSource;
     [SerializeField] private AudioClip clipCorrer;
     [SerializeField] private AudioClip clipCaminar;
+    [SerializeField] private float walkStepInterval = 0.45f; // Tiempo entre pasos al caminar
+    [SerializeField] private float runStepInterval = 0.28f;  // Tiempo entre pasos al correr
     private float stepTimer;
+
+    [Header("Run Path")]
+    [SerializeField] private ParticleSystem Rastro;
+
+    
 
     public static PlayerController Instance { get; private set; }
 
@@ -45,7 +51,7 @@ public class PlayerController : MonoBehaviour
 
         currentStamina = maxStamina; // Empezamos llenos
 
-        if (playerSource == null) playerSource = GetComponent<AudioSource>();
+        //if (playerSource == null) playerSource = GetComponent<AudioSource>();
     }
 
     private void Update()
@@ -71,8 +77,32 @@ public class PlayerController : MonoBehaviour
         HandleStamina();
         Animate();
         HandleFootsteps();
+        HandleParticles();
     }
 
+    private void HandleParticles()
+    {
+        if (Rastro == null) return;
+
+        // Si está corriendo y se está moviendo, activamos la emisión
+        var emission = Rastro.emission;
+
+        // Al usar 'enabled', si se apaga, las partículas ya creadas siguen vivas
+        emission.enabled = isRunning && isMoving;
+
+        if (isRunning && isMoving)
+        {
+            // HACER QUE FLUYAN EN DIRECCIÓN OPUESTA
+            // Tomamos el vector de movimiento invertido (-movementInput)
+            Vector2 oppositeDirection = -movementInput;
+
+            // Convertimos la dirección en un ángulo en grados
+            float angle = Mathf.Atan2(oppositeDirection.y, oppositeDirection.x) * Mathf.Rad2Deg;
+
+            // Rotamos el sistema de partículas hacia ese ángulo
+            Rastro.transform.rotation = Quaternion.Euler(0, 0, angle);
+        }
+    }
     private void HandleStamina()
     {
         if (isRunning)
@@ -105,28 +135,25 @@ public class PlayerController : MonoBehaviour
 
     private void HandleFootsteps()
     {
-        if (isMoving && !(playerHide != null && playerHide.IsHidden))
+        if (AudioManager.Instance == null) return;
+
+        if (isMoving)
         {
+            // 1. Elegimos qué clip mandarle al canal de SFX
             AudioClip clipDeseado = isRunning ? clipCorrer : clipCaminar;
+            float volumen = isRunning ? 0.8f : 0.5f; // Correr suena un poco más fuerte
 
-            if (playerSource.clip != clipDeseado || !playerSource.isPlaying)
-            {
-                playerSource.clip = clipDeseado;
-                playerSource.loop = true;
-                playerSource.Play();
-            }
-
-            playerSource.pitch = isRunning ? 1.3f : 1.0f;
+            // 2. Le decimos al manager: "reproduce este clip en bucle"
+            AudioManager.Instance.ControlarPasosLoop(clipDeseado, true, volumen);
         }
         else
         {
-            if (playerSource.isPlaying)
-            {
-                playerSource.Stop();
-                playerSource.clip = null;
-            }
+            // 3. Si no se mueve, le decimos al manager que apague ese loop de SFX
+            AudioManager.Instance.ControlarPasosLoop(null, false, 0f);
         }
     }
+
+
 
     private void FixedUpdate()
     {

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
@@ -16,7 +16,7 @@ public class InventoryUI : MonoBehaviour
 
     void Start()
     {
-        // 1. Buscar al player si no est� asignado
+        // 1. Buscar al player si no está asignado
         if (playerObject == null) playerObject = GameObject.FindGameObjectWithTag("Player");
 
         if (playerObject != null)
@@ -31,7 +31,7 @@ public class InventoryUI : MonoBehaviour
     {
         if (inventoryLogic == null) return;
 
-        // 2. Si el �ndice cambi�, actualizar marco dorado
+        // 2. Si el índice cambió, actualizar marco dorado
         if (inventoryLogic.actItemIndex != lastSelectedIndex)
         {
             UpdateSelectionVisual(inventoryLogic.actItemIndex);
@@ -75,19 +75,24 @@ public class InventoryUI : MonoBehaviour
 
         for (int i = 0; i < 5; i++)
         {
-            // Evitar errores si el inventario no tiene 5 espacios a�n
-            if (i >= inventoryLogic.Inventory.Count) break;
+            // CAMBIO: Si la lista técnica no tiene este índice, significa que el slot está vacío
+            if (i >= inventoryLogic.Inventory.Count)
+            {
+                itemIcons[i].enabled = false;
+                itemIcons[i].sprite = null;
+                continue; // 🔥 'continue' salta al siguiente número (i++), NO rompe el bucle
+            }
 
             IInventoryItem item = inventoryLogic.Inventory[i];
 
-            // Si hay un item real (no es nulo ni el default)
+            // Si hay un item real y no es el default
             if (item != null && item != (IInventoryItem)inventoryLogic.defaultItem)
             {
                 // Intentamos convertir a BaseItem para leer el Sprite
                 if (item is BaseItem baseItem && baseItem.InventoryIcon != null)
                 {
-                    itemIcons[i].sprite = baseItem.InventoryIcon;
-                    itemIcons[i].enabled = true;
+                    itemIcons[i].sprite = baseItem.InventoryIcon; // Aquí se asigna la foto real
+                    itemIcons[i].enabled = true; // Encendemos el portarretratos
                 }
                 else
                 {
@@ -96,7 +101,7 @@ public class InventoryUI : MonoBehaviour
             }
             else
             {
-                // Slot vac�o
+                // Slot vacío dentro de la lista
                 itemIcons[i].enabled = false;
                 itemIcons[i].sprite = null;
             }

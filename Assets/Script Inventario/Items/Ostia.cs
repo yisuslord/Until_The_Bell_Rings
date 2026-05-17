@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Ostia : BaseItem
+public class Ostia : BaseItem, IInventoryItem
 {
     [Header("Potion Settings")]
     [SerializeField] private int healAmount = 1;
