@@ -1,32 +1,37 @@
 ﻿using UnityEngine;
-using UnityEngine.AI;
+using System.Collections;
 
 public class Sensible : EnemyBase
 {
     [Header("Detection Settings")]
     [SerializeField] private float detectionRadius = 4f;
-    [SerializeField] private AltarZone altarZone; // Arrastra la zona aquí
+    [SerializeField] private AltarZone altarZone;
 
     [Header("Combat Settings")]
     [SerializeField] private float cooldownTime = 3f;
     public Animator anim;
     private bool moving;
     private bool isStunned = false;
+    private bool isAttacking = false; // Candado para la animación de ataque
 
     private void Update()
     {
-        moving = agent.velocity.magnitude > 0.1f;
+        moving = !isStunned && !isAttacking && agent.velocity.magnitude > 0.1f;
         Animate();
 
-        if (isStunned) return;
+        if (isStunned || isAttacking) return;
 
-        // --- NUEVA LÓGICA DE ZONA SEGURA ---
         if (altarZone != null && altarZone.IsPlayerInside)
         {
             if (currentState != State.Wandering)
             {
                 Debug.Log("Jugador a salvo en Altar. Sensible vuelve a patrullar.");
                 currentState = State.Wandering;
+            }
+            if (agent.isOnNavMesh)
+            {
+                agent.ResetPath();
+                SetRandomDestination(); // Función heredada de EnemyBase para que camine a otro lado
             }
         }
 
@@ -42,7 +47,6 @@ public class Sensible : EnemyBase
     {
         if (PlayerController.Instance != null)
         {
-            // Si el jugador está en la zona segura, no puede ser perseguido
             if (altarZone.IsPlayerInside) return;
 
             PlayerHide playerHide = PlayerController.Instance.GetComponent<PlayerHide>();
@@ -57,21 +61,46 @@ public class Sensible : EnemyBase
         }
     }
 
-    private void CheckAttack()
+    // Sobreescribimos CheckAttack para controlar el frenado suave previo al golpe
+    protected override void CheckAttack()
     {
-        
+        if (PlayerController.Instance == null) return;
+
         Collider2D hit = Physics2D.OverlapCircle(transform.position, attackDistance, playerLayer);
 
+        if (hit != null && !isAttacking && !isStunned)
+        {
+            StartCoroutine(SensibleAttackRoutine());
+        }
+    }
+
+    private IEnumerator SensibleAttackRoutine()
+    {
+        isAttacking = true;
+        agent.isStopped = true; // Se detiene antes de atacar
+
+        // Aquí iria la animación de ataque
+        // Ejemplo if (anim != null) anim.SetTrigger("attack");
+
+        // Tiempo que tarda el monstruo en estirar o hacer la animacion
+        yield return new WaitForSeconds(0.3f);
+
+        // Verificación doble por si el jugador esquivó en ese microsegundo
+        Collider2D hit = Physics2D.OverlapCircle(transform.position, attackDistance, playerLayer);
         if (hit != null && hit.TryGetComponent(out IDamageable damageable))
         {
             damageable.TakeDamage(attackDamage);
             Debug.Log("<color=red>¡Sensible golpeó al jugador!</color>");
-
-            StartCoroutine(AttackCooldown());
         }
+
+        // Breve espera para terminar de reproducir el golpe antes del aturdimiento completo
+        yield return new WaitForSeconds(0.2f);
+
+        isAttacking = false;
+        StartCoroutine(AttackCooldown()); // Pasa a su descanso regular
     }
 
-    private System.Collections.IEnumerator AttackCooldown()
+    private IEnumerator AttackCooldown()
     {
         isStunned = true;
         agent.isStopped = true;
@@ -81,19 +110,15 @@ public class Sensible : EnemyBase
 
         isStunned = false;
         agent.isStopped = false;
-        currentState = State.Wandering; 
+        currentState = State.Wandering;
     }
+
     public override void OnStimulusReceived(Vector2 position, StimulusType type)
     {
-        // Si el estímulo es de un objeto corruptible, el Sensible se hace el sordo y lo ignora
-        if (type == StimulusType.Corruptible)
-        {
-            return;
-        }
-
-        // Si es cualquier otro estímulo (ruido del jugador, pasos, etc.), hace el comportamiento normal (Investigar)
+        if (type == StimulusType.Corruptible) return;
         base.OnStimulusReceived(position, type);
     }
+
     private void HandleInvestigation()
     {
         if (!agent.pathPending && agent.remainingDistance < 0.5f)
@@ -101,10 +126,7 @@ public class Sensible : EnemyBase
             CheckForPlayerProximity();
             investigationTimer -= Time.deltaTime;
 
-            if (investigationTimer <= 0)
-            {
-                currentState = State.Wandering;
-            }
+            if (investigationTimer <= 0) currentState = State.Wandering;
         }
     }
 
@@ -112,15 +134,6 @@ public class Sensible : EnemyBase
     {
         Collider2D hit = Physics2D.OverlapCircle(transform.position, detectionRadius, playerLayer);
         if (hit != null) currentState = State.Chasing;
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.magenta;
-        Gizmos.DrawWireSphere(transform.position, detectionRadius);
-
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, attackDistance);
     }
 
     private void Animate()
