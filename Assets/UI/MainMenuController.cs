@@ -19,7 +19,10 @@ public class MainMenuController : MonoBehaviour
     private void StartGame()
     {
         // Al usar SceneManager, Unity carga la nueva escena
-        SceneManager.LoadScene(gameSceneName);
+        LoadingManager.SceneToLoad = "Mapa"; // Asegúrate de que el nombre coincida exactamente con tu escena de nivel
+
+        // 2. Cargamos la escena intermedia de carga
+        SceneManager.LoadScene("Loading");
     }
 
     private void QuitGame()
