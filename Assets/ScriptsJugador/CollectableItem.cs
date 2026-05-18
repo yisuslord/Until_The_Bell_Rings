@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
+using static UnityEditor.Progress;
 
 public class CollectibleItem : MonoBehaviour, ICorruptible
 {
@@ -13,12 +15,40 @@ public class CollectibleItem : MonoBehaviour, ICorruptible
     [Header("Audio")]
     [SerializeField] private AudioClip clipRecoger;
 
+    [Header("UI de Interacción")]
+    [SerializeField] private TextMeshProUGUI textoInteraccionUI; // 🔥 Arrastra el texto aquí
+    private IInventoryItem miItem;
+
+    private void Awake()
+    {
+        miItem = GetComponent<IInventoryItem>();
+
+        // 🔥 ¡LA MAGIA DE LA BÚSQUEDA AUTOMÁTICA!
+        // Buscamos en toda la escena un objeto que tenga el componente TextMeshProUGUI
+        // Nota: Si tienes varios textos TMP en tu Canvas, es mejor buscarlo por el nombre exacto de su GameObject.
+        GameObject objetoTexto = GameObject.Find("TextoInteraccion");
+        
+
+        if (objetoTexto != null)
+        {
+            textoInteraccionUI = objetoTexto.GetComponent<TextMeshProUGUI>();
+            textoInteraccionUI.text = "";
+
+        }
+        else
+        {
+            Debug.LogWarning($"[CollectibleItem] No se encontró el GameObject 'TextoInteraccion' en la escena para {gameObject.name}");
+        }
+    }
+
     private void Update()
     {
         // Si el jugador está en el rango, no está corrompido y presiona E
         if (playerInRange && !isCorrupted && (Input.GetKeyDown(KeyCode.E)||Input.GetButtonDown("Interact")))
         {
             RecogerObjeto();
+        }
+        else { 
         }
     }
 
@@ -29,8 +59,10 @@ public class CollectibleItem : MonoBehaviour, ICorruptible
             // 🔥 Buscamos la lógica (BaseItem) en este MISMÍSIMO objeto del suelo
             IInventoryItem item = GetComponent<IInventoryItem>();
 
-            if (item != null)
+            if (item != null && miItem != null)
             {
+                // Ocultamos el texto inmediatamente al recogerlo
+                OcultarTexto();
                 // Lo añadimos al inventario
                 tempInventory.AddItem(item);
 
@@ -64,6 +96,8 @@ public class CollectibleItem : MonoBehaviour, ICorruptible
         {
             playerInRange = true;
             tempInventory = other.GetComponent<PlayerInventory>();
+            // 🔥 ¡JUGADOR EN RANGO!: Mostramos las instrucciones dinámicas
+            MostrarTexto();
 
             // Opcional: Podrías activar aquí un mensaje de "Presiona E para recoger"
         }
@@ -75,11 +109,40 @@ public class CollectibleItem : MonoBehaviour, ICorruptible
         {
             playerInRange = false;
             tempInventory = null;
+            // 🔥 ¡JUGADOR SE ALEJÓ!: Ocultamos las instrucciones
+            OcultarTexto();
         }
     }
 
+    private void MostrarTexto()
+    {
+        if (textoInteraccionUI != null && miItem != null)
+        {
+            // Personaliza el texto con el nombre real del objeto (ej: "[E] Recoger Batería")
+            textoInteraccionUI.text = $"[E (teclado) / B (control)] Recoger {miItem.ItemName}";
+            textoInteraccionUI.gameObject.SetActive(true); // Lo encendemos
+        }
+    }
+
+    /*private void MotrarTextoCorrompido()
+    {
+        if (textoInteraccionUI !=null && isCorrupted)
+        {
+            textoInteraccionUI.text = $"La {miItem.ItemName} ha sido corrompida";
+            textoInteraccionUI.gameObject.SetActive(true);
+        }
+    }*/
+
+    private void OcultarTexto()
+    {
+        if (textoInteraccionUI != null)
+        {
+            textoInteraccionUI.gameObject.SetActive(false); // Lo apagamos
+        }
+    }
     public void Corrupt()
     {
+
         if (isCorrupted) return; // No corromper lo ya corrompido
 
         isCorrupted = true;
