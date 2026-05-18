@@ -1,12 +1,12 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerInventory : MonoBehaviour
 {
-    [Header("Configuraci�n")]
+    [Header("Configuración")]
     public int maxItems = 5;
     public int actItemIndex = 0;
-    public BaseItem defaultItem; // El item vac�o (Placeholder)
+    public BaseItem defaultItem; // El item vacío (Placeholder)
 
     [Header("Estado del Inventario")]
     public List<IInventoryItem> Inventory = new List<IInventoryItem>();
@@ -14,7 +14,7 @@ public class PlayerInventory : MonoBehaviour
     
     void Awake()
     {
-        // Inicializamos con espacios vac�os
+        // Inicializamos con espacios vacíos
         for (int i = 0; i < maxItems; i++)
         {
             Inventory.Add(defaultItem);
@@ -24,7 +24,7 @@ public class PlayerInventory : MonoBehaviour
 
     void Update()
     {
-        // 1. Selecci�n de Slots (1-5)
+        // 1. Selección de Slots (1-5)
         ManejarSeleccion();
 
         // 2. Usar Item (Tecla Q)
@@ -53,7 +53,7 @@ public class PlayerInventory : MonoBehaviour
 
         
 
-        // Limitar el �ndice por seguridad
+        // Limitar el índice por seguridad
         actItemIndex = Mathf.Clamp(actItemIndex, 0, maxItems - 1);
     }
 
@@ -75,37 +75,64 @@ public class PlayerInventory : MonoBehaviour
 
         if (item != null && item != (IInventoryItem)defaultItem)
         {
-            // Convertimos a componente para volverlo a activar en el mundo
             MonoBehaviour itemComponent = item as MonoBehaviour;
+
             if (itemComponent != null)
             {
+                // 1. Lo liberamos: deja de ser hijo del jugador
+                itemComponent.transform.SetParent(null);
+
+                // 2. Lo posicionamos cerca de los pies del jugador con un ligero desfase
+                Vector3 posicionSoltado = transform.position + (Vector3)Random.insideUnitCircle * 0.5f;
+                itemComponent.transform.position = posicionSoltado;
+
+                // 3. ¡Lo reactivamos! Al encenderse, volverá a activar sus Triggers y su SpriteRenderer
                 itemComponent.gameObject.SetActive(true);
-                itemComponent.transform.SetParent(null); // Lo sacamos del hijo del jugador
-                itemComponent.transform.position = transform.position + (Vector3)Random.insideUnitCircle; // Lo suelta cerca
+
+                // 4. Si el objeto original usa físicas, las reseteamos al tocar el suelo
+                if (itemComponent.TryGetComponent(out Rigidbody2D rb))
+                {
+                    rb.linearVelocity = Vector2.zero;
+                    rb.angularVelocity = 0f;
+                }
+
+                Debug.Log($"<color=orange>{item.ItemName} devuelto al mundo real.</color>");
             }
 
+            // Limpiamos el slot y refrescamos la UI
             RemoverItemActual();
-            Debug.Log("Item soltado.");
         }
     }
 
     public void RemoverItemActual()
     {
         Inventory[actItemIndex] = defaultItem;
+
+        // 🔥 NUEVO: Forzamos a la UI a enterarse INMEDIATAMENTE de que este slot se vació
+        InventoryUI ui = Object.FindFirstObjectByType<InventoryUI>();
+        if (ui != null)
+        {
+            ui.UpdateInventoryIcons();
+        }
     }
 
     public void AddItem(IInventoryItem newItem)
     {
-        //playerSource.PlayOneShot(Recoger);
-
-
         for (int i = 0; i < Inventory.Count; i++)
         {
-            if (Inventory[i] == defaultItem || Inventory[i] == null)
+            // 🔥 Buscamos el primer slot vacío (ya sea null o el defaultItem)
+            if (Inventory[i] == null || Inventory[i] == (IInventoryItem)defaultItem)
             {
                 Inventory[i] = newItem;
-                return;
+                Debug.Log($"<color=green>Objeto colocado en el slot libre: {i}</color>");
+
+                // Forzamos a la UI a dibujar el nuevo ícono que acaba de entrar en ese hueco
+                InventoryUI ui = Object.FindFirstObjectByType<InventoryUI>();
+                if (ui != null) ui.UpdateInventoryIcons();
+
+                return; // Cortamos el método para que no lo duplique en otros slots
             }
         }
+        Debug.Log("<color=red>Inventario lleno, no hay huecos vacíos.</color>");
     }
 }

@@ -105,7 +105,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemLogicPrefab: {fileID: 1277612447409189844}
   isCorrupted: 0
-  clipRecoger: {fileID: 0}
+  clipRecoger: {fileID: 8300000, guid: 0e1d6ab1586d1bf4dafa5caf8cde4af6, type: 3}
 --- !u!114 &8985969282758388476
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -182,7 +182,7 @@ AudioSource:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1277612447409189844}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}

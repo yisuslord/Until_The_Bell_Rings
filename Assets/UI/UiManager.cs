@@ -13,6 +13,9 @@ public class UIManager : MonoBehaviour
     [Header("Velas UI")]
     [SerializeField] private TextMeshProUGUI candlesCounterText; // El texto al lado del icono
 
+    /*[Header("Batería de linterna")]
+    [SerializeField] private Image batterylight;*/
+
     private void Awake()
     {
         if (Instance == null) Instance = this;

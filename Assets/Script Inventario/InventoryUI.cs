@@ -75,30 +75,48 @@ public class InventoryUI : MonoBehaviour
 
         for (int i = 0; i < 5; i++)
         {
-            // CAMBIO: Si la lista técnica no tiene este índice, significa que el slot está vacío
+            // Si el inventario no tiene este índice inicializado, ocultamos
             if (i >= inventoryLogic.Inventory.Count)
             {
-                itemIcons[i].enabled = false;
                 itemIcons[i].sprite = null;
-                continue; // 🔥 'continue' salta al siguiente número (i++), NO rompe el bucle
+                SetIconAlpha(itemIcons[i], 0f); // Invisible
+                continue;
             }
 
             IInventoryItem item = inventoryLogic.Inventory[i];
 
-            // Si hay un item real en el slot y no es el por defecto
-            if (item != null && item != (IInventoryItem)inventoryLogic.defaultItem)
+            // 🔥 COMPARACIÓN CLAVE: Si el ítem es null o es exactamente el defaultItem, el slot está VACÍO
+            if (item == null || item == (IInventoryItem)inventoryLogic.defaultItem)
             {
-                // 🔥 LEEMOS DIRECTAMENTE DE LA INTERFAZ, YA NO FALLARÁ
+                itemIcons[i].sprite = null;     // Borramos la imagen vieja del objeto usado
+                SetIconAlpha(itemIcons[i], 0f); // Volvemos el slot 100% invisible
+            }
+            else
+            {
+                // Si hay un objeto real, intentamos leer su icono
                 if (item.InventoryIcon != null)
                 {
-                    itemIcons[i].sprite = item.InventoryIcon;
-                    itemIcons[i].enabled = true;
+                    itemIcons[i].sprite = item.InventoryIcon; // Asignamos el dibujo
+                    SetIconAlpha(itemIcons[i], 1f);          // Lo mostramos (100% opaco)
                 }
                 else
                 {
-                    itemIcons[i].enabled = false;
+                    // Si el objeto no tiene icono configurado, lo ocultamos para que no salga el cuadro blanco
+                    itemIcons[i].sprite = null;
+                    SetIconAlpha(itemIcons[i], 0f);
                 }
             }
         }
     }
+
+    // Función auxiliar (recuerda mantenerla al final de tu InventoryUI)
+    private void SetIconAlpha(Image img, float alpha)
+    {
+        if (img == null) return;
+        Color c = img.color;
+        c.a = alpha;
+        img.color = c;
+        img.enabled = true; // Lo dejamos encendido para evitar bugs de canvas de Unity
+    }
 }
+    

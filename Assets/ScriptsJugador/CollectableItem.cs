@@ -3,7 +3,7 @@
 public class CollectibleItem : MonoBehaviour, ICorruptible
 {
     [Header("Ajustes de Item")]
-    [SerializeField] private GameObject itemLogicPrefab;
+    //[SerializeField] private GameObject itemLogicPrefab;
     public bool isCorrupted = false;
 
     private bool playerInRange = false; // Nueva variable para saber si el player está cerca
@@ -26,25 +26,34 @@ public class CollectibleItem : MonoBehaviour, ICorruptible
     {
         if (tempInventory != null)
         {
-            GameObject logicObj = Instantiate(itemLogicPrefab);
-            IInventoryItem item = logicObj.GetComponent<IInventoryItem>();
+            // 🔥 Buscamos la lógica (BaseItem) en este MISMÍSIMO objeto del suelo
+            IInventoryItem item = GetComponent<IInventoryItem>();
 
             if (item != null)
             {
+                // Lo añadimos al inventario
                 tempInventory.AddItem(item);
 
-                logicObj.transform.SetParent(tempInventory.transform);
-                logicObj.SetActive(false);
+                // 🔥 En lugar de clonar, transformamos a este mismo objeto en hijo del jugador
+                transform.SetParent(tempInventory.transform);
 
-                // 🔥 LLAMADA AL AUDIO MANAGER ANTES DE DESTRUIR EL OBJETO
+                // Lo posicionamos en el centro del jugador (opcional, por orden)
+                transform.localPosition = Vector3.zero;
+
+                // Lo desactivamos por completo del mundo real (físicas, render, triggers, etc.)
+                gameObject.SetActive(false);
+
+                // Reproducir Audio
                 if (AudioManager.Instance != null && clipRecoger != null)
                 {
-                    // Usamos 2D porque es un sonido de inventario/interfaz para el jugador
                     AudioManager.Instance.PlaySFX2D(clipRecoger, 1f);
                 }
 
-                Debug.Log("<color=green>Item recogido con E.</color>");
-                Destroy(gameObject);
+                Debug.Log($"<color=green>{gameObject.name} guardado y desactivado (Sin clones).</color>");
+
+                // 🔥 IMPORTANTE: Limpiamos la referencia temporal para evitar bugs al desaparecer
+                playerInRange = false;
+                tempInventory = null;
             }
         }
     }
