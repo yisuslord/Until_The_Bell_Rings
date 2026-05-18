@@ -6,7 +6,7 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
     [Header("Corruption Logic")]
     [Range(0, 100)]
     [SerializeField] private float successChance = 50f; // 50% de probabilidad por defecto
-    [SerializeField] private float waitBeforeAttempt = 4f; // Tiempo que "tarda" en corromper
+    [SerializeField] public float waitBeforeAttempt = 4f; // Tiempo que "tarda" en corromper
 
     [Header("Scanning Settings")]
     [SerializeField] private float scanInterval = 2f; // Tiempo entre escaneos

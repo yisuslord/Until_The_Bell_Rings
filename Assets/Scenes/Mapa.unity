@@ -1265,20 +1265,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentLevel: 1
   currentState: 0
-  nightDuration: 120
+  nightDuration: 20
   uiRelojContenedor: {fileID: 961600883}
   textoTiempo: {fileID: 485552244}
   lightGlobal: {fileID: 1732797039}
   dayIntensity: 1
   nightIntensity: 0.05
   lightTransitionSpeed: 1.5
-  flashlight: {fileID: 802036036}
   allEnemies:
   - {fileID: 1747865094}
   - {fileID: 269297771}
   - {fileID: 1268290486}
   - {fileID: 1784031885}
   stalker: {fileID: 1747865094}
+  flashlight: {fileID: 802036036}
 --- !u!4 &196165968
 Transform:
   m_ObjectHideFlags: 0

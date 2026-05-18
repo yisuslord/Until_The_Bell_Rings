@@ -12,7 +12,7 @@ public abstract class EnemyBase : MonoBehaviour, IStimulusReceiver
     [SerializeField] protected float attackDistance = 0.8f;
     [SerializeField] protected int attackDamage = 1;
     [SerializeField] private float wanderRadius = 7f;
-    [SerializeField] private float waitTimeAtPoint = 2f;
+    [SerializeField] protected float waitTimeAtPoint = 2f;
     [SerializeField] protected LayerMask playerLayer;
 
     private float wanderTimer;
