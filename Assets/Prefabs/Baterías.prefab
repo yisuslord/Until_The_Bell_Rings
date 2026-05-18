@@ -110,6 +110,7 @@ MonoBehaviour:
     m_Bits: 128
   corruptionDuration: 10
   restoreAmount: 40
+  clipRecarga: {fileID: 8300000, guid: 787d866d0b067c94e92f1b36fa699c02, type: 3}
 --- !u!61 &-5995557567111452228
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -168,6 +169,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55e95ccd4a0d4a849bac4bded4935018, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemLogicPrefab: {fileID: 147772585999268337}
   isCorrupted: 0
   clipRecoger: {fileID: 8300000, guid: 0e1d6ab1586d1bf4dafa5caf8cde4af6, type: 3}
