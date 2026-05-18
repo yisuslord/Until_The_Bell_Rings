@@ -7,8 +7,8 @@ public class Asechador : EnemyBase
     public Animator anim;
     [SerializeField] private Altar altarTarget;
     [SerializeField] private AltarZone altarZone;
-    [SerializeField] private float attemptInterval = 10f; // Cada 10s piensa si atacar
-    [Range(0, 100)][SerializeField] private float attackChance = 40f; // 40% de probabilidad de éxito al intentar
+    [SerializeField] public float attemptInterval = 10f; // Cada 10s piensa si atacar
+    [Range(0, 100)][SerializeField] public float attackChance = 40f; // 40% de probabilidad de éxito al intentar
     [SerializeField] private int altarDamage = 15; // Cuánto le quita al altar de un golpe
 
     private float attemptTimer;
