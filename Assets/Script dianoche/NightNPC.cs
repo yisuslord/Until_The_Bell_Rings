@@ -39,6 +39,15 @@ public class NightNPC : MonoBehaviour, IInteractable
             "Eso es todo lo que necesitas saber por ahora, explora el entorno y habla conmigo cuando estés listo para enfrentar la noche"
         },
 
+        // Explicación objetos
+        new string[]
+        {
+            "PADRE: A lo largo de la iglesia, encontrarás objetos que te ayudarán a cumplir tu misión",
+            "Las baterías: tendrás una linterna cuya energía se agota, pero descuida, mientras tengas baterías contigo estarás bien",
+            "Los cálices: si un demonio te lastima, un cáliz podrá ayudarte a sanar",
+            "Las cruces: serán tu protección contra el sensible, pues éste no tolera el poder de Dios"
+        },
+
         // Empezar Noche
         new string[]
         {
