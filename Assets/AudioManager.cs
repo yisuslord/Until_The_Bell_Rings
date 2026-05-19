@@ -29,6 +29,40 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    // Añade esto dentro de tu AudioManager.cs
+
+    /// <summary>
+    /// Hace un fade out de la música actual en un tiempo determinado.
+    /// </summary>
+    public void FadeOutMusic(float duration)
+    {
+        // Usamos el propio AudioManager para correr la corrutina y que no se destruya al cambiar de escena
+        StartCoroutine(FadeOutMusicCoroutine(duration));
+    }
+
+    private System.Collections.IEnumerator FadeOutMusicCoroutine(float duration)
+    {
+        // Asumiendo que guardas la referencia al AudioSource de la música en una variable llamada 'musicSource'
+        // Si tu canal de música se llama diferente (ej: musicChannel), cámbialo aquí.
+        if (musicSource == null || !musicSource.isPlaying) yield break;
+
+        float startVolume = musicSource.volume;
+        float timer = 0f;
+
+        while (timer < duration)
+        {
+            timer += Time.deltaTime;
+            // Va reduciendo el volumen de manera lineal a lo largo del tiempo
+            musicSource.volume = Mathf.Lerp(startVolume, 0f, timer / duration);
+            yield return null; // Espera al siguiente frame
+        }
+
+        musicSource.volume = 0f;
+        musicSource.Stop();
+
+        // Restablecemos el volumen original del componente para la próxima pista que se reproduzca en el juego
+        musicSource.volume = startVolume;
+    }
     private void ConfigurarFuentesGlobales()
     {
         if (playerMovementSource == null) playerMovementSource = gameObject.AddComponent<AudioSource>();
