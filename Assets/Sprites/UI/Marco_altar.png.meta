@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Marco_altar_0: 6105819123088962956
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
