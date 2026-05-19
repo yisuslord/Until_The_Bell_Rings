@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class Altar : MonoBehaviour, IDamageable
 {
@@ -101,5 +102,6 @@ public class Altar : MonoBehaviour, IDamageable
         isGameOver = true;
         Debug.Log("<color=red>EL ALTAR SE HA EXTINGUIDO. LA OSCURIDAD REINA.</color>");
         Time.timeScale = 0f;
+        SceneManager.LoadScene(2);
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.Rendering.Universal;
 using TMPro;
 using UnityEngine.AI;
-
+using UnityEngine.SceneManagement;
 public enum GameState { Day, Night }
 
 public class LevelManager : MonoBehaviour
@@ -106,8 +106,32 @@ public class LevelManager : MonoBehaviour
 
     public void EndNight()
     {
-        currentLevel++;
+        // 🔥 Si se acaba la noche del nivel 3 (o superior), el jugador gana
+        if (currentLevel >= 3)
+        {
+            StartCoroutine(SecuenciaVictoriaRoutine());
+        }
+        else
+        {
+            // Si va en nivel 1 o 2, avanza al siguiente día con normalidad
+            currentLevel++;
+            SetDay();
+        }
+    }
+
+    // 🔥 CORRUTINA DE VICTORIA: Vuelve el día, congela la acción y cambia de escena
+    private System.Collections.IEnumerator SecuenciaVictoriaRoutine()
+    {
+        // 1. Apagamos la lógica de la noche y restauramos el día (vuelve la luz global poco a poco)
         SetDay();
+
+        Debug.Log("<color=green>[LevelManager] ¡Nivel 3 completado! Sobreviviste. Iniciando transición al WinState...</color>");
+
+        // 2. Esperamos unos segundos para que el jugador asimile la victoria mientras sale el sol
+        yield return new WaitForSeconds(2f);
+
+        // 3. Cargamos la escena de ganar
+        SceneManager.LoadScene("Winstate");
     }
 
     private void SetDay()
@@ -180,24 +204,24 @@ public class LevelManager : MonoBehaviour
             {
                 if (currentLevel == 1)
                 {
-                    agent.speed = 2.5f;
+                    agent.speed = 3f;
                     corruptor.waitBeforeAttempt = 4.0f;
-                    corruptor.scanInterval = 3.0f;
-                    corruptor.successChance = 40f;
+                    corruptor.scanInterval = 1.5f;
+                    corruptor.successChance = 50f;
                 }
                 else if (currentLevel == 2)
                 {
-                    agent.speed = 3.4f;
+                    agent.speed = 4f;
                     corruptor.waitBeforeAttempt = 3.2f;
-                    corruptor.scanInterval = 2.0f;
-                    corruptor.successChance = 60f;
+                    corruptor.scanInterval = 1f;
+                    corruptor.successChance = 70f;
                 }
                 else
                 {
-                    agent.speed = 4.5f + (4.5f * randomFactor);
+                    agent.speed = 6f + (4.5f * randomFactor);
                     corruptor.waitBeforeAttempt = 2.0f;
-                    corruptor.scanInterval = 1.0f + (1.0f * randomFactor);
-                    corruptor.successChance = 85f + (85f * randomFactor);
+                    corruptor.scanInterval = 0.5f + (1.0f * randomFactor);
+                    corruptor.successChance = 90f + (85f * randomFactor);
                 }
             }
         }
