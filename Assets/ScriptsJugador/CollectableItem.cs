@@ -2,7 +2,7 @@
 using UnityEngine;
 using static UnityEditor.Progress;
 
-public class CollectibleItem : MonoBehaviour, ICorruptible
+public class CollectibleItem : MonoBehaviour
 {
     [Header("Ajustes de Item")]
     //[SerializeField] private GameObject itemLogicPrefab;
@@ -140,7 +140,7 @@ public class CollectibleItem : MonoBehaviour, ICorruptible
             textoInteraccionUI.gameObject.SetActive(false); // Lo apagamos
         }
     }
-    public void Corrupt()
+    /*public void Corrupt()
     {
 
         if (isCorrupted) return; // No corromper lo ya corrompido
@@ -152,5 +152,5 @@ public class CollectibleItem : MonoBehaviour, ICorruptible
             sr.color = Color.magenta;
 
         // Opcional: Emitir un sonido o partículas de corrupción aquí
-    }
+    }*/
 }

@@ -136,6 +136,7 @@ MonoBehaviour:
   successChance: 100
   waitBeforeAttempt: 4
   scanInterval: 2
+  memoryCapacity: 2
 --- !u!58 &5932785124661813989
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -171,4 +172,4 @@ CircleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Radius: 4.37
+  m_Radius: 107
