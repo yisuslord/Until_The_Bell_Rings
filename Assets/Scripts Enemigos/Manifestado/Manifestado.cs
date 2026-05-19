@@ -127,6 +127,7 @@ public class Manifestado : EnemyBase
     private IEnumerator ManifestadoAttackRoutine()
     {
         isAttacking = true;
+        anim.SetBool("Atack", true);
         agent.isStopped = true;
 
         // Aquí va la animación de ataque
@@ -146,9 +147,10 @@ public class Manifestado : EnemyBase
             Debug.Log("<color=purple>El Manifestado te golpeó y se fundió en las sombras.</color>");
         }
 
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.5f);
 
         isAttacking = false;
+        anim.SetBool("Atack", false);
         StartCoroutine(AturdimientoRoutine());
     }
 

@@ -86,13 +86,15 @@ public class Sensible : EnemyBase
     private IEnumerator SensibleAttackRoutine()
     {
         isAttacking = true;
+        anim.SetBool("Atack", true);
+        Debug.Log("<color=red>¡Sensible inicia su ataque!</color>");
         agent.isStopped = true; // Se detiene antes de atacar
 
         // Aquí iria la animación de ataque
         // Ejemplo if (anim != null) anim.SetTrigger("attack");
 
         // Tiempo que tarda el monstruo en estirar o hacer la animacion
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(0.5f);
 
         // Verificación doble por si el jugador esquivó en ese microsegundo
         Collider2D hit = Physics2D.OverlapCircle(transform.position, attackDistance, playerLayer);
@@ -108,9 +110,11 @@ public class Sensible : EnemyBase
             AudioManager.Instance.PlaySFX2D(clipGolpe, .5f);
         }
         // Breve espera para terminar de reproducir el golpe antes del aturdimiento completo
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(0.5f);
 
         isAttacking = false;
+        anim.SetBool("Atack", false);
+        Debug.Log("<color=blue>Sensible se aturde después de atacar.</color>");
         StartCoroutine(AttackCooldown()); // Pasa a su descanso regular
     }
 
