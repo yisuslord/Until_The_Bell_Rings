@@ -108,6 +108,7 @@ MonoBehaviour:
   enemyLayer:
     serializedVersion: 2
     m_Bits: 128
+  textoInteraccionUI: {fileID: 0}
   corruptionDuration: 10
   restoreAmount: 40
   clipRecarga: {fileID: 8300000, guid: 787d866d0b067c94e92f1b36fa699c02, type: 3}
@@ -171,3 +172,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isCorrupted: 0
   clipRecoger: {fileID: 8300000, guid: 0e1d6ab1586d1bf4dafa5caf8cde4af6, type: 3}
+  textoInteraccionUI: {fileID: 0}

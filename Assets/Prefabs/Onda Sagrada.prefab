@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 1277612447409189844}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.29, y: 1.8078648, z: 0}
+  m_LocalPosition: {x: -4.271, y: 1.735, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -104,6 +104,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isCorrupted: 0
   clipRecoger: {fileID: 8300000, guid: 0e1d6ab1586d1bf4dafa5caf8cde4af6, type: 3}
+  textoInteraccionUI: {fileID: 0}
 --- !u!114 &8985969282758388476
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -122,6 +123,7 @@ MonoBehaviour:
   enemyLayer:
     serializedVersion: 2
     m_Bits: 128
+  textoInteraccionUI: {fileID: 0}
   corruptionDuration: 120
   range: 10
   pushForce: 15
