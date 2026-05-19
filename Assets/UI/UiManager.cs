@@ -70,7 +70,7 @@ public class UIManager : MonoBehaviour
 
             // Si la vida es mayor al 34% (más de 1 corazón si tienes 3), vuelve a ser roja.
             // Si es 1 corazón o menos, se pone magenta (o el color de alerta que elijas)
-            playerHealthBarFill.color = (fillValue <= 0.34f) ? Color.magenta : Color.red;
+            //playerHealthBarFill.color = (fillValue <= 0.34f) ? Color.magenta : Color.red;
         }
     }
 

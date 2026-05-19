@@ -1,10 +1,7 @@
-// Guardar como: MainMenuView.cs
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using static UnityEngine.GraphicsBuffer;
-using System.Collections;
 
 public class MainMenuView : MonoBehaviour
 {
@@ -13,6 +10,7 @@ public class MainMenuView : MonoBehaviour
     [SerializeField] private Button settingsButton;
     [SerializeField] private Button quitButton;
     [SerializeField] private Button backButton;
+    [SerializeField] private Button creditsButton; // 🔥 Ya lo tienes aquí declarado
 
     [Header("Panels")]
     [SerializeField] private GameObject settingsPanelObject;
@@ -20,6 +18,7 @@ public class MainMenuView : MonoBehaviour
     // Eventos para que el controlador los escuche
     public UnityEvent OnStartPressed = new UnityEvent();
     public UnityEvent OnQuitPressed = new UnityEvent();
+    public UnityEvent OnCreditsPressed = new UnityEvent(); // 🔥 NUEVO: Evento de aviso
 
     private IMenuPanel _settingsPanel;
 
@@ -36,6 +35,12 @@ public class MainMenuView : MonoBehaviour
         });
         quitButton.onClick.AddListener(() => OnQuitPressed?.Invoke());
         backButton.onClick.AddListener(() => EventSystem.current.SetSelectedGameObject(settingsButton.gameObject));
+
+        // 🔥 NUEVO: Le ordenamos al botón de créditos que dispare el aviso al controlador
+        if (creditsButton != null)
+        {
+            creditsButton.onClick.AddListener(() => OnCreditsPressed?.Invoke());
+        }
     }
 
     private void OnDisable()
@@ -43,6 +48,8 @@ public class MainMenuView : MonoBehaviour
         startButton.onClick.RemoveAllListeners();
         settingsButton.onClick.RemoveAllListeners();
         quitButton.onClick.RemoveAllListeners();
-    }
 
+        // 🔥 NUEVO: Limpieza preventiva de listeners
+        if (creditsButton != null) creditsButton.onClick.RemoveAllListeners();
+    }
 }

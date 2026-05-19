@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 public class DeathMenuController : MonoBehaviour
 {
 
+
     private void Start()
     {
         // Al entrar a la escena de muerte, nos aseguramos de que el tiempo

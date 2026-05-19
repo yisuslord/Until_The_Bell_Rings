@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine.Rendering.Universal;
 using TMPro;
-using UnityEngine.AI; // 🔥 Necesario para modificar las velocidades del NavMeshAgent
+using UnityEngine.AI;
 
 public enum GameState { Day, Night }
 
@@ -27,13 +27,22 @@ public class LevelManager : MonoBehaviour
     public float lightTransitionSpeed = 1.5f;
 
     [Header("Referencias de Enemigos")]
-    public List<EnemyBase> allEnemies; // Asegúrate de arrastrar aquí a tus Sensibles, Manifestados y Corruptores de la escena
+    public List<EnemyBase> allEnemies;
     public Asechador stalker;
+
+    [Header("Música Dinámica (Día / Noche)")]
+    [SerializeField] private AudioClip musicaDia;     // 🔥 Arrastra el audio relajante de día
+    [SerializeField] private AudioClip musicaNoche;   // 🔥 Arrastra el audio tenso de noche
+    [SerializeField] private float duracionFadeOut = 1.5f; // Segundos que tardará en apagarse la pista anterior
+
+    [Header("Referencias Extras Legacy")]
+    public GameObject flashlight;
 
     private void Awake() { Instance = this; }
 
     private void Start()
     {
+        // Al iniciar la escena, forzamos de inmediato el estado del día original
         SetDay();
     }
 
@@ -76,26 +85,22 @@ public class LevelManager : MonoBehaviour
         if (uiRelojContenedor != null) uiRelojContenedor.SetActive(true);
         if (flashlight != null) flashlight.SetActive(true);
 
-        // 🔥 1. Ajustar las estadísticas de los enemigos según el nivel actual
+        // 🔥 Transición de Audio: Cambiamos a la música de noche de forma segura
+        StartCoroutine(TransicionMusicaFase(musicaNoche));
+
+        // Ajustar las estadísticas de los enemigos según el nivel actual
         ConfigurarEstadisticasPorNivel();
 
-        // 2. Activar enemigos correspondientes
+        // Activar enemigos correspondientes
         foreach (var enemy in allEnemies)
         {
             if (enemy != null) enemy.gameObject.SetActive(true);
         }
 
-        // Control del Acechador (Solo entra a partir del Nivel 2)
         if (stalker != null)
         {
-            if (currentLevel >= 2)
-            {
-                stalker.gameObject.SetActive(true);
-            }
-            else
-            {
-                stalker.gameObject.SetActive(false);
-            }
+            if (currentLevel >= 2) stalker.gameObject.SetActive(true);
+            else stalker.gameObject.SetActive(false);
         }
     }
 
@@ -111,6 +116,9 @@ public class LevelManager : MonoBehaviour
         if (uiRelojContenedor != null) uiRelojContenedor.SetActive(false);
         if (flashlight != null) flashlight.SetActive(false);
 
+        // 🔥 Transición de Audio: Regresamos a la música de día de forma segura
+        StartCoroutine(TransicionMusicaFase(musicaDia));
+
         foreach (var enemy in allEnemies)
         {
             if (enemy != null) enemy.gameObject.SetActive(false);
@@ -118,12 +126,23 @@ public class LevelManager : MonoBehaviour
         if (stalker != null) stalker.gameObject.SetActive(false);
     }
 
-    /// <summary>
-    /// Modifica los parámetros de la IA dinámicamente según el nivel actual + un factor aleatorio.
-    /// </summary>
+    // 🔥 LA CORRUTINA DE TRANSICIÓN: Evita cortes bruscos en las pistas de fondo
+    private System.Collections.IEnumerator TransicionMusicaFase(AudioClip nuevaPista)
+    {
+        if (AudioManager.Instance == null || nuevaPista == null) yield break;
+
+        // 1. Iniciamos el desvanecimiento de la pista que esté sonando actualmente en el canal de música
+        AudioManager.Instance.FadeOutMusic(duracionFadeOut);
+
+        // 2. Esperamos en segundo plano a que el volumen llegue totalmente a cero
+        yield return new WaitForSeconds(duracionFadeOut);
+
+        // 3. Encendemos la nueva pista correspondiente a la fase
+        AudioManager.Instance.PlayMusic(nuevaPista, 1f);
+    }
+
     private void ConfigurarEstadisticasPorNivel()
     {
-        // Factor de variación aleatoria (entre -7% y +7%)
         float randomFactor = Random.Range(-0.07f, 0.07f);
 
         foreach (var enemy in allEnemies)
@@ -133,69 +152,56 @@ public class LevelManager : MonoBehaviour
             NavMeshAgent agent = enemy.GetComponent<NavMeshAgent>();
             if (agent == null) continue;
 
-            // =============== LÓGICA DEL SENSIBLE ===============
             if (enemy is Sensible sensible)
             {
                 if (currentLevel == 1) { agent.speed = 3.2f; }
                 else if (currentLevel == 2) { agent.speed = 3.5f; }
-                else // Nivel 3+
-                {
-                    agent.speed = 3.9f + (3.9f * randomFactor);
-                }
-                Debug.Log($"[LevelManager] Sensible configurado - Velocidad: {agent.speed}");
+                else { agent.speed = 3.9f + (3.9f * randomFactor); }
             }
-
-            // =============== LÓGICA DEL MANIFESTADO ===============
             else if (enemy is Manifestado manifestado)
             {
                 if (currentLevel == 1)
                 {
                     agent.speed = 2.0f;
-                    manifestado.darknessThreshold = 4.5f; // Tarda más en aparecer al inicio
+                    manifestado.darknessThreshold = 4.5f;
                 }
                 else if (currentLevel == 2)
                 {
                     agent.speed = 2.3f;
-                    manifestado.darknessThreshold = 3.0f; // Tiempo estándar
+                    manifestado.darknessThreshold = 3.0f;
                 }
-                else // Nivel 3+
+                else
                 {
                     agent.speed = 2.6f + (2.6f * randomFactor);
-                    // Aparece rapidísimo en la oscuridad (entre 1.3s y 1.7s aprox)
                     manifestado.darknessThreshold = 1.5f + (1.5f * randomFactor);
                 }
-                Debug.Log($"[LevelManager] Manifestado - Velocidad: {agent.speed}, Tiempo en Oscuridad: {manifestado.darknessThreshold}s");
             }
-
-            // =============== LÓGICA DEL CORRUPTOR ===============
             else if (enemy is CorruptorEnemy corruptor)
             {
                 if (currentLevel == 1)
                 {
                     agent.speed = 2.5f;
                     corruptor.waitBeforeAttempt = 4.0f;
-                    corruptor.scanInterval = 3.0f;       // Escanea lento el mapa
-                    corruptor.successChance = 40f;       // 40% probabilidad de corromper
+                    corruptor.scanInterval = 3.0f;
+                    corruptor.successChance = 40f;
                 }
                 else if (currentLevel == 2)
                 {
                     agent.speed = 3.4f;
                     corruptor.waitBeforeAttempt = 3.2f;
-                    corruptor.scanInterval = 2.0f;       // Escaneo estándar
-                    corruptor.successChance = 60f;       // 60% probabilidad de corromper
+                    corruptor.scanInterval = 2.0f;
+                    corruptor.successChance = 60f;
                 }
-                else // Nivel 3+
+                else
                 {
                     agent.speed = 4.5f + (4.5f * randomFactor);
                     corruptor.waitBeforeAttempt = 2.0f;
-                    corruptor.scanInterval = 1.0f + (1.0f * randomFactor); // Escanea el doble de rápido
-                    corruptor.successChance = 85f + (85f * randomFactor);  // Casi un sabotaje garantizado (85% base)
+                    corruptor.scanInterval = 1.0f + (1.0f * randomFactor);
+                    corruptor.successChance = 85f + (85f * randomFactor);
                 }
-                Debug.Log($"[LevelManager] Corruptor - Velocidad: {agent.speed}, Scan: {corruptor.scanInterval}s, Éxito: {corruptor.successChance}%");
             }
         }
 
-        // =============== LÓGICA DEL ACECHADOR (JEFE) ===============
         if (stalker != null && currentLevel >= 2)
         {
             NavMeshAgent stalkerAgent = stalker.GetComponent<NavMeshAgent>();
@@ -206,15 +212,12 @@ public class LevelManager : MonoBehaviour
                 stalker.attemptInterval = 10f;
                 stalker.attackChance = 40f;
             }
-            else // Nivel 3+
+            else
             {
                 if (stalkerAgent != null) stalkerAgent.speed = 3.6f + (3.6f * randomFactor);
                 stalker.attemptInterval = 6f;
                 stalker.attackChance = 60f + (60f * randomFactor);
             }
-            Debug.Log($"[LevelManager] Acechador - Velocidad: {stalkerAgent.speed}, Intervalo Altar: {stalker.attemptInterval}s, Probabilidad: {stalker.attackChance}%");
         }
     }
-    [Header("Referencias Extras Legacy")]
-    public GameObject flashlight;
 }
