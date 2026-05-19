@@ -8,6 +8,10 @@ public class Manifestado : EnemyBase
     [SerializeField] public float darknessThreshold = 3f;
     [SerializeField] private float attackCooldown = 4f;
 
+    [Header("Audio System")]
+    [SerializeField] private AudioClip clipAwake;
+    [SerializeField] private AudioClip clipGolpe;
+
     public Animator anim;
     private float darknessTimer;
     private bool isHunting = false;
@@ -68,6 +72,11 @@ public class Manifestado : EnemyBase
         // 3. ACCIÓN DE CAZA (Aquí aplicamos tu lógica exacta del Sensible)
         if (isHunting)
         {
+            if (AudioManager.Instance != null && clipAwake != null)
+            {
+                // Usamos 2D porque es un sonido de inventario/interfaz para el jugador
+                AudioManager.Instance.PlaySFX2D(clipAwake, 1f);
+            }
             HandleHunting();
         }
         else
@@ -129,6 +138,11 @@ public class Manifestado : EnemyBase
         if (hit != null && hit.TryGetComponent(out IDamageable damageable))
         {
             damageable.TakeDamage(attackDamage);
+            if (AudioManager.Instance != null && clipGolpe != null)
+            {
+                // Usamos 2D porque es un sonido de inventario/interfaz para el jugador
+                AudioManager.Instance.PlaySFX2D(clipGolpe, 1f);
+            }
             Debug.Log("<color=purple>El Manifestado te golpeó y se fundió en las sombras.</color>");
         }
 

@@ -14,6 +14,10 @@ public class Sensible : EnemyBase
     private bool isStunned = false;
     private bool isAttacking = false; // Candado para la animación de ataque
 
+    [Header("Audio System")]
+    [SerializeField] private AudioClip clipAtaque;
+    [SerializeField] private AudioClip clipGolpe;
+
     private void Update()
     {
         moving = !isStunned && !isAttacking && agent.velocity.magnitude > 0.1f;
@@ -45,6 +49,11 @@ public class Sensible : EnemyBase
 
     private void HandleChasing()
     {
+        if (AudioManager.Instance != null && clipAtaque != null)
+        {
+            // Usamos 2D porque es un sonido de inventario/interfaz para el jugador
+            AudioManager.Instance.PlaySFX2D(clipAtaque, 1f);
+        }
         if (PlayerController.Instance != null)
         {
             if (altarZone.IsPlayerInside) return;
@@ -89,10 +98,15 @@ public class Sensible : EnemyBase
         Collider2D hit = Physics2D.OverlapCircle(transform.position, attackDistance, playerLayer);
         if (hit != null && hit.TryGetComponent(out IDamageable damageable))
         {
+            
             damageable.TakeDamage(attackDamage);
             Debug.Log("<color=red>¡Sensible golpeó al jugador!</color>");
         }
-
+        if (AudioManager.Instance != null && clipGolpe != null)
+        {
+            // Usamos 2D porque es un sonido de inventario/interfaz para el jugador
+            AudioManager.Instance.PlaySFX2D(clipGolpe, 1f);
+        }
         // Breve espera para terminar de reproducir el golpe antes del aturdimiento completo
         yield return new WaitForSeconds(0.2f);
 

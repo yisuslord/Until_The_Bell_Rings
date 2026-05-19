@@ -1380,10 +1380,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   resumeButton: {fileID: 12156976}
   controlsButton: {fileID: 478743880}
-  settingsButton: {fileID: 1092574420}
   exitButton: {fileID: 956230384}
   controlsPanel: {fileID: 2116639322}
-  settingsPanel: {fileID: 458260157}
   OnExitToMenu:
     m_PersistentCalls:
       m_Calls:
@@ -1569,6 +1567,14 @@ PrefabInstance:
       propertyPath: altarZone
       value: 
       objectReference: {fileID: 166854801}
+    - target: {fileID: 6676523079259132957, guid: 9ebfa97f49b1aee4984f09f180aec1e5, type: 3}
+      propertyPath: clipAwake
+      value: 
+      objectReference: {fileID: 8300000, guid: 5575aec7b313b1045977c4f7cb2424d2, type: 3}
+    - target: {fileID: 6676523079259132957, guid: 9ebfa97f49b1aee4984f09f180aec1e5, type: 3}
+      propertyPath: clipGolpe
+      value: 
+      objectReference: {fileID: 8300000, guid: 9c21e7c32b9713345ba7c920b765c177, type: 3}
     - target: {fileID: 7290383926131094982, guid: 9ebfa97f49b1aee4984f09f180aec1e5, type: 3}
       propertyPath: m_Name
       value: Manifestado
@@ -3148,6 +3154,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -7441269052075906132, guid: cc43cde9376a52842a6fd94e3468906e, type: 3}
+      propertyPath: clipAdvertencia
+      value: 
+      objectReference: {fileID: 8300000, guid: 939350ca94dc32845a6c9f32b6ee3791, type: 3}
+    - target: {fileID: -7441269052075906132, guid: cc43cde9376a52842a6fd94e3468906e, type: 3}
+      propertyPath: usarSonidoEnBucle
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 92213197999277524, guid: cc43cde9376a52842a6fd94e3468906e, type: 3}
       propertyPath: candleLight
       value: 
@@ -32689,6 +32703,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -7441269052075906132, guid: cc43cde9376a52842a6fd94e3468906e, type: 3}
+      propertyPath: clipAdvertencia
+      value: 
+      objectReference: {fileID: 8300000, guid: 939350ca94dc32845a6c9f32b6ee3791, type: 3}
+    - target: {fileID: -7441269052075906132, guid: cc43cde9376a52842a6fd94e3468906e, type: 3}
+      propertyPath: usarSonidoEnBucle
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 92213197999277524, guid: cc43cde9376a52842a6fd94e3468906e, type: 3}
       propertyPath: candleLight
       value: 
@@ -33110,9 +33132,17 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -7441269052075906132, guid: cc43cde9376a52842a6fd94e3468906e, type: 3}
+      propertyPath: clipAdvertencia
+      value: 
+      objectReference: {fileID: 8300000, guid: 939350ca94dc32845a6c9f32b6ee3791, type: 3}
+    - target: {fileID: -7441269052075906132, guid: cc43cde9376a52842a6fd94e3468906e, type: 3}
       propertyPath: indicatorPrefab
       value: 
       objectReference: {fileID: 291413966}
+    - target: {fileID: -7441269052075906132, guid: cc43cde9376a52842a6fd94e3468906e, type: 3}
+      propertyPath: usarSonidoEnBucle
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 92213197999277524, guid: cc43cde9376a52842a6fd94e3468906e, type: 3}
       propertyPath: candleLight
       value: 
@@ -34821,6 +34851,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -7441269052075906132, guid: cc43cde9376a52842a6fd94e3468906e, type: 3}
+      propertyPath: clipAdvertencia
+      value: 
+      objectReference: {fileID: 8300000, guid: 939350ca94dc32845a6c9f32b6ee3791, type: 3}
+    - target: {fileID: -7441269052075906132, guid: cc43cde9376a52842a6fd94e3468906e, type: 3}
+      propertyPath: usarSonidoEnBucle
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 92213197999277524, guid: cc43cde9376a52842a6fd94e3468906e, type: 3}
       propertyPath: candleLight
       value: 
@@ -35594,6 +35632,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4828811741731202388, guid: 01682b94465fea14e8f2a6c1eb15c10c, type: 3}
+      propertyPath: clipBusqueda
+      value: 
+      objectReference: {fileID: 8300000, guid: 0551b7eec34d01b4c86c89855bf7be7e, type: 3}
+    - target: {fileID: 4828811741731202388, guid: 01682b94465fea14e8f2a6c1eb15c10c, type: 3}
       propertyPath: currentState
       value: 0
       objectReference: {fileID: 0}
@@ -35601,6 +35643,10 @@ PrefabInstance:
       propertyPath: wanderRadius
       value: 10.47
       objectReference: {fileID: 0}
+    - target: {fileID: 4828811741731202388, guid: 01682b94465fea14e8f2a6c1eb15c10c, type: 3}
+      propertyPath: clipCorromper
+      value: 
+      objectReference: {fileID: 8300000, guid: eeb88bfec12f31f4abd587d81235a240, type: 3}
     - target: {fileID: 4939330805562075654, guid: 01682b94465fea14e8f2a6c1eb15c10c, type: 3}
       propertyPath: m_Name
       value: Corruptor
@@ -36637,6 +36683,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -7441269052075906132, guid: cc43cde9376a52842a6fd94e3468906e, type: 3}
+      propertyPath: clipAdvertencia
+      value: 
+      objectReference: {fileID: 8300000, guid: 939350ca94dc32845a6c9f32b6ee3791, type: 3}
+    - target: {fileID: -7441269052075906132, guid: cc43cde9376a52842a6fd94e3468906e, type: 3}
+      propertyPath: usarSonidoEnBucle
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 92213197999277524, guid: cc43cde9376a52842a6fd94e3468906e, type: 3}
       propertyPath: candleLight
       value: 
@@ -47865,6 +47919,14 @@ PrefabInstance:
       propertyPath: altarZone
       value: 
       objectReference: {fileID: 166854801}
+    - target: {fileID: 8046606849011247556, guid: 9c18ecd038677e54b9582feab9bc22a9, type: 3}
+      propertyPath: clipGolpe
+      value: 
+      objectReference: {fileID: 8300000, guid: 26d3d826546b99c47928dada34f04cea, type: 3}
+    - target: {fileID: 8046606849011247556, guid: 9c18ecd038677e54b9582feab9bc22a9, type: 3}
+      propertyPath: clipAtaque
+      value: 
+      objectReference: {fileID: 8300000, guid: 3c68c4b2a17309f4c984b5ca024a4c43, type: 3}
     - target: {fileID: 8046606849011247556, guid: 9c18ecd038677e54b9582feab9bc22a9, type: 3}
       propertyPath: detectionRadius
       value: 82.5

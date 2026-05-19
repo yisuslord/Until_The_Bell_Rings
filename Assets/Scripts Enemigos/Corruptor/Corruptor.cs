@@ -5,43 +5,42 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
 {
     [Header("Corruption Logic")]
     [Range(0, 100)]
-    [SerializeField] public float successChance = 50f; // 50% de probabilidad por defecto
-    [SerializeField] public float waitBeforeAttempt = 4f; // Tiempo que "tarda" en corromper
+    [SerializeField] public float successChance = 50f;
+    [SerializeField] public float waitBeforeAttempt = 4f;
 
     [Header("Scanning Settings")]
-    [SerializeField] public float scanInterval = 2f; // Tiempo entre escaneos
-    private float scanTimer; // El contador interno
-
-    [Header("Memory")]
-    private ICorruptible lastAttemptedObject; // Guardamos el último objeto que intentamos corromper
+    [SerializeField] public float scanInterval = 2f;
+    private float scanTimer;
 
     [Header("Memory System")]
-    [SerializeField] private int memoryCapacity = 2; // Cuántos objetos recuerda antes de olvidar el primero
-    private List<ICorruptible> memoryList = new List<ICorruptible>(); // Lista de objetos recientes
+    [SerializeField] private int memoryCapacity = 2;
+    private List<ICorruptible> memoryList = new List<ICorruptible>();
 
     private bool isAttempting = false;
 
+    [Header("Audio System")]
+    [SerializeField] private AudioClip clipCorromper;
+    [SerializeField] private AudioClip clipBusqueda;
 
-
-    // 1. Añadimos una variable para guardar la posición exacta del objetivo detectado
     private Vector2 currentTargetPosition;
 
     public override void OnStimulusReceived(Vector2 position, StimulusType type)
     {
         if (type != StimulusType.Corruptible) return;
 
-        // 🔥 Aseguramos que la posición no sea 0,0 si el estímulo trae datos
-        currentTargetPosition = position;
-
+        // Validamos el estímulo recibido: Si el objeto en esa posición exacta ya está en memoria, lo ignoramos de inmediato
         Collider2D hit = Physics2D.OverlapPoint(position);
         if (hit != null && hit.TryGetComponent(out ICorruptible target))
         {
-            if (memoryList.Contains(target)) return;
+            if (memoryList.Contains(target))
+            {
+                return; // 🛑 CANDADO 1: El estímulo es rechazado si ya lo recuerda
+            }
         }
 
+        currentTargetPosition = position;
         base.OnStimulusReceived(position, type);
     }
-
 
     private void Update()
     {
@@ -60,7 +59,6 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
         }
         else if (currentState == State.Investigating)
         {
-            // 🔥 MEJORA: Verificamos si llegamos al destino
             if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance + 0.5f)
             {
                 Debug.Log("<color=orange>Corruptor: ¡He llegado al objetivo! Iniciando proceso...</color>");
@@ -70,24 +68,24 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
         }
     }
 
-
-    // 2. Ajustamos la detección en la corrutina
     private System.Collections.IEnumerator CorruptionProcess()
     {
         agent.isStopped = true;
         ICorruptible target = null;
         GameObject victimObj = null;
 
-        // Buscamos en un radio pequeño alrededor de donde el enemigo se detuvo
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, 2.5f);
 
         foreach (var hit in hits)
         {
             if (hit.TryGetComponent(out ICorruptible found))
             {
-                // Verificamos que no sea él mismo y que no esté en memoria (opcional)
                 if (hit.gameObject != this.gameObject)
                 {
+                    // 🛑 CANDADO 2: Si el objeto que tiene enfrente ya está en su memoria, lo salta 
+                    // Esto evita que corrompa la misma vela si hay dos muy juntas.
+                    if (memoryList.Contains(found)) continue;
+
                     target = found;
                     victimObj = hit.gameObject;
                     break;
@@ -95,63 +93,38 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
             }
         }
 
+        // Si el objetivo que tiene enfrente es válido y no está en su memoria
         if (target != null)
         {
             Debug.Log($"<color=yellow>Saboteando: {victimObj.name}...</color>");
-            AddToMemory(target);
+            AddToMemory(target); // Guardamos en memoria para asegurar que no se repita en la siguiente acción
         }
         else
         {
-            Debug.LogWarning($"<color=red>Fallo total: No encontré ICorruptible cerca de {transform.position}</color>");
+            Debug.LogWarning($"<color=red>Acción abortada: El objeto cercano ya fue saboteado recientemente o no es válido.</color>");
             FinishAction();
             yield break;
         }
 
         yield return new WaitForSeconds(waitBeforeAttempt);
 
+        // Tirada de dados para el éxito de la corrupción
         if (Random.Range(0f, 100f) <= successChance)
         {
+            if (AudioManager.Instance != null && clipCorromper != null)
+            {
+                AudioManager.Instance.PlaySFX2D(clipCorromper, 1f);
+            }
             target.Corrupt();
             Debug.Log("<color=purple>¡SABOTAJE EXITOSO!</color>");
+        }
+        else
+        {
+            Debug.Log("<color=cyan>El intento de sabotaje falló por probabilidad, pero el enemigo recuerda la vela.</color>");
         }
 
         FinishAction();
     }
-
-    /*private void ExecuteCorruption()
-    {
-        
-        float scanRadius = 1.5f;
-
-       
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, scanRadius);
-
-        Debug.Log($"ExecuteCorruption: Se encontraron {hits.Length} colisionadores cerca.");
-
-        bool foundTarget = false;
-        foreach (var hit in hits)
-        {
-           
-            if (hit.gameObject == gameObject) continue;
-
-            Debug.Log($"Analizando objeto: {hit.name}");
-
-            if (hit.TryGetComponent(out ICorruptible target))
-            {
-                target.Corrupt();
-                Debug.Log("<color=purple>¡SABOTAJE EXITOSO en " + hit.name + "!</color>");
-                foundTarget = true;
-                break; 
-            }
-        }
-
-        if (!foundTarget)
-        {
-            Debug.LogWarning("<color=orange>ExecuteCorruption: No se encontró ningún objeto con ICorruptible cerca.</color>");
-        }
-
-        FinishAction();
-    }*/
 
     private void FinishAction()
     {
@@ -163,8 +136,6 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
         }
 
         currentState = State.Wandering;
-
-        // Usamos la función de huida que planeamos antes
         ForceNewWanderPoint();
     }
 
@@ -172,10 +143,10 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
     {
         if (currentState == State.Wandering)
         {
-            HandleWandering(); // Obligamos a elegir un destino de patrulla
+            HandleWandering();
         }
     }
-    // --- MODIFICACIÓN EN PASSIVE SCAN ---
+
     private void PassiveScan()
     {
         Collider2D[] objects = Physics2D.OverlapCircleAll(transform.position, 15f);
@@ -184,6 +155,7 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
         {
             if (obj.TryGetComponent(out ICorruptible target))
             {
+                // 🛑 CANDADO 3: El radar pasivo ignora por completo los elementos de la lista
                 if (memoryList.Contains(target)) continue;
 
                 if (obj.TryGetComponent(out Candle vela))
@@ -191,9 +163,8 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
                     if (!vela.IsLit || vela.IsCorrupted) continue;
                 }
 
-                // 🔥 FIJAR POSICIÓN ANTES DE IR
                 currentTargetPosition = obj.transform.position;
-                Debug.Log($"<color=green>Radar: Objetivo {obj.name} en {currentTargetPosition}</color>");
+                Debug.Log($"<color=green>Radar: Objetivo válido encontrado -> {obj.name}</color>");
 
                 OnStimulusReceived(currentTargetPosition, StimulusType.Corruptible);
                 return;
@@ -201,30 +172,16 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
         }
     }
 
-    // --- NUEVA LÓGICA DE MEMORIA ---
     private void AddToMemory(ICorruptible newObject)
     {
-        // Si el objeto ya está (por seguridad), no lo duplicamos
         if (memoryList.Contains(newObject)) return;
 
-        // Añadimos el nuevo objeto al historial
         memoryList.Add(newObject);
 
-        // Si superamos la capacidad (2 objetos), olvidamos el más antiguo (el índice 0)
         if (memoryList.Count > memoryCapacity)
         {
-            Debug.Log("<color=white>Corruptor ha olvidado un objeto antiguo y puede volver a visitarlo.</color>");
+            Debug.Log("<color=white>Corruptor ha olvidado el objeto más antiguo de su lista.</color>");
             memoryList.RemoveAt(0);
         }
     }
-    // Dentro de CorruptorEnemy.cs
-
-    /*public override void GetRepelled(Vector2 shockwaveSource, float force)
-    {
-        // El Corruptor es más débil a la luz sagrada/onda
-        Debug.Log("<color=purple>El Corruptor se disuelve ante la onda...</color>");
-
-        // Llamamos al método Die que ya configuramos en la base
-        Die();
-    }*/
 }

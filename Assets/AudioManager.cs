@@ -152,4 +152,23 @@ public class AudioManager : MonoBehaviour
         // Destruye el objeto automáticamente cuando el clip termine de sonar
         Destroy(tempAudioObj, clip.length);
     }
+
+    public AudioSource PlaySFXLoop(AudioClip clip, float volume = 1f)
+    {
+        if (clip == null) return null;
+
+        // Creamos un GameObject hijo del AudioManager para que no ensucie la jerarquía
+        GameObject loopObj = new GameObject($"LoopSFX_{clip.name}");
+        loopObj.transform.SetParent(this.transform);
+
+        AudioSource newSource = loopObj.AddComponent<AudioSource>();
+        newSource.clip = clip;
+        newSource.volume = volume;
+        newSource.loop = true; // 🔥 Activamos el loop
+        newSource.outputAudioMixerGroup = sfxGroup; // Enrutado al canal de SFX
+
+        newSource.Play();
+
+        return newSource; // Devolvemos el componente para que el Warning lo controle
+    }
 }
