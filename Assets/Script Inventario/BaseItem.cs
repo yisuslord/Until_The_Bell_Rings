@@ -2,7 +2,7 @@
 using TMPro;
 using UnityEngine;
 
-public abstract class BaseItem : MonoBehaviour, IInteractable, ICorruptible, IInventoryItem
+public abstract class BaseItem : MonoBehaviour, IInteractable, IInventoryItem
 {
     // Modifica la línea de tu variable existente para que cumpla con la interfaz:
     [Header("Item Info")]

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Bateria : BaseItem, ICorruptible
+public class Bateria : BaseItem
 {
     [Header("Ajustes de Recarga")]
     [SerializeField] private float restoreAmount = 40f; // Cuánta energía restaura al usarse

@@ -127,7 +127,7 @@ MonoBehaviour:
   currentState: 0
   attackDistance: 0.8
   attackDamage: 1
-  wanderRadius: 8
+  wanderRadius: 310.1
   waitTimeAtPoint: 2
   playerLayer:
     serializedVersion: 2
@@ -136,6 +136,7 @@ MonoBehaviour:
   successChance: 100
   waitBeforeAttempt: 4
   scanInterval: 2
+  memoryCapacity: 2
 --- !u!58 &5932785124661813989
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -171,4 +172,4 @@ CircleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Radius: 4.37
+  m_Radius: 107.5
