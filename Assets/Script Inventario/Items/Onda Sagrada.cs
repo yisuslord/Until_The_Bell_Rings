@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class OndaSagrada : BaseItem
+public class OndaSagrada : BaseItem, ICorruptible
 {
     [Header("Shockwave Settings")]
     [SerializeField] private float range = 10f;
