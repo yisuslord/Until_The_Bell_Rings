@@ -113,7 +113,7 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
         {
             if (AudioManager.Instance != null && clipCorromper != null)
             {
-                AudioManager.Instance.PlaySFX2D(clipCorromper, 1f);
+                AudioManager.Instance.PlaySFX2D(clipCorromper, .5f);
             }
             target.Corrupt();
             Debug.Log("<color=purple>¡SABOTAJE EXITOSO!</color>");

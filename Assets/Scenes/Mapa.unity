@@ -50271,6 +50271,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 166854801}
     - target: {fileID: 4788331723821855575, guid: e921cce549ee77a478279aa57c301d6f, type: 3}
+      propertyPath: clipGolpe
+      value: 
+      objectReference: {fileID: 8300000, guid: 9c21e7c32b9713345ba7c920b765c177, type: 3}
+    - target: {fileID: 4788331723821855575, guid: e921cce549ee77a478279aa57c301d6f, type: 3}
       propertyPath: altarTarget
       value: 
       objectReference: {fileID: 510391898}

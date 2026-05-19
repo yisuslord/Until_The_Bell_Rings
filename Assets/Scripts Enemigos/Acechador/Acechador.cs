@@ -15,6 +15,10 @@ public class Asechador : EnemyBase
     private bool moving;
     private bool isAttackingAltar = false;
 
+    [Header("Audio System")]
+    [SerializeField] private AudioClip clipAtaque;
+    [SerializeField] private AudioClip clipGolpe;
+
     protected override void Awake()
     {
         base.Awake();
@@ -82,10 +86,15 @@ public class Asechador : EnemyBase
 
         if (!agent.pathPending && distanceToAltar <= attackDistance)
         {
+
             // Golpeamos el altar
             altarTarget.TakeDamage(altarDamage);
             Debug.Log("<color=red>¡El Acechador asestó un golpe al altar!</color>");
-
+            if (AudioManager.Instance != null && clipAtaque != null)
+            {
+                // Usamos 2D porque es un sonido de inventario/interfaz para el jugador
+                AudioManager.Instance.PlaySFX2D(clipGolpe, .5f);
+            }
             // Volvemos a la normalidad (A patrullar)
             isAttackingAltar = false;
             currentState = State.Wandering;

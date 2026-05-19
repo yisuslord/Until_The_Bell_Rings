@@ -75,7 +75,7 @@ public class Manifestado : EnemyBase
             if (AudioManager.Instance != null && clipAwake != null)
             {
                 // Usamos 2D porque es un sonido de inventario/interfaz para el jugador
-                AudioManager.Instance.PlaySFX2D(clipAwake, 1f);
+                AudioManager.Instance.PlaySFX2D(clipAwake, .5f);
             }
             HandleHunting();
         }
@@ -141,7 +141,7 @@ public class Manifestado : EnemyBase
             if (AudioManager.Instance != null && clipGolpe != null)
             {
                 // Usamos 2D porque es un sonido de inventario/interfaz para el jugador
-                AudioManager.Instance.PlaySFX2D(clipGolpe, 1f);
+                AudioManager.Instance.PlaySFX2D(clipGolpe, .5f);
             }
             Debug.Log("<color=purple>El Manifestado te golpeó y se fundió en las sombras.</color>");
         }

@@ -52,7 +52,7 @@ public class Sensible : EnemyBase
         if (AudioManager.Instance != null && clipAtaque != null)
         {
             // Usamos 2D porque es un sonido de inventario/interfaz para el jugador
-            AudioManager.Instance.PlaySFX2D(clipAtaque, 1f);
+            AudioManager.Instance.PlaySFX2D(clipAtaque, .5f);
         }
         if (PlayerController.Instance != null)
         {
@@ -105,7 +105,7 @@ public class Sensible : EnemyBase
         if (AudioManager.Instance != null && clipGolpe != null)
         {
             // Usamos 2D porque es un sonido de inventario/interfaz para el jugador
-            AudioManager.Instance.PlaySFX2D(clipGolpe, 1f);
+            AudioManager.Instance.PlaySFX2D(clipGolpe, .5f);
         }
         // Breve espera para terminar de reproducir el golpe antes del aturdimiento completo
         yield return new WaitForSeconds(0.2f);
