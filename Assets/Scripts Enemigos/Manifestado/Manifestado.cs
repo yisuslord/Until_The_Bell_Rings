@@ -5,7 +5,7 @@ public class Manifestado : EnemyBase
 {
     [Header("Manifestado Logic")]
     [SerializeField] private AltarZone altarZone;
-    [SerializeField] private float darknessThreshold = 3f;
+    [SerializeField] public float darknessThreshold = 3f;
     [SerializeField] private float attackCooldown = 4f;
 
     public Animator anim;

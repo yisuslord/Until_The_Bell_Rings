@@ -123,7 +123,7 @@ public class LevelManager : MonoBehaviour
     /// </summary>
     private void ConfigurarEstadisticasPorNivel()
     {
-        // Factor de variación aleatoria (entre -7% y +7% de rendimiento en las estadísticas base del nivel)
+        // Factor de variación aleatoria (entre -7% y +7%)
         float randomFactor = Random.Range(-0.07f, 0.07f);
 
         foreach (var enemy in allEnemies)
@@ -133,8 +133,6 @@ public class LevelManager : MonoBehaviour
             NavMeshAgent agent = enemy.GetComponent<NavMeshAgent>();
             if (agent == null) continue;
 
-            // 🔍 DETECTAR QUÉ TIPO DE ENEMIGO ES:
-
             // =============== LÓGICA DEL SENSIBLE ===============
             if (enemy is Sensible sensible)
             {
@@ -142,7 +140,7 @@ public class LevelManager : MonoBehaviour
                 else if (currentLevel == 2) { agent.speed = 3.5f; }
                 else // Nivel 3+
                 {
-                    agent.speed = 3.9f + (3.9f * randomFactor); // Más veloz en nivel 3
+                    agent.speed = 3.9f + (3.9f * randomFactor);
                 }
                 Debug.Log($"[LevelManager] Sensible configurado - Velocidad: {agent.speed}");
             }
@@ -150,36 +148,50 @@ public class LevelManager : MonoBehaviour
             // =============== LÓGICA DEL MANIFESTADO ===============
             else if (enemy is Manifestado manifestado)
             {
-                // El manifestado es espectral, lo hacemos notablemente más lento que el sensible
-                if (currentLevel == 1) { agent.speed = 2.0f; }
-                else if (currentLevel == 2) { agent.speed = 2.3f; }
+                if (currentLevel == 1)
+                {
+                    agent.speed = 2.0f;
+                    manifestado.darknessThreshold = 4.5f; // Tarda más en aparecer al inicio
+                }
+                else if (currentLevel == 2)
+                {
+                    agent.speed = 2.3f;
+                    manifestado.darknessThreshold = 3.0f; // Tiempo estándar
+                }
                 else // Nivel 3+
                 {
                     agent.speed = 2.6f + (2.6f * randomFactor);
+                    // Aparece rapidísimo en la oscuridad (entre 1.3s y 1.7s aprox)
+                    manifestado.darknessThreshold = 1.5f + (1.5f * randomFactor);
                 }
-                Debug.Log($"[LevelManager] Manifestado configurado - Velocidad: {agent.speed}");
+                Debug.Log($"[LevelManager] Manifestado - Velocidad: {agent.speed}, Tiempo en Oscuridad: {manifestado.darknessThreshold}s");
             }
 
             // =============== LÓGICA DEL CORRUPTOR ===============
             else if (enemy is CorruptorEnemy corruptor)
             {
-                // El corruptor se vuelve drásticamente más veloz en cada nivel para alcanzar sus objetivos
                 if (currentLevel == 1)
                 {
                     agent.speed = 2.5f;
                     corruptor.waitBeforeAttempt = 4.0f;
+                    corruptor.scanInterval = 2.0f;       // Escanea lento el mapa
+                    corruptor.successChance = 40f;       // 40% probabilidad de corromper
                 }
                 else if (currentLevel == 2)
                 {
                     agent.speed = 3.4f;
                     corruptor.waitBeforeAttempt = 3.2f;
+                    corruptor.scanInterval = 1.5f;       // Escaneo estándar
+                    corruptor.successChance = 60f;       // 60% probabilidad de corromper
                 }
                 else // Nivel 3+
                 {
-                    agent.speed = 4.5f + (4.5f * randomFactor); // Muy rápido en nivel 3
-                    corruptor.waitBeforeAttempt = 2.0f;        // Corrompe el doble de rápido
+                    agent.speed = 4.5f + (4.5f * randomFactor);
+                    corruptor.waitBeforeAttempt = 2.0f;
+                    corruptor.scanInterval = 0.8f + (1.0f * randomFactor); // Escanea el doble de rápido
+                    corruptor.successChance = 85f + (85f * randomFactor);  // Casi un sabotaje garantizado (85% base)
                 }
-                Debug.Log($"[LevelManager] Corruptor configurado - Velocidad: {agent.speed}, Tiempo Sabotaje: {corruptor.waitBeforeAttempt}");
+                Debug.Log($"[LevelManager] Corruptor - Velocidad: {agent.speed}, Scan: {corruptor.scanInterval}s, Éxito: {corruptor.successChance}%");
             }
         }
 
@@ -196,12 +208,11 @@ public class LevelManager : MonoBehaviour
             }
             else // Nivel 3+
             {
-                // En el nivel 3 el Acechador es una pesadilla para el Altar
                 if (stalkerAgent != null) stalkerAgent.speed = 3.6f + (3.6f * randomFactor);
-                stalker.attemptInterval = 6f;  // Piensa si atacar el altar mucho más seguido (cada 6s en vez de 10s)
-                stalker.attackChance = 60f + (60f * randomFactor); // La probabilidad base sube al 60%
+                stalker.attemptInterval = 6f;
+                stalker.attackChance = 60f + (60f * randomFactor);
             }
-            Debug.Log($"[LevelManager] Acechador configurado - Velocidad: {stalkerAgent.speed}, Intervalo Altar: {stalker.attemptInterval}s, Probabilidad: {stalker.attackChance}%");
+            Debug.Log($"[LevelManager] Acechador - Velocidad: {stalkerAgent.speed}, Intervalo Altar: {stalker.attemptInterval}s, Probabilidad: {stalker.attackChance}%");
         }
     }
 
