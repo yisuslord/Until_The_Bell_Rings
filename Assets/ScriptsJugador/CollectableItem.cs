@@ -41,6 +41,15 @@ public class CollectibleItem : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        if (textoInteraccionUI.gameObject.activeSelf)
+        {
+            textoInteraccionUI.gameObject.SetActive(false);
+        }
+
+    }
+
     private void Update()
     {
         // Si el jugador está en el rango, no está corrompido y presiona E
@@ -119,7 +128,7 @@ public class CollectibleItem : MonoBehaviour
         if (textoInteraccionUI != null && miItem != null)
         {
             // Personaliza el texto con el nombre real del objeto (ej: "[E] Recoger Batería")
-            textoInteraccionUI.text = $"[E (teclado) / B (control)] Recoger {miItem.ItemName}";
+            textoInteraccionUI.text = $"{miItem.ItemName}";
             textoInteraccionUI.gameObject.SetActive(true); // Lo encendemos
         }
     }

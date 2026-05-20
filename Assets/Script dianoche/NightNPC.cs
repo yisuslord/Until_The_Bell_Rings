@@ -19,10 +19,10 @@ public class NightNPC : MonoBehaviour, IInteractable
         {
             "PADRE: Bienvenido, tu debes ser el nuevo sacristán, Samuel verdad?",
             "Yo soy el padre de esta parroquia, con más de 30 años de experiencia, supongo que ya conoces tu función, deberás cuidar y preservar el templo",
-            "¿Cómo lo harás? Yo te explicaré eso",
+            "Cómo lo harás? Yo te explicaré eso",
             "Primero que nada puedes empezar por recorrer el lugar tranquilamente o si tienes prisa puedes correr (A)",
             "A lo largo de la parroquia hay varias cosas con las cuales interactuar, guardar o incluso esconderte en ellas (B)",
-            "Si las recoges puedes verlas en tu inventario y usarlas en el momento que quieras (X) siempre que las hayas elegido (L1, R1)",
+            "Si las recoges puedes verlas en tu inventario y usarlas en el momento que quieras (X) siempre que las hayas elegido (LB, RB)",
             "Adelante investiga un poco el templo y vuelve conmigo cuando estés listo."
         },
 
@@ -32,10 +32,10 @@ public class NightNPC : MonoBehaviour, IInteractable
             "PADRE: Bien, ahora te contare un pequeño secreto, cuidar del altar no es tan simple como parece, deberás estar muy atento en las noches",
             "Este lugar lleva mucho tiempo aquí y es muy especial, cuando la oscuridad cae hay criaturas intentando dañar el altar y es tu deber evitarlo" +
             ", hasta ahora hemos identificado 3 de ellas: ",
-            "El Sensible: Patrulla en las noches y si percibe luz o sonido te perseguirá, te recomiendo no correr tanto y si te persigue escóndete (A en un escondite) para que se vaya.",
+            "El Sensible: Patrulla en las noches y si percibe luz o sonido te perseguirá, te recomiendo no correr tanto y si te persigue escóndete (B en un escondite) para que se vaya.",
             "El Manifestado: Aparece en zonas sin luz cuando estás mucho tiempo ahí, regularmente desaparece cuando te ataca",
             "El Corruptor: El apaga las velas y corrompe las reliquias, dejandolas inútiles por un tiempo",
-            "Tu función será la de evitar que todas las velas se apaguen, cuando una esté apagada acércate y enciendela (A), pero evita que te hagan daño.",
+            "Tu función será la de evitar que todas las velas se apaguen, cuando una esté apagada acércate y enciendela (B), pero evita que te hagan daño.",
             "Eso es todo lo que necesitas saber por ahora, explora el entorno y habla conmigo cuando estés listo para enfrentar la noche"
         },
 
@@ -51,7 +51,7 @@ public class NightNPC : MonoBehaviour, IInteractable
         // Empezar Noche
         new string[]
         {
-            "PADRE: ¿Estas Listo?",
+            "PADRE: Estas Listo?",
             "Estas protegiendo un templo sagrado, ten cuidado la noche se acerca",
             "(Presiona Select para empezar)"
         }
@@ -60,7 +60,7 @@ public class NightNPC : MonoBehaviour, IInteractable
 
     public void Interact()
     {
-        if (DialogueUI.Instance.IsOpen || !canInteract)
+        if (DialogueUI.Instance.IsOpen || !canInteract || LevelManager.Instance.currentState == GameState.Night)
             return;
 
         Debug.Log("El PADRE ESTA HABLANDO");
