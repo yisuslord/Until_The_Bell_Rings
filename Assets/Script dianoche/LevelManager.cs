@@ -208,24 +208,24 @@ public class LevelManager : MonoBehaviour
             {
                 if (currentLevel == 1)
                 {
-                    agent.speed = 3f;
+                    agent.speed = 5f;
                     corruptor.waitBeforeAttempt = 4.0f;
                     corruptor.scanInterval = 1.5f;
-                    corruptor.successChance = 50f;
+                    corruptor.successChance = 80f;
                 }
                 else if (currentLevel == 2)
                 {
-                    agent.speed = 4f;
+                    agent.speed = 6f;
                     corruptor.waitBeforeAttempt = 3.2f;
                     corruptor.scanInterval = 1f;
-                    corruptor.successChance = 70f;
+                    corruptor.successChance = 90f;
                 }
                 else
                 {
-                    agent.speed = 6f + (4.5f * randomFactor);
+                    agent.speed = 7f + (4.5f * randomFactor);
                     corruptor.waitBeforeAttempt = 2.0f;
                     corruptor.scanInterval = 0.5f + (1.0f * randomFactor);
-                    corruptor.successChance = 90f + (85f * randomFactor);
+                    corruptor.successChance = 100f + (5f * randomFactor);
                 }
             }
         }
@@ -236,14 +236,14 @@ public class LevelManager : MonoBehaviour
 
             if (currentLevel == 2)
             {
-                if (stalkerAgent != null) stalkerAgent.speed = 3.0f;
-                stalker.attemptInterval = 10f;
+                if (stalkerAgent != null) stalkerAgent.speed = 2f;
+                stalker.attemptInterval = 15f;
                 stalker.attackChance = 40f;
             }
             else
             {
-                if (stalkerAgent != null) stalkerAgent.speed = 3.6f + (3.6f * randomFactor);
-                stalker.attemptInterval = 6f;
+                if (stalkerAgent != null) stalkerAgent.speed = 3f + (3.6f * randomFactor);
+                stalker.attemptInterval = 10f;
                 stalker.attackChance = 60f + (60f * randomFactor);
             }
         }
