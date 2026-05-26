@@ -162,7 +162,7 @@ public class LevelManager : MonoBehaviour
         yield return new WaitForSeconds(duracionFadeOut);
 
         // 3. Encendemos la nueva pista correspondiente a la fase
-        AudioManager.Instance.PlayMusic(nuevaPista, 1f);
+        AudioManager.Instance.PlayMusic(nuevaPista, .5f);
     }
 
     private void ConfigurarEstadisticasPorNivel()

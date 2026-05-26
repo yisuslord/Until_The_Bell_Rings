@@ -136,8 +136,8 @@ MonoBehaviour:
   altarZone: {fileID: 0}
   darknessThreshold: 3
   attackCooldown: 4
-  clipAwake: {fileID: 0}
-  clipGolpe: {fileID: 0}
+  clipAwake: {fileID: 8300000, guid: 5575aec7b313b1045977c4f7cb2424d2, type: 3}
+  clipGolpe: {fileID: 8300000, guid: 9c21e7c32b9713345ba7c920b765c177, type: 3}
   anim: {fileID: 0}
 --- !u!114 &-4848138911845982131
 MonoBehaviour:

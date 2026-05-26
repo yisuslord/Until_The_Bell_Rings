@@ -18,6 +18,9 @@ public class Sensible : EnemyBase
     [SerializeField] private AudioClip clipAtaque;
     [SerializeField] private AudioClip clipGolpe;
 
+
+    private bool yaSonóPersecucion = false; // 🔥 Candado para que el audio no se repita en bucle
+
     private void Update()
     {
         moving = !isStunned && !isAttacking && agent.velocity.magnitude > 0.1f;
@@ -49,22 +52,46 @@ public class Sensible : EnemyBase
 
     private void HandleChasing()
     {
-        if (AudioManager.Instance != null && clipAtaque != null)
+        // 🔥 EL CANDADO: Suena exactamente una vez al iniciar esta persecución
+        if (!yaSonóPersecucion)
         {
-            // Usamos 2D porque es un sonido de inventario/interfaz para el jugador
-            AudioManager.Instance.PlaySFX2D(clipAtaque, .5f);
+            if (AudioManager.Instance != null && clipAtaque != null)
+            {
+                AudioManager.Instance.PlaySFX2D(clipAtaque, 0.2f);
+            }
+            yaSonóPersecucion = true;
         }
+
         if (PlayerController.Instance != null)
         {
-            if (altarZone.IsPlayerInside) return;
+            // CASO 1: El jugador entra al altar
+            if (altarZone != null && altarZone.IsPlayerInside)
+            {
+                yaSonóPersecucion = false; // 🔄 Reseteamos
+                currentState = State.Wandering; // Asegúrate de cambiar el estado aquí si se salva
+                return;
+            }
 
+            // CASO 2: El jugador se esconde
             PlayerHide playerHide = PlayerController.Instance.GetComponent<PlayerHide>();
             if (playerHide != null && playerHide.IsHidden)
             {
+                yaSonóPersecucion = false; // 🔄 Reseteamos
                 currentState = State.Wandering;
                 return;
             }
 
+            // CASO 3: Verificación de distancia (Por si el jugador lo pierde corriendo normal)
+            // Ajusta el "15f" por la distancia máxima de visión/pérdida de tu juego
+            float distanciaAlJugador = Vector3.Distance(transform.position, PlayerController.Instance.transform.position);
+            if (distanciaAlJugador > 15f)
+            {
+                yaSonóPersecucion = false; // 🔄 Reseteamos porque lo perdió de vista
+                currentState = State.Wandering;
+                return;
+            }
+
+            // Si no se cumple ninguna de las anteriores, lo sigue persiguiendo
             MoveTo(PlayerController.Instance.transform.position);
             CheckAttack();
         }
@@ -90,25 +117,27 @@ public class Sensible : EnemyBase
         Debug.Log("<color=red>¡Sensible inicia su ataque!</color>");
         agent.isStopped = true; // Se detiene antes de atacar
 
-        // Aquí iria la animación de ataque
-        // Ejemplo if (anim != null) anim.SetTrigger("attack");
-
-        // Tiempo que tarda el monstruo en estirar o hacer la animacion
+        // Tiempo que tarda el monstruo en estirar los brazos o hacer la animación
         yield return new WaitForSeconds(0.5f);
+
+        // 🔥 REPRODUCCIÓN BLINDADA: El sonido se ejecuta al completarse el golpe (Volumen subido a 1f)
+        if (AudioManager.Instance != null && clipGolpe != null)
+        {
+            AudioManager.Instance.PlaySFX2D(clipGolpe, 2f);
+        }
 
         // Verificación doble por si el jugador esquivó en ese microsegundo
         Collider2D hit = Physics2D.OverlapCircle(transform.position, attackDistance, playerLayer);
         if (hit != null && hit.TryGetComponent(out IDamageable damageable))
         {
-            
             damageable.TakeDamage(attackDamage);
             Debug.Log("<color=red>¡Sensible golpeó al jugador!</color>");
         }
-        if (AudioManager.Instance != null && clipGolpe != null)
+        else
         {
-            // Usamos 2D porque es un sonido de inventario/interfaz para el jugador
-            AudioManager.Instance.PlaySFX2D(clipGolpe, .5f);
+            Debug.Log("<color=yellow>¡Sensible falló el ataque, el jugador esquivó!</color>");
         }
+
         // Breve espera para terminar de reproducir el golpe antes del aturdimiento completo
         yield return new WaitForSeconds(0.5f);
 
@@ -137,8 +166,14 @@ public class Sensible : EnemyBase
         base.OnStimulusReceived(position, type);
     }
 
+
     private void HandleInvestigation()
     {
+        // Si el monstruo está patrullando, el candado de audio DEBE estar listo para la próxima persecución
+        if (yaSonóPersecucion)
+        {
+            yaSonóPersecucion = false;
+        }
         if (!agent.pathPending && agent.remainingDistance < 0.5f)
         {
             CheckForPlayerProximity();

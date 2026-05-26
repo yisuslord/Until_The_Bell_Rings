@@ -27,7 +27,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         if (AudioManager.Instance != null && clipDano != null)
         {
             // Usamos 2D porque es un sonido de inventario/interfaz para el jugador
-            AudioManager.Instance.PlaySFX2D(clipDano, 1f);
+            AudioManager.Instance.PlaySFX2D(clipDano, .5f);
         }
 
         currentHealth -= amount;

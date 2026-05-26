@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
+using UnityEngine.Rendering.Universal; // Enlazamos el sistema de luces 2D de Unity (URP)
 
 public class Asechador : EnemyBase
 {
     [Header("Asechador Settings")]
-
     public Animator anim;
     [SerializeField] private Altar altarTarget;
     [SerializeField] private AltarZone altarZone;
@@ -16,19 +16,32 @@ public class Asechador : EnemyBase
     private bool isAttackingAltar = false;
 
     [Header("Audio System")]
-    [SerializeField] private AudioClip clipAtaque;
-    [SerializeField] private AudioClip clipGolpe;
+    [SerializeField] private AudioClip clipAtaque; // Sonido cuando decide correr al Altar
+    [SerializeField] private AudioClip clipGolpe;  // Sonido del impacto contra el Altar
+
+    // 🔥 NUEVO COMPONENTE DE LUZ
+    private Light2D miLuz;
+
+    // 🔥 CANDADO DE AUDIO: Para que el grito de ataque al altar no se duplique en el frame
+    private bool yaSonoAtaque = false;
 
     protected override void Awake()
     {
         base.Awake();
         attemptTimer = attemptInterval;
+
+        // 🔍 Buscamos la luz de forma automática en el prefab o sus hijos
+        miLuz = GetComponentInChildren<Light2D>();
+
+        // Empieza apagada mientras patrulla tranquilamente
+        ControlarLuz(false);
     }
 
     private void Update()
     {
         moving = agent.velocity.magnitude > 0.1f;
         Animate();
+
         // Si ya decidió atacar el altar, ignoramos el patrullaje normal
         if (isAttackingAltar)
         {
@@ -44,8 +57,6 @@ public class Asechador : EnemyBase
                 CheckAltarAttempt(); // Mientras patrulla, calcula si puede ir al altar
                 break;
             case State.Investigating:
-                // Como bloqueamos los estímulos abajo, rara vez entrará aquí, 
-                // pero lo dejamos por si luego quieres que investigue algo específico.
                 HandleWandering();
                 break;
         }
@@ -59,7 +70,7 @@ public class Asechador : EnemyBase
             attemptTimer = attemptInterval; // Reiniciamos el reloj
 
             // Condición 1: El jugador NO está en la zona del altar
-            if (!altarZone.IsPlayerInside)
+            if (altarZone != null && !altarZone.IsPlayerInside)
             {
                 // Condición 2: Tiramos los dados (Probabilidad)
                 float roll = Random.Range(0f, 100f);
@@ -69,7 +80,21 @@ public class Asechador : EnemyBase
                 {
                     Debug.Log("<color=red>¡El Acechador va a atacar el altar!</color>");
                     isAttackingAltar = true;
-                    MoveTo(altarTarget.transform.position); // Corre hacia el altar
+
+                    // 🔥 ALERTA VISUAL: Encendemos su luz en el instante que se vuelve agresivo hacia el Altar
+                    ControlarLuz(true);
+
+                    // 🔥 ALERTA DE AUDIO: Suena el grito/aviso de ataque una sola vez
+                    if (!yaSonoAtaque && AudioManager.Instance != null && clipAtaque != null)
+                    {
+                        AudioManager.Instance.PlaySFX2D(clipAtaque, 0.35f); // Volumen balanceado
+                        yaSonoAtaque = true;
+                    }
+
+                    if (altarTarget != null)
+                    {
+                        MoveTo(altarTarget.transform.position); // Corre hacia el altar
+                    }
                 }
             }
             else
@@ -81,33 +106,47 @@ public class Asechador : EnemyBase
 
     private void HandleAltarAttack()
     {
+        if (altarTarget == null) return;
+
         // Revisamos si ya llegó a la posición del altar
         float distanceToAltar = Vector2.Distance(transform.position, altarTarget.transform.position);
 
         if (!agent.pathPending && distanceToAltar <= attackDistance)
         {
-
             // Golpeamos el altar
             altarTarget.TakeDamage(altarDamage);
             Debug.Log("<color=red>¡El Acechador asestó un golpe al altar!</color>");
-            if (AudioManager.Instance != null && clipAtaque != null)
+
+            // 🔥 CORRECCIÓN DE AUDIO: Vinculado correctamente a clipGolpe y ejecutado al impacto
+            if (AudioManager.Instance != null && clipGolpe != null)
             {
-                // Usamos 2D porque es un sonido de inventario/interfaz para el jugador
-                AudioManager.Instance.PlaySFX2D(clipGolpe, .5f);
+                AudioManager.Instance.PlaySFX2D(clipGolpe, 0.8f);
             }
-            // Volvemos a la normalidad (A patrullar)
+
+            // Volvemos a la normalidad (A patrullar tranquilamente)
             isAttackingAltar = false;
+            yaSonoAtaque = false; // 🔄 RESETEO: Candado listo para la próxima tirada de dados exitosa
+            ControlarLuz(false);  // 🔥 APAGADO: Al terminar el ataque y volver a patrullar, apaga su luz
+
             currentState = State.Wandering;
             attemptTimer = attemptInterval; // Reseteamos el cooldown para que no ataque dos veces seguidas
         }
     }
 
-    // 🔥 LA SOLUCIÓN: Sobreescribimos los estímulos para que el jefe no se distraiga
+    // Sobreescribimos los estímulos para que el jefe no se distraiga
     public override void OnStimulusReceived(Vector2 position, StimulusType type)
     {
         // El Acechador es el jefe. No le importan los ruiditos del jugador ni las velas.
-        // Simplemente hacemos un 'return' vacío para que ignore todo.
         return;
+    }
+
+    // 🔥 MÉTODO AUXILIAR ANTICRASHEO: Control seguro de la luz
+    private void ControlarLuz(bool encender)
+    {
+        if (miLuz != null)
+        {
+            miLuz.enabled = encender;
+        }
     }
 
     private void Animate()

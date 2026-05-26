@@ -19,22 +19,24 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
     private bool isAttempting = false;
 
     [Header("Audio System")]
-    [SerializeField] private AudioClip clipCorromper;
-    [SerializeField] private AudioClip clipBusqueda;
+    [SerializeField] private AudioClip clipCorromper; // Sonido al sabotear con éxito
+    [SerializeField] private AudioClip clipBusqueda;  // 🔥 Sonido cuando el radar localiza una vela válida
 
     private Vector2 currentTargetPosition;
+
+    // 🔥 CANDADO DE AUDIO: Evita que el sonido de búsqueda se solape si encuentra estímulos seguidos
+    private bool yaSonoBusqueda = false;
 
     public override void OnStimulusReceived(Vector2 position, StimulusType type)
     {
         if (type != StimulusType.Corruptible) return;
 
-        // Validamos el estímulo recibido: Si el objeto en esa posición exacta ya está en memoria, lo ignoramos de inmediato
         Collider2D hit = Physics2D.OverlapPoint(position);
         if (hit != null && hit.TryGetComponent(out ICorruptible target))
         {
             if (memoryList.Contains(target))
             {
-                return; // 🛑 CANDADO 1: El estímulo es rechazado si ya lo recuerda
+                return; // 🛑 CANDADO 1: Rechazado si ya lo recuerda
             }
         }
 
@@ -82,8 +84,6 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
             {
                 if (hit.gameObject != this.gameObject)
                 {
-                    // 🛑 CANDADO 2: Si el objeto que tiene enfrente ya está en su memoria, lo salta 
-                    // Esto evita que corrompa la misma vela si hay dos muy juntas.
                     if (memoryList.Contains(found)) continue;
 
                     target = found;
@@ -93,11 +93,10 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
             }
         }
 
-        // Si el objetivo que tiene enfrente es válido y no está en su memoria
         if (target != null)
         {
             Debug.Log($"<color=yellow>Saboteando: {victimObj.name}...</color>");
-            AddToMemory(target); // Guardamos en memoria para asegurar que no se repita en la siguiente acción
+            AddToMemory(target);
         }
         else
         {
@@ -106,14 +105,16 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
             yield break;
         }
 
+        // Espera los segundos de canalización/animación del sabotaje
         yield return new WaitForSeconds(waitBeforeAttempt);
 
         // Tirada de dados para el éxito de la corrupción
         if (Random.Range(0f, 100f) <= successChance)
         {
+            // 🔥 IMPACTO ÚNICO DE SABOTAJE: Suena en el frame exacto del éxito
             if (AudioManager.Instance != null && clipCorromper != null)
             {
-                AudioManager.Instance.PlaySFX2D(clipCorromper, .5f);
+                AudioManager.Instance.PlaySFX2D(clipCorromper, 0.4f); // Volumen calibrado para dar un buen susto ambiental
             }
             target.Corrupt();
             Debug.Log("<color=purple>¡SABOTAJE EXITOSO!</color>");
@@ -129,6 +130,8 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
     private void FinishAction()
     {
         isAttempting = false;
+        yaSonoBusqueda = false; // 🔄 RESETEO DEL RADAR: Al terminar una acción, su radar vuelve a estar listo para pitar
+
         if (agent != null)
         {
             agent.isStopped = false;
@@ -155,7 +158,6 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
         {
             if (obj.TryGetComponent(out ICorruptible target))
             {
-                // 🛑 CANDADO 3: El radar pasivo ignora por completo los elementos de la lista
                 if (memoryList.Contains(target)) continue;
 
                 if (obj.TryGetComponent(out Candle vela))
@@ -165,6 +167,17 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
 
                 currentTargetPosition = obj.transform.position;
                 Debug.Log($"<color=green>Radar: Objetivo válido encontrado -> {obj.name}</color>");
+
+                // 🔥 CONEXIÓN DEL AUDIO DE BÚSQUEDA:
+                // Suena una sola vez en el instante donde el radar bloquea una vela encendida para perseguirla
+                if (!yaSonoBusqueda)
+                {
+                    if (AudioManager.Instance != null && clipBusqueda != null)
+                    {
+                        AudioManager.Instance.PlaySFX2D(clipBusqueda, 0.25f); // Un sonido sutil (un click mecánico o un pulso)
+                    }
+                    yaSonoBusqueda = true;
+                }
 
                 OnStimulusReceived(currentTargetPosition, StimulusType.Corruptible);
                 return;

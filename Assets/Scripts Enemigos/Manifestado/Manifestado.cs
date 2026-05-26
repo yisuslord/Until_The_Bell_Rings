@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections;
+// Nos aseguramos de incluir el namespace de luces si usas el pipeline 2D (URP)
+using UnityEngine.Rendering.Universal;
 
 public class Manifestado : EnemyBase
 {
@@ -19,15 +21,25 @@ public class Manifestado : EnemyBase
     private bool isAttacking = false;
 
     private bool moving;
+    private bool yaSonoPersecucion = false;
 
     private FlashlightController playerFlashlight;
     private SpriteRenderer spriteRenderer;
+
+    // 🔥 NUEVA COMPONENTE DE LUZ
+    private Light2D miLuz;
 
     protected override void Awake()
     {
         base.Awake();
         playerFlashlight = Object.FindFirstObjectByType<FlashlightController>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+
+        // 🔍 Buscamos la luz de forma automática en el mismo objeto o en sus hijos
+        miLuz = GetComponentInChildren<Light2D>();
+
+        // La apagamos por defecto al iniciar el juego por si acaso comenzó encendida en el inspector
+        ControlarLuz(false);
     }
 
     private void Update()
@@ -44,7 +56,8 @@ public class Manifestado : EnemyBase
             {
                 StopHunting();
                 spriteRenderer.enabled = false;
-                if (agent.isOnNavMesh) agent.ResetPath(); // Limpia la ruta para no campear el Altar
+                ControlarLuz(false); // 🔥 ALTARES: Se apaga la luz al desvanecerse
+                if (agent.isOnNavMesh) agent.ResetPath();
             }
             return;
         }
@@ -61,22 +74,28 @@ public class Manifestado : EnemyBase
             {
                 isHunting = true;
                 spriteRenderer.enabled = true;
+                ControlarLuz(true); // 🔥 APARICIÓN: Se enciende la luz al manifestarse desde la oscuridad
             }
         }
         else
         {
+            // 🔥 ESPANTADO: Si el jugador lo alumbra con la linterna, el método StopHunting() se encargará de apagar su luz
             StopHunting();
             if (!isHunting && !isAturdido) spriteRenderer.enabled = false;
         }
 
-        // 3. ACCIÓN DE CAZA (Aquí aplicamos tu lógica exacta del Sensible)
+        // 3. ACCIÓN DE CAZA 
         if (isHunting)
         {
-            if (AudioManager.Instance != null && clipAwake != null)
+            if (!yaSonoPersecucion)
             {
-                // Usamos 2D porque es un sonido de inventario/interfaz para el jugador
-                AudioManager.Instance.PlaySFX2D(clipAwake, .5f);
+                if (AudioManager.Instance != null && clipAwake != null)
+                {
+                    AudioManager.Instance.PlaySFX2D(clipAwake, 0.25f);
+                }
+                yaSonoPersecucion = true;
             }
+
             HandleHunting();
         }
         else
@@ -85,27 +104,32 @@ public class Manifestado : EnemyBase
         }
     }
 
-    // 🔥 NUEVO MÉTODO: Estructurado igual que el 'HandleChasing' del Sensible
     private void HandleHunting()
     {
         if (PlayerController.Instance != null)
         {
-            // Checar si el jugador tiene el componente y está escondido
             PlayerHide playerHide = PlayerController.Instance.GetComponent<PlayerHide>();
             if (playerHide != null && playerHide.IsHidden)
             {
-                StopHunting();            // Apaga el modo caza y el timer
-                spriteRenderer.enabled = false; // Se desvanece de inmediato
+                StopHunting();
+                spriteRenderer.enabled = false;
 
                 if (agent.isOnNavMesh)
                 {
-                    agent.ResetPath();    // 🔥 LA SOLUCIÓN: Borra la ruta hacia la caja
-                    agent.isStopped = true; // Se queda congelado en su posición actual
+                    agent.ResetPath();
+                    agent.isStopped = true;
                 }
                 return;
             }
 
-            // Si no está escondido, lo persigue normalmente
+            float distanciaAlJugador = Vector3.Distance(transform.position, PlayerController.Instance.transform.position);
+            if (distanciaAlJugador > 15f)
+            {
+                StopHunting();
+                spriteRenderer.enabled = false;
+                return;
+            }
+
             agent.isStopped = false;
             MoveTo(PlayerController.Instance.transform.position);
             CheckAttack();
@@ -130,20 +154,19 @@ public class Manifestado : EnemyBase
         anim.SetBool("Atack", true);
         agent.isStopped = true;
 
-        // Aquí va la animación de ataque
         if (anim != null) anim.SetTrigger("attack");
 
         yield return new WaitForSeconds(0.3f);
+
+        if (AudioManager.Instance != null && clipGolpe != null)
+        {
+            AudioManager.Instance.PlaySFX2D(clipGolpe, 1f);
+        }
 
         Collider2D hit = Physics2D.OverlapCircle(transform.position, attackDistance, playerLayer);
         if (hit != null && hit.TryGetComponent(out IDamageable damageable))
         {
             damageable.TakeDamage(attackDamage);
-            if (AudioManager.Instance != null && clipGolpe != null)
-            {
-                // Usamos 2D porque es un sonido de inventario/interfaz para el jugador
-                AudioManager.Instance.PlaySFX2D(clipGolpe, .5f);
-            }
             Debug.Log("<color=purple>El Manifestado te golpeó y se fundió en las sombras.</color>");
         }
 
@@ -157,8 +180,7 @@ public class Manifestado : EnemyBase
     private IEnumerator AturdimientoRoutine()
     {
         isAturdido = true;
-        isHunting = false;
-        darknessTimer = 0;
+        StopHunting(); // 🔄 Esto reinicia parámetros y apaga la luz automáticamente por seguridad
 
         spriteRenderer.enabled = false;
 
@@ -173,7 +195,19 @@ public class Manifestado : EnemyBase
     {
         isHunting = false;
         darknessTimer = 0;
+        yaSonoPersecucion = false;
+        ControlarLuz(false); // 🔥 ESPANTADO / DORMIDO: Apagamos la luz de inmediato en cualquier reseteo del monstruo
+
         if (agent.isOnNavMesh && !isAturdido && !isAttacking) agent.isStopped = true;
+    }
+
+    // 🔥 MÉTODO AUXILIAR ANTICRASHEO: Controla el encendido seguro de la luz
+    private void ControlarLuz(bool encender)
+    {
+        if (miLuz != null)
+        {
+            miLuz.enabled = encender;
+        }
     }
 
     private void Animate()
