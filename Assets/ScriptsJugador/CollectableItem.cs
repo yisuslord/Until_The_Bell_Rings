@@ -16,7 +16,7 @@ public class CollectibleItem : MonoBehaviour
     [SerializeField] private AudioClip clipRecoger;
 
     [Header("UI de Interacción")]
-    [SerializeField] private TextMeshProUGUI textoInteraccionUI; // 🔥 Arrastra el texto aquí
+    private TextMeshProUGUI textoInteraccionUI; // 🔥 Arrastra el texto aquí
     private IInventoryItem miItem;
 
     private void Awake()
@@ -43,11 +43,11 @@ public class CollectibleItem : MonoBehaviour
 
     private void Start()
     {
-        if (textoInteraccionUI.gameObject.activeSelf)
+        // 🔥 EL CANDADO: Si la variable es null, ni siquiera intentamos revisar el gameObject
+        if (textoInteraccionUI != null && textoInteraccionUI.gameObject.activeSelf)
         {
             textoInteraccionUI.gameObject.SetActive(false);
         }
-
     }
 
     private void Update()

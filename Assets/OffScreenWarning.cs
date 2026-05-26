@@ -21,6 +21,9 @@ public class OffScreenWarning : MonoBehaviour
     // 🔥 EL CANDADO: Evita que el sonido se ejecute infinitamente en el Update
     private bool isSoundPlaying = false;
 
+    // 🧠 NUEVO CANDADO: Evita falsos positivos en el primer frame de la escena
+    private bool initialized = false;
+
     private void Start()
     {
         candle = GetComponent<Candle>();
@@ -37,6 +40,13 @@ public class OffScreenWarning : MonoBehaviour
 
     private void Update()
     {
+        // 🛑 IGNORAR EL PRIMER FRAME: Esperamos a que todas las variables del mapa se sincronicen
+        if (!initialized)
+        {
+            initialized = true;
+            return;
+        }
+
         // REGLA 1: Solo mostrar si la vela está apagada/corrupta
         if (candle.IsLit && !candle.IsCorrupted)
         {

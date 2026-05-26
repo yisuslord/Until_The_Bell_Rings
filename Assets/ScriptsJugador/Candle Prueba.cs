@@ -17,7 +17,6 @@ public class Candle : MonoBehaviour, IInteractable, ICorruptible
     [SerializeField] private Color litColor = Color.white;
     [SerializeField] private Color unlitColor = Color.gray;
 
-    // 🔥 NUEVO: Referencia al componente de luz real
     [Header("Real Light")]
     [SerializeField] private Light2D candleLight;
     [SerializeField] private float lightIntensity = 1.0f; // Intensidad cuando está prendida
@@ -35,20 +34,28 @@ public class Candle : MonoBehaviour, IInteractable, ICorruptible
 
         // Intentamos buscar la luz en los hijos si no se asignó en el inspector
         if (candleLight == null) candleLight = GetComponentInChildren<Light2D>();
+
+        // 🛑 CANDADO DE INICIALIZACIÓN: Establecemos el estado lógico ANTES del primer frame
+        if (startLit)
+        {
+            isLit = true;
+        }
     }
 
-    private IEnumerator Start()
+    private void Start()
     {
         altar = Object.FindFirstObjectByType<Altar>();
 
-        // Estado inicial
+        // Sincronizamos los gráficos y componentes lumínicos con el estado asignado en el Awake
         UpdateVisuals();
 
-        yield return null;
-
-        if (startLit)
+        if (isLit)
         {
-            LightCandle();
+            // Notificamos a los sistemas del mapa que ya nació encendida
+            NotifyAltar();
+            EmitStimulus(StimulusType.Light);
+            EmitStimulus(StimulusType.Corruptible);
+            Debug.Log($"{gameObject.name}: Inicializada Encendida con Luz Real");
         }
     }
 
@@ -89,8 +96,6 @@ public class Candle : MonoBehaviour, IInteractable, ICorruptible
     public void Restore()
     {
         isCorrupted = false;
-        // Si queremos que al restaurarse siga apagada hasta que el player la toque,
-        // solo actualizamos visuales. Si queremos que se prenda sola, llamamos a LightCandle().
         UpdateVisuals();
         NotifyAltar();
     }
@@ -113,7 +118,6 @@ public class Candle : MonoBehaviour, IInteractable, ICorruptible
         }
     }
 
-    // 🔥 ACTUALIZADO: Maneja el color del Sprite Y el estado de la Luz 2D
     private void UpdateVisuals()
     {
         if (spriteRenderer != null)
@@ -123,17 +127,8 @@ public class Candle : MonoBehaviour, IInteractable, ICorruptible
 
         if (candleLight != null)
         {
-            // La luz se activa solo si está encendida
             candleLight.enabled = isLit;
             candleLight.intensity = isLit ? lightIntensity : 0f;
-
-            // Opcional: Si está corrompida, podrías poner la luz morada en vez de apagarla
-            /*
-            if(isCorrupted) {
-                candleLight.enabled = true;
-                candleLight.color = Color.magenta;
-            }
-            */
         }
     }
 }
