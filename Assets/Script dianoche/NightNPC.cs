@@ -6,10 +6,12 @@ public class NightNPC : MonoBehaviour, IInteractable
     private bool canStartNight = false;
 
     // Estado de poder o no interactuar para evitar interaccion extra
-    private bool canInteract = true;
+    public bool canInteract = true;
 
     // Fase de los dialogos (Que dialogo va a decir)
     private int dialogueStep = 0;
+
+
 
     // Dialogos
     private string[][] dialogues =
@@ -88,7 +90,14 @@ public class NightNPC : MonoBehaviour, IInteractable
         if (canStartNight && (Input.GetKeyDown(KeyCode.J)||Input.GetButtonDown("Select")) && LevelManager.Instance.currentState == GameState.Day)
         {
             LevelManager.Instance.StartNight();
+            canInteract = false;
             canStartNight = false;
+
+        }
+
+        if (LevelManager.Instance.currentState == GameState.Day && !canInteract)
+        {
+            canInteract = true;
         }
     }
 
@@ -99,7 +108,7 @@ public class NightNPC : MonoBehaviour, IInteractable
         yield return new WaitUntil(() =>
             !DialogueManager.Instance.IsDialogueActive);
 
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(2f);
 
         canInteract = true;
     }

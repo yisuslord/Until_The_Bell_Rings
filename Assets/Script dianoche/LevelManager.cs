@@ -37,6 +37,7 @@ public class LevelManager : MonoBehaviour
 
     [Header("Referencias Extras Legacy")]
     public GameObject flashlight;
+    public GameObject padreGameObject;
 
     private void Awake() { Instance = this; }
 
@@ -82,6 +83,8 @@ public class LevelManager : MonoBehaviour
         currentState = GameState.Night;
         timer = nightDuration;
 
+        padreGameObject.SetActive(false);
+
         if (uiRelojContenedor != null) uiRelojContenedor.SetActive(true);
         if (flashlight != null) flashlight.SetActive(true);
 
@@ -106,6 +109,7 @@ public class LevelManager : MonoBehaviour
 
     public void EndNight()
     {
+        padreGameObject.SetActive(true);
         // 🔥 Si se acaba la noche del nivel 3 (o superior), el jugador gana
         if (currentLevel >= 3)
         {
