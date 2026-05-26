@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
-using UnityEngine.Rendering.Universal; // 🔥 NECESARIO para controlar Light 2D
+using UnityEngine.Rendering.Universal; // NECESARIO para controlar Light 2D
+using TMPro; // 🔥 NECESARIO para controlar el componente de Texto
 
 public class Candle : MonoBehaviour, IInteractable, ICorruptible
 {
@@ -21,6 +22,10 @@ public class Candle : MonoBehaviour, IInteractable, ICorruptible
     [SerializeField] private Light2D candleLight;
     [SerializeField] private float lightIntensity = 1.0f; // Intensidad cuando está prendida
 
+    [Header("UI de Interacción (Auto-asignada)")]
+    private TextMeshProUGUI textoInteraccionUI;
+    private bool playerInRange = false;
+
     private bool isLit = false;
     private bool isCorrupted = false;
     private Altar altar;
@@ -40,6 +45,29 @@ public class Candle : MonoBehaviour, IInteractable, ICorruptible
         {
             isLit = true;
         }
+
+        // 🔥 LA BÚSQUEDA BLINDADA: Escanea la escena buscando el objeto "TextoInteraccion"
+        // sin importar si está encendido o apagado por otros elementos del Canvas.
+        TextMeshProUGUI[] todosLosTextos = Resources.FindObjectsOfTypeAll<TextMeshProUGUI>();
+
+        foreach (var texto in todosLosTextos)
+        {
+            if (texto.gameObject.name == "TextoInteraccion")
+            {
+                textoInteraccionUI = texto;
+                break; // Lo encontramos, salimos del bucle
+            }
+        }
+
+        // Limpieza inicial de seguridad
+        if (textoInteraccionUI != null)
+        {
+            textoInteraccionUI.text = "";
+        }
+        else
+        {
+            Debug.LogWarning($"[Candle] No se encontró el GameObject 'TextoInteraccion' en la escena para {gameObject.name}");
+        }
     }
 
     private void Start()
@@ -57,14 +85,23 @@ public class Candle : MonoBehaviour, IInteractable, ICorruptible
             EmitStimulus(StimulusType.Corruptible);
             Debug.Log($"{gameObject.name}: Inicializada Encendida con Luz Real");
         }
+        else
+        {
+            // Si empieza apagada, nos aseguramos de que el texto esté oculto al arrancar el nivel
+            OcultarTexto();
+        }
     }
 
     public void Interact()
     {
+        // Solo permitimos encenderla si está apagada
         if (!isLit)
         {
             isCorrupted = false;
             LightCandle();
+
+            // 🔥 Ocultamos el texto inmediatamente al encenderse con éxito
+            OcultarTexto();
         }
     }
 
@@ -90,6 +127,14 @@ public class Candle : MonoBehaviour, IInteractable, ICorruptible
 
         UpdateVisuals();
         NotifyAltar();
+
+        // 🔥 Si el jugador estaba parado al lado de la vela cuando el Corruptor la apagó,
+        // volvemos a mostrar el texto "Encender Vela"
+        if (playerInRange)
+        {
+            MostrarTexto();
+        }
+
         StartCoroutine(RestoreTimer());
     }
 
@@ -129,6 +174,50 @@ public class Candle : MonoBehaviour, IInteractable, ICorruptible
         {
             candleLight.enabled = isLit;
             candleLight.intensity = isLit ? lightIntensity : 0f;
+        }
+    }
+
+    // --- DETECCIÓN EN RANGO PARA LA INTERFAZ DE USUARIO ---
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            playerInRange = true;
+
+            // 🔥 Solo mostramos el texto si la vela está apagada
+            if (!isLit)
+            {
+                MostrarTexto();
+            }
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            playerInRange = false;
+            OcultarTexto(); // Borra el mensaje al alejarse
+        }
+    }
+
+    private void MostrarTexto()
+    {
+        // Evitamos encender la interfaz si la vela de hecho ya está prendida
+        if (textoInteraccionUI != null && !isLit)
+        {
+            textoInteraccionUI.text = "Encender Vela";
+            textoInteraccionUI.gameObject.SetActive(true); // Encendemos la UI global
+        }
+    }
+
+    private void OcultarTexto()
+    {
+        // Solo intentamos apagarla si nosotros la tenemos asignada de forma segura
+        if (textoInteraccionUI != null)
+        {
+            textoInteraccionUI.gameObject.SetActive(false); // Apagamos la UI global
         }
     }
 }
