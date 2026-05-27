@@ -165,7 +165,7 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
     // Filtra las velas que ya esten apagadas, corrompidas o en memoria. Si encuentra una vela encendida valida, reproduce el sonido de alerta una sola vez mediante su candado booleano y manda la posicion al sistema de estimulos para iniciar la persecucion.
     private void PassiveScan()
     {
-        Collider2D[] objects = Physics2D.OverlapCircleAll(transform.position, 15f);
+        Collider2D[] objects = Physics2D.OverlapCircleAll(transform.position, 200f);
 
         foreach (var obj in objects)
         {

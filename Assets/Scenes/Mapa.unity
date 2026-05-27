@@ -2110,6 +2110,10 @@ PrefabInstance:
       value: Manifestado
       objectReference: {fileID: 0}
     - target: {fileID: 7290383926131094982, guid: 9ebfa97f49b1aee4984f09f180aec1e5, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7290383926131094982, guid: 9ebfa97f49b1aee4984f09f180aec1e5, type: 3}
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
@@ -55697,13 +55701,21 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4828811741731202388, guid: 01682b94465fea14e8f2a6c1eb15c10c, type: 3}
+      propertyPath: scanInterval
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4828811741731202388, guid: 01682b94465fea14e8f2a6c1eb15c10c, type: 3}
       propertyPath: wanderRadius
-      value: 10.47
+      value: 200
       objectReference: {fileID: 0}
     - target: {fileID: 4828811741731202388, guid: 01682b94465fea14e8f2a6c1eb15c10c, type: 3}
       propertyPath: clipCorromper
       value: 
       objectReference: {fileID: 8300000, guid: eeb88bfec12f31f4abd587d81235a240, type: 3}
+    - target: {fileID: 4828811741731202388, guid: 01682b94465fea14e8f2a6c1eb15c10c, type: 3}
+      propertyPath: memoryCapacity
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4939330805562075654, guid: 01682b94465fea14e8f2a6c1eb15c10c, type: 3}
       propertyPath: m_Name
       value: Corruptor
@@ -69011,6 +69023,10 @@ PrefabInstance:
       objectReference: {fileID: 6192245317881030728, guid: d03d35dc10f100047bf93f3d40cc9407, type: 3}
     - target: {fileID: 2369477619805274872, guid: 9c18ecd038677e54b9582feab9bc22a9, type: 3}
       propertyPath: m_SortingOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4080375179880061838, guid: 9c18ecd038677e54b9582feab9bc22a9, type: 3}
+      propertyPath: m_IsTrigger
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4783669895825162843, guid: 9c18ecd038677e54b9582feab9bc22a9, type: 3}
