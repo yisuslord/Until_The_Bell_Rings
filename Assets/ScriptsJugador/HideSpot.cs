@@ -5,14 +5,13 @@ public class HideSpot : MonoBehaviour, IInteractable, IHideable
 {
     [SerializeField] private Transform hidePoint;
 
-    [Header("UI de Interacción (Auto-asignada)")]
+    [Header("UI de Interaccion (Auto-asignada)")]
     private TextMeshProUGUI textoInteraccionUI;
     private bool playerInRange = false;
 
     private void Awake()
     {
-        // 🔥 LA BÚSQUEDA BLINDADA: Escanea la escena buscando el objeto "TextoInteraccion" 
-        // sin importar si está encendido o apagado por otros ítems.
+        // Escaneo global en buffer para localizar el componente de texto sin importar su estado jerarquico activo/inactivo
         TextMeshProUGUI[] todosLosTextos = Resources.FindObjectsOfTypeAll<TextMeshProUGUI>();
 
         foreach (var texto in todosLosTextos)
@@ -20,30 +19,31 @@ public class HideSpot : MonoBehaviour, IInteractable, IHideable
             if (texto.gameObject.name == "TextoInteraccion")
             {
                 textoInteraccionUI = texto;
-                break; // Lo encontramos, salimos del bucle
+                break;
             }
         }
 
-        // Limpieza inicial de seguridad
+        // Inicializacion de seguridad del buffer de texto
         if (textoInteraccionUI != null)
         {
             textoInteraccionUI.text = "";
         }
         else
         {
-            Debug.LogWarning($"[HideSpot] No se encontró el GameObject 'TextoInteraccion' en la escena para {gameObject.name}");
+            Debug.LogWarning($"[HideSpot] No se encontro el GameObject 'TextoInteraccion' en la escena para {gameObject.name}");
         }
     }
 
     private void Start()
     {
-        // Nos aseguramos de que empiece oculto de forma segura al arrancar el nivel
+        // Garantiza el estado apagado del componente visual al inicializar el escenario
         if (textoInteraccionUI != null && textoInteraccionUI.gameObject.activeSelf)
         {
             textoInteraccionUI.gameObject.SetActive(false);
         }
     }
 
+    // Procesa la solicitud de interaccion del jugador con el punto de escondite
     public void Interact()
     {
         PlayerHide player = FindFirstObjectByType<PlayerHide>();
@@ -51,14 +51,15 @@ public class HideSpot : MonoBehaviour, IInteractable, IHideable
 
         if (!player.IsHidden)
         {
-            // 🔥 Al esconderse, ocultamos el texto inmediatamente para que no se quede flotando dentro del escondite
+            // Remocion del texto de interfaz previa transicion de estado para evitar persistencia visual flotante
             OcultarTexto();
             player.Hide(this);
         }
         else
         {
             player.Unhide();
-            // Si sale y sigue dentro del trigger, volvemos a mostrar el texto por si quiere volver a entrar
+
+            // Re-evaluacion del indicador visual si el jugador decide salir pero permanece en el area del trigger
             if (playerInRange)
             {
                 MostrarTexto();
@@ -66,18 +67,20 @@ public class HideSpot : MonoBehaviour, IInteractable, IHideable
         }
     }
 
+    // Define la logica fisica del jugador al ingresar al contenedor de ocultamiento
     public void Hide(Transform player)
     {
         player.position = hidePoint.position;
-        Debug.Log("Se metió en la caja");
+        Debug.Log($"[Mecanica] Jugador ingresó al punto de ocultamiento en: {gameObject.name}");
     }
 
+    // Define la logica fisica del jugador al egresar del contenedor de ocultamiento
     public void Unhide(Transform player)
     {
-        Debug.Log("Salió de la caja");
+        Debug.Log($"[Mecanica] Jugador salio del punto de ocultamiento en: {gameObject.name}");
     }
 
-    // --- DETECCIÓN DEL JUGADOR PARA LA INTERFAZ ---
+    // --- DETECCION DEL JUGADOR PARA LA INTERFAZ ---
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -85,7 +88,7 @@ public class HideSpot : MonoBehaviour, IInteractable, IHideable
         {
             playerInRange = true;
 
-            // 🔥 Solo mostramos el texto si el jugador NO está escondido ya adentro
+            // Restriccion de la interfaz: Evita el despliegue del prompt si el jugador ya se encuentra en estado oculto
             PlayerHide player = other.GetComponent<PlayerHide>();
             if (player != null && !player.IsHidden)
             {
@@ -99,7 +102,7 @@ public class HideSpot : MonoBehaviour, IInteractable, IHideable
         if (other.CompareTag("Player"))
         {
             playerInRange = false;
-            OcultarTexto(); // Quita el mensaje "Esconderse" de la pantalla al alejarse
+            OcultarTexto();
         }
     }
 
@@ -108,7 +111,7 @@ public class HideSpot : MonoBehaviour, IInteractable, IHideable
         if (textoInteraccionUI != null)
         {
             textoInteraccionUI.text = "Esconderse";
-            textoInteraccionUI.gameObject.SetActive(true); // Encendemos la UI global
+            textoInteraccionUI.gameObject.SetActive(true);
         }
     }
 
@@ -116,7 +119,7 @@ public class HideSpot : MonoBehaviour, IInteractable, IHideable
     {
         if (textoInteraccionUI != null)
         {
-            textoInteraccionUI.gameObject.SetActive(false); // Apagamos la UI global
+            textoInteraccionUI.gameObject.SetActive(false);
         }
     }
 }

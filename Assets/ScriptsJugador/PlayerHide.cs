@@ -6,16 +6,16 @@ public class PlayerHide : MonoBehaviour
 
     [SerializeField] private SpriteRenderer playerSprite;
 
-    // Referencia al collider para apagar las colisiones
     private Collider2D playerCollider;
     private IHideable currentHideSpot;
 
     private void Start()
     {
-        // Buscamos automáticamente el collider que tenga tu jugador (BoxCollider2D, CapsuleCollider2D, etc.)
+        // Buscamos el componente de colisiones que tenga el jugador en su objeto
         playerCollider = GetComponent<Collider2D>();
     }
 
+    // Activa el estado de escondido cuando interactuamos con un lugar valido
     public void Hide(IHideable hideSpot)
     {
         if (IsHidden) return;
@@ -23,10 +23,10 @@ public class PlayerHide : MonoBehaviour
         IsHidden = true;
         currentHideSpot = hideSpot;
 
-        // 1. Apagamos el sprite (te vuelves invisible)
+        // Ocultamos el renderizador del sprite para que el personaje no se vea en pantalla
         playerSprite.enabled = false;
 
-        // 2. Apagamos las colisiones (los enemigos, raycasts y triggers te ignoran por completo)
+        // Apagamos sus colisiones para que los enemigos o ataques lo ignoren por completo
         if (playerCollider != null)
         {
             playerCollider.enabled = false;
@@ -36,14 +36,15 @@ public class PlayerHide : MonoBehaviour
         Debug.Log("Jugador escondido: Sprite y Colisiones desactivados");
     }
 
+    // Saca al jugador del escondite y restablece su estado normal en el juego
     public void Unhide()
     {
         if (!IsHidden) return;
 
-        // 1. Volvemos a encender el sprite
+        // Volvemos a hacer visible el sprite del personaje
         playerSprite.enabled = true;
 
-        // 2. Reactivamos las colisiones
+        // Encendemos las colisiones para que el mundo vuelva a interactuar con el cuerpo del jugador
         if (playerCollider != null)
         {
             playerCollider.enabled = true;

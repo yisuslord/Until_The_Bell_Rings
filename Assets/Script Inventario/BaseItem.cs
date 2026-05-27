@@ -6,24 +6,25 @@ public abstract class BaseItem : MonoBehaviour, IInteractable, IInventoryItem
     [SerializeField] protected string itemName;
     [SerializeField] private Sprite inventoryIcon;
 
-    // Propiedad pública para que la UI pueda leer el icono
+    // Propiedades publicas de lectura para los componentes de la interfaz de usuario (UI)
     public Sprite InventoryIcon => inventoryIcon;
     public string ItemName => itemName;
 
+    [Header("Physics Settings")]
     public LayerMask enemyLayer;
 
-    // Nota: Dejamos esto solo por si la interfaz IInventoryItem o algún script viejo aún pregunta por ello, 
-    // pero siempre devolverá falso ya que no hay mecánicas de corrupción aquí.
+    // Implementacion por defecto de IInventoryItem. Devuelve falso al no requerir logica de corrupcion en items base.
     public bool IsCorrupted => false;
 
     protected virtual void Start()
     {
-        // Ya no emite presencia ni busca enemigos porque el corruptor ignora los ítems sueltos.
+        // Metodo virtual para inicializaciones especificas en clases derivadas
     }
 
+    // Gestion de la interaccion fisica del jugador con el item en el escenario
     public virtual void Interact()
     {
-        // El objeto se puede recolectar directamente sin trabas de corrupción
+        // Localizacion del componente central de inventario para procesar la recoleccion
         var inv = Object.FindFirstObjectByType<Inventario>();
         if (inv != null && inv.addItem(this))
         {
@@ -31,12 +32,16 @@ public abstract class BaseItem : MonoBehaviour, IInteractable, IInventoryItem
         }
     }
 
+    // Define el comportamiento inmediato del objeto tras ser aceptado por el inventario
     protected virtual void OnCollected()
     {
+        // Se desactiva el objeto de la escena para conservarlo en memoria dentro del buffer del inventario
         gameObject.SetActive(false);
     }
 
+    // Metodo abstracto obligatorio para definir la logica de consumo o activacion de cada item derivado
     public abstract void Use();
 
+    // Metodo virtual auxiliar para la obtencion de clips de audio especificos del item
     public virtual AudioClip GetClip() { return null; }
 }

@@ -12,7 +12,7 @@ public class CollectibleItem : MonoBehaviour
     [Header("Audio")]
     [SerializeField] private AudioClip clipRecoger;
 
-    [Header("UI de Interacción")]
+    [Header("UI de Interaccion")]
     private TextMeshProUGUI textoInteraccionUI;
     private IInventoryItem miItem;
 
@@ -20,7 +20,7 @@ public class CollectibleItem : MonoBehaviour
     {
         miItem = GetComponent<IInventoryItem>();
 
-        // 🔥 NUEVA BÚSQUEDA BLINDADA: Busca en TODA la escena, incluídos objetos desactivados
+        // Buscamos el texto de interaccion por toda la escena, este prendido o apagado
         TextMeshProUGUI[] todosLosTextos = Resources.FindObjectsOfTypeAll<TextMeshProUGUI>();
 
         foreach (var texto in todosLosTextos)
@@ -28,24 +28,24 @@ public class CollectibleItem : MonoBehaviour
             if (texto.gameObject.name == "TextoInteraccion")
             {
                 textoInteraccionUI = texto;
-                break; // Lo encontramos, salimos del bucle
+                break;
             }
         }
 
-        // Verificación de seguridad por si acaso cambiaste el nombre en el Canvas
+        // Limpiamos el texto al arrancar por seguridad
         if (textoInteraccionUI != null)
         {
             textoInteraccionUI.text = "";
         }
         else
         {
-            Debug.LogWarning($"[CollectibleItem] No se encontró el GameObject 'TextoInteraccion' (ni activo ni inactivo) para {gameObject.name}");
+            Debug.LogWarning($"[CollectibleItem] No se encontro el GameObject 'TextoInteraccion' en la escena para {gameObject.name}");
         }
     }
 
     private void Start()
     {
-        // El primer frame se asegura de ocultarlo globalmente de forma segura si está asignado
+        // Nos aseguramos de que el texto de la interfaz empiece apagado
         if (textoInteraccionUI != null && textoInteraccionUI.gameObject.activeSelf)
         {
             textoInteraccionUI.gameObject.SetActive(false);
@@ -54,6 +54,7 @@ public class CollectibleItem : MonoBehaviour
 
     private void Update()
     {
+        // Si el jugador esta cerca, el objeto no esta corrompido y presiona el boton, lo recoge
         if (playerInRange && !isCorrupted && (Input.GetKeyDown(KeyCode.E) || Input.GetButtonDown("Interact")))
         {
             RecogerObjeto();
@@ -71,23 +72,27 @@ public class CollectibleItem : MonoBehaviour
                 OcultarTexto();
                 tempInventory.AddItem(item);
 
+                // Metemos el objeto dentro del inventario, lo acomodamos y lo desactivamos del mundo
                 transform.SetParent(tempInventory.transform);
                 transform.localPosition = Vector3.zero;
                 gameObject.SetActive(false);
 
+                // Reproducimos el sonido de recoger objeto
                 if (AudioManager.Instance != null && clipRecoger != null)
                 {
                     AudioManager.Instance.PlaySFX2D(clipRecoger, 1f);
                 }
 
-                Debug.Log($"<color=green>{gameObject.name} guardado y desactivado (Sin clones).</color>");
+                Debug.Log($"<color=green>[Inventario] {gameObject.name} guardado y desactivado exitosamente.</color>");
 
+                // Limpiamos las variables locales porque el objeto ya se guardo
                 playerInRange = false;
                 tempInventory = null;
             }
         }
     }
 
+    // Cuando el jugador se acerca al objeto
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
@@ -98,6 +103,7 @@ public class CollectibleItem : MonoBehaviour
         }
     }
 
+    // Cuando el jugador se aleja del objeto
     private void OnTriggerExit2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
@@ -112,6 +118,7 @@ public class CollectibleItem : MonoBehaviour
     {
         if (textoInteraccionUI != null && miItem != null)
         {
+            // Ponemos el nombre del objeto en el texto y lo encendemos
             textoInteraccionUI.text = $"{miItem.ItemName}";
             textoInteraccionUI.gameObject.SetActive(true);
         }

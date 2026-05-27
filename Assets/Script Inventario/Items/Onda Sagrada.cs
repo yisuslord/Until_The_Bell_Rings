@@ -9,52 +9,56 @@ public class OndaSagrada : BaseItem
 
     [SerializeField] private Sprite myIcon;
 
-    // Devolvemos el sprite cumpliendo con la interfaz
-    //public Sprite InventoryIcon => myIcon;
-
-    
-
-    /*private bool isCorrupted = false;
-
-    public bool IsCorrupted => isCorrupted;
-
-    public void Corrupt() {
-
-    }
-
-    public void Restore()
-    {
-
-    }*/
+    // Procesa la logica de reposicionamiento, ejecucion visual, calculo de fuerza fisica y ciclo de vida del clon
     public override void Use()
     {
-        /// 🔥 LLAMADA AL AUDIO MANAGER ANTES DE DESTRUIR EL OBJETO
+        // Determinacion de la coordenada exacta del jugador en el frame de activacion
+        Vector3 posicionJugador = transform.position;
+        PlayerController jugador = Object.FindFirstObjectByType<PlayerController>();
+
+        if (jugador != null)
+        {
+            posicionJugador = jugador.transform.position;
+        }
+
+        // Sincronizacion de posicionamiento global del clon con el cuerpo del jugador
+        transform.position = posicionJugador;
+
+        // Reproduccion de la pista de audio antes de alterar los componentes del objeto
         if (AudioManager.Instance != null && clipOnda != null)
         {
-            // Usamos 2D porque es un sonido de inventario/interfaz para el jugador
             AudioManager.Instance.PlaySFX2D(clipOnda, 1f);
         }
 
-        // 2. Efecto Visual
-        IVisualEffect effect = GetComponentInParent<IVisualEffect>();
+        // Resolucion y ejecucion del componente visual local incorporado en el Prefab
+        IVisualEffect effect = GetComponent<IVisualEffect>();
+        if (effect == null) effect = GetComponentInChildren<IVisualEffect>();
+
         if (effect != null)
         {
-            effect.PlayEffect(transform.parent.position);
+            effect.PlayEffect(posicionJugador);
         }
         else
         {
-            effect = Object.FindFirstObjectByType<Onda_Visual>();
-            if (effect != null) effect.PlayEffect(transform.position);
+            Debug.LogWarning("[OndaSagrada] No se encontro el componente de efecto visual (IVisualEffect) en la estructura de este Prefab.");
         }
 
-        // 3. Lógica de Empuje
-        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(transform.position, range, enemyLayer);
+        // Calculo de colisiones radiales para la aplicacion del vector de repulsion en los enemigos
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(posicionJugador, range, enemyLayer);
         foreach (var hit in hitEnemies)
         {
             if (hit.TryGetComponent(out EnemyBase enemy))
             {
-                enemy.GetRepelled(transform.position, pushForce);
+                enemy.GetRepelled(posicionJugador, pushForce);
             }
         }
+
+        // NOTA DE DESARROLLO: Remocion de componentes visuales y fisicos superficiales del clon actual.
+        // Se preserva la instancia del GameObject en escena durante 2 segundos para garantizar la finalizacion
+        // del ciclo de emision de las particulas antes del vaciado definitivo de memoria.
+        if (TryGetComponent(out SpriteRenderer sr)) sr.enabled = false;
+        if (TryGetComponent(out Collider2D col)) col.enabled = false;
+
+        Destroy(gameObject, 2.0f);
     }
 }

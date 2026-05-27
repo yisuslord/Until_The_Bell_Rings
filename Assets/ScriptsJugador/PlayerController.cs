@@ -17,10 +17,10 @@ public class PlayerController : MonoBehaviour
 
     [Header("Stamina System")]
     [SerializeField] private float maxStamina = 100f;
-    [SerializeField] private float staminaDrain = 20f;   // Cuánto baja por segundo al correr
-    [SerializeField] private float staminaRegen = 15f;   // Cuánto sube por segundo
+    [SerializeField] private float staminaDrain = 20f;   // Cuanto baja por segundo al correr
+    [SerializeField] private float staminaRegen = 15f;   // Cuanto sube por second
     private float currentStamina;
-    private bool isExhausted = false; // Bloqueo cuando llega a 0
+    private bool isExhausted = false; // Bloqueo cuando llega a 0 y no deja correr
 
     [Header("Noise System")]
     [SerializeField] private float noiseRadius = 5f;
@@ -38,42 +38,42 @@ public class PlayerController : MonoBehaviour
     [Header("Run Path")]
     [SerializeField] private ParticleSystem Rastro;
 
-    
-
     public static PlayerController Instance { get; private set; }
 
     private void Awake()
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
+
         rb = GetComponent<Rigidbody2D>();
         playerHide = GetComponent<PlayerHide>();
 
-        currentStamina = maxStamina; // Empezamos llenos
-
-        //if (playerSource == null) playerSource = GetComponent<AudioSource>();
+        // Empezamos con la barra de estamina llena
+        currentStamina = maxStamina;
     }
 
     private void Update()
     {
+        // Si el jugador esta escondido, no se mueve, recupera estamina y actualiza las animaciones
         if (playerHide != null && playerHide.IsHidden)
         {
             movementInput = Vector2.zero;
-            HandleStamina(); // Recuperar estamina mientras está escondido
+            HandleStamina();
             Animate();
             return;
         }
 
+        // Capturamos el movimiento del teclado o mando
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
         movementInput = new Vector2(horizontal, vertical).normalized;
-        
+
         isMoving = movementInput != Vector2.zero;
 
-        // Lógica de Carrera con Estamina
-        // Solo puede correr si presiona Shift, se mueve, Y NO está agotado
-        isRunning = (Input.GetKey(KeyCode.LeftShift)||Input.GetButton("Run")) && isMoving && !isExhausted;
+        // Solo puede correr si presiona el boton, se esta moviendo y no se quedo sin estamina
+        isRunning = (Input.GetKey(KeyCode.LeftShift) || Input.GetButton("Run")) && isMoving && !isExhausted;
 
+        // Actualizamos todos los sistemas dependientes del movimiento por cada frame
         HandleStamina();
         Animate();
         HandleFootsteps();
@@ -84,49 +84,49 @@ public class PlayerController : MonoBehaviour
     {
         if (Rastro == null) return;
 
-        // Si está corriendo y se está moviendo, activamos la emisión
+        // Prendemos las particulas solo si esta corriendo y moviendose
         var emission = Rastro.emission;
-
-        // Al usar 'enabled', si se apaga, las partículas ya creadas siguen vivas
         emission.enabled = isRunning && isMoving;
 
         if (isRunning && isMoving)
         {
-            // HACER QUE FLUYAN EN DIRECCIÓN OPUESTA
-            // Tomamos el vector de movimiento invertido (-movementInput)
+            // Invertimos el movimiento para que las particulas salgan hacia atras
             Vector2 oppositeDirection = -movementInput;
 
-            // Convertimos la dirección en un ángulo en grados
+            // Calculamos el angulo en base a la direccion contraria
             float angle = Mathf.Atan2(oppositeDirection.y, oppositeDirection.x) * Mathf.Rad2Deg;
 
-            // Rotamos el sistema de partículas hacia ese ángulo
+            // Rotamos el emisor de particulas para que apunte en la direccion correcta
             Rastro.transform.rotation = Quaternion.Euler(0, 0, angle);
         }
     }
+
     private void HandleStamina()
     {
         if (isRunning)
         {
+            // Si corre, gastamos estamina por segundo
             currentStamina -= staminaDrain * Time.deltaTime;
             if (currentStamina <= 0)
             {
                 currentStamina = 0;
-                isExhausted = true;
+                isExhausted = true; // Se canso, se bloquea la carrera
             }
         }
         else
         {
+            // Si camina o esta quieto, recuperamos estamina poco a poco
             currentStamina += staminaRegen * Time.deltaTime;
             currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
 
+            // Solo si se recupera al 100% puede volver a correr de nuevo
             if (isExhausted && currentStamina >= maxStamina)
             {
                 isExhausted = false;
             }
         }
 
-        // 🔥 LLAMADA AL UI MANAGER
-        // Asumiendo que tu UIManager tiene una instancia estática: UIManager.Instance
+        // Enviamos los datos actualizados a la interfaz de usuario
         if (UIManager.Instance != null)
         {
             UIManager.Instance.UpdatePlayerStamina(currentStamina, maxStamina, isExhausted);
@@ -139,28 +139,27 @@ public class PlayerController : MonoBehaviour
 
         if (isMoving)
         {
-            // 1. Elegimos qué clip mandarle al canal de SFX
+            // Elegimos el sonido y el volumen dependiendo de si corre o camina
             AudioClip clipDeseado = isRunning ? clipCorrer : clipCaminar;
-            float volumen = isRunning ? 0.8f : 0.5f; // Correr suena un poco más fuerte
+            float volumen = isRunning ? 0.8f : 0.5f;
 
-            // 2. Le decimos al manager: "reproduce este clip en bucle"
+            // Mandamos el sonido elegido al manager para que suene en bucle
             AudioManager.Instance.ControlarPasosLoop(clipDeseado, true, volumen);
         }
         else
         {
-            // 3. Si no se mueve, le decimos al manager que apague ese loop de SFX
+            // Si se detiene, le avisamos al manager que apague los sonidos de pasos
             AudioManager.Instance.ControlarPasosLoop(null, false, 0f);
         }
     }
 
-
-
     private void FixedUpdate()
     {
-        // La velocidad depende de si realmente está corriendo (considerando estamina)
+        // Aplicamos la velocidad fisica segun el estado actual del jugador
         float speed = isRunning ? runSpeed : walkSpeed;
         rb.linearVelocity = movementInput * speed;
 
+        // Si corre, generamos una alerta logica para los enemigos cada cierto tiempo
         if (isMoving && isRunning)
         {
             noiseTimer -= Time.fixedDeltaTime;
@@ -174,8 +173,7 @@ public class PlayerController : MonoBehaviour
 
     private void EmitNoise()
     {
-        // El sonido de "correr" ya lo maneja HandleFootsteps para el ritmo de pasos.
-        // Aquí emitimos la alerta visual/lógica para los enemigos.
+        // Buscamos enemigos en un circulo a la redonda y les mandamos el estimulo de ruido
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(transform.position, noiseRadius, enemyLayer);
         foreach (var hit in hitEnemies)
         {
@@ -188,6 +186,7 @@ public class PlayerController : MonoBehaviour
 
     private void Animate()
     {
+        // Controlamos los parametros del Animator para actualizar los sprites del personaje
         anim.SetBool("Moving", isMoving);
         if (isMoving)
         {
@@ -195,6 +194,4 @@ public class PlayerController : MonoBehaviour
             anim.SetFloat("Y", movementInput.y);
         }
     }
-
-    // ... (Métodos EmitNoise y Animate se mantienen igual)
 }

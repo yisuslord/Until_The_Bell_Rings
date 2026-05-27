@@ -3,29 +3,33 @@
 public class Bateria : BaseItem
 {
     [Header("Ajustes de Recarga")]
-    [SerializeField] private float restoreAmount = 40f; // Cuánta energía restaura al usarse
+    [Tooltip("Cantidad de energia que se restaurara a la linterna.")]
+    [SerializeField] private float restoreAmount = 40f;
+
     [SerializeField] private AudioClip clipRecarga;
 
-    // Se ejecuta cuando el jugador presiona la Q teniendo este objeto seleccionado en la Hotbar
+    // Esta funcion la llama automaticamente el inventario cuando usamos la bateria
     public override void Use()
     {
-        /// 🔥 LLAMADA AL AUDIO MANAGER ANTES DE DESTRUIR EL OBJETO
+        // Reproducimos el sonido de recarga en 2D a traves del AudioManager
         if (AudioManager.Instance != null && clipRecarga != null)
         {
-            // Usamos 2D porque es un sonido de inventario/interfaz para el jugador
             AudioManager.Instance.PlaySFX2D(clipRecarga, 1f);
         }
-        // Buscamos el controlador de la linterna en el jugador
+
+        // Buscamos la linterna que esta activa en la escena
         FlashlightController flashlight = Object.FindFirstObjectByType<FlashlightController>();
 
         if (flashlight != null)
         {
+            // Si encontramos la linterna, le sumamos la energia de la bateria
             flashlight.RechargeBattery(restoreAmount);
-            Debug.Log($"<color=cyan>{itemName} usada con éxito.</color>");
+            Debug.Log($"[Inventario] {itemName} consumida. Energia restaurada: {restoreAmount}");
         }
         else
         {
-            Debug.LogWarning("No se encontró FlashlightController en la escena.");
+            // Si no hay ninguna linterna en el mapa, avisamos con una advertencia en la consola
+            Debug.LogWarning("[Inventario] Objeto no consumido: No se encontro el FlashlightController en la escena.");
         }
     }
 }

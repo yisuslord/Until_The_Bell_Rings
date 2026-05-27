@@ -4,7 +4,7 @@ using UnityEngine;
 public class Inventario : MonoBehaviour
 {
     [Header("Settings")]
-    public BaseItem defaultItem; // Cambiado a BaseItem para consistencia
+    public BaseItem defaultItem;
     public int maxItems = 5;
 
     [Header("Current Status")]
@@ -21,7 +21,7 @@ public class Inventario : MonoBehaviour
 
     void Update()
     {
-        // Selección de items (Teclas 1-5)
+        // Mapeo de entrada numerica para la seleccion de slots en la Hotbar (Teclas 1-5)
         for (int i = 0; i < maxItems; i++)
         {
             if (Input.GetKeyDown(KeyCode.Alpha1 + i))
@@ -30,13 +30,13 @@ public class Inventario : MonoBehaviour
             }
         }
 
-        // Usar objeto activo (Tecla Q)
+        // Procesamiento del consumo del item activo
         if (Input.GetKeyDown(KeyCode.Q))
         {
             UseActiveItem();
         }
 
-        // Soltar objeto activo (Tecla R)
+        // Procesamiento del descarte del item activo hacia el escenario mundial
         if (Input.GetKeyDown(KeyCode.R))
         {
             RemoveItem(actItem);
@@ -45,14 +45,15 @@ public class Inventario : MonoBehaviour
 
     private void UseActiveItem()
     {
-        // Si el objeto actual no es el vacío/default
+        // Validacion de seguridad para evitar la ejecucion de logica sobre el item vacio por defecto
         if (actItem != null && actItem != (IInventoryItem)defaultItem)
         {
-            actItem.Use(); // Llamamos al Use() de BaseItem
+            // Invocacion del comportamiento polimorfico del item seleccionado
+            actItem.Use();
 
-            // Si es un consumible (como la poción), lo eliminamos tras usarlo
+            // Remocion automatica del buffer de datos tras el consumo logico
             RemoveItem(actItem);
-            Debug.Log($"Item en slot {actItemIndex} usado y consumido.");
+            Debug.Log($"[Inventario] Item en slot {actItemIndex} procesado y removido.");
         }
     }
 
@@ -61,29 +62,33 @@ public class Inventario : MonoBehaviour
         if (index >= Inventory.Count) return;
         actItemIndex = index;
         actItem = Inventory[index];
-        Debug.Log("Item activo: Slot " + actItemIndex);
+        Debug.Log("[Inventario] Cambio de slot activo a: " + actItemIndex);
     }
 
+    // Gestiona la insercion de un nuevo elemento interactuable dentro del contenedor logico
     public bool addItem(IInventoryItem newItem)
     {
         for (int i = 0; i < Inventory.Count; i++)
         {
-            // Buscamos un slot que tenga el item por defecto
+            // Busqueda de slots disponibles que contengan la referencia del item nulo por defecto
             if (Inventory[i] == (IInventoryItem)defaultItem)
             {
                 MonoBehaviour itemMB = newItem as MonoBehaviour;
+
+                // Transferencia de jerarquia al transform del inventario para su preservacion centralizada
                 itemMB.gameObject.transform.SetParent(transform);
-                itemMB.gameObject.SetActive(false); // Nos aseguramos de que no se vea en el mundo
+                itemMB.gameObject.SetActive(false);
 
                 Inventory[i] = newItem;
-                ChooseItem(i); // Lo seleccionamos automáticamente al recogerlo
+                ChooseItem(i);
                 return true;
             }
         }
-        Debug.Log("Inventario lleno");
+        Debug.Log("[Inventario] Registro rechazado: Capacidad maxima alcanzada.");
         return false;
     }
 
+    // Maneja la remocion de elementos, distinguiendo entre descarte fisico y vaciado por consumo
     public void RemoveItem(IInventoryItem oldItem)
     {
         if (oldItem == (IInventoryItem)defaultItem) return;
@@ -93,7 +98,7 @@ public class Inventario : MonoBehaviour
 
         MonoBehaviour itemMB = oldItem as MonoBehaviour;
 
-        // Si lo soltamos con R (no por uso), lo devolvemos al mundo
+        // Evaluacion del origen de la remocion: Si proviene de una entrada de descarte, se devuelve al escenario fisico
         if (Input.GetKeyDown(KeyCode.R))
         {
             itemMB.gameObject.transform.SetParent(null);
@@ -102,14 +107,16 @@ public class Inventario : MonoBehaviour
         }
         else
         {
-            // Si se usó (Q), podrías destruirlo o simplemente dejarlo desactivado
-            // Destroy(itemMB.gameObject); 
+            // NOTA DE DESARROLLO: Si la remocion proviene del metodo Use(), la liberacion de memoria 
+            // o desactivacion extendida del clon es delegada a la clase especifica del item derivado.
         }
 
+        // Restauracion del slot al elemento por defecto del sistema
         Inventory[index] = (IInventoryItem)defaultItem;
         actItem = Inventory[actItemIndex];
     }
 
+    // Rellena la estructura de datos interna con la instancia por defecto para evitar punteros nulos
     private void PopulateInventory()
     {
         while (Inventory.Count < maxItems)

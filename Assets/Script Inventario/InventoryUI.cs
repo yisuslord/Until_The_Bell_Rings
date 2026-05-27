@@ -16,7 +16,7 @@ public class InventoryUI : MonoBehaviour
 
     void Start()
     {
-        // 1. Buscar al player si no está asignado
+        // Resolucion dinamica del objeto de jugador mediante tags en caso de no estar serializado en el inspector
         if (playerObject == null) playerObject = GameObject.FindGameObjectWithTag("Player");
 
         if (playerObject != null)
@@ -31,13 +31,13 @@ public class InventoryUI : MonoBehaviour
     {
         if (inventoryLogic == null) return;
 
-        // 2. Si el índice cambió, actualizar marco dorado
+        // Evaluacion de transicion de indices en la Hotbar para actualizar el marco de seleccion activa
         if (inventoryLogic.actItemIndex != lastSelectedIndex)
         {
             UpdateSelectionVisual(inventoryLogic.actItemIndex);
         }
 
-        // 3. Actualizar iconos constantemente
+        // Sincronizacion de las texturas de los iconos de los items con el estado del buffer lógico
         UpdateInventoryIcons();
     }
 
@@ -54,13 +54,13 @@ public class InventoryUI : MonoBehaviour
     {
         if (selectionIndicators.Count < 5) return;
 
-        // Apagar todos los marcos
+        // Desactivacion en bloque de todos los indicadores del arreglo visual
         for (int i = 0; i < selectionIndicators.Count; i++)
         {
             selectionIndicators[i].gameObject.SetActive(false);
         }
 
-        // Encender solo el actual
+        // Activacion exclusiva del indicador correspondiente al slot activo de la Hotbar
         if (currentSelectedIndex >= 0 && currentSelectedIndex < selectionIndicators.Count)
         {
             selectionIndicators[currentSelectedIndex].gameObject.SetActive(true);
@@ -75,33 +75,34 @@ public class InventoryUI : MonoBehaviour
 
         for (int i = 0; i < 5; i++)
         {
-            // Si el inventario no tiene este índice inicializado, ocultamos
+            // Ocultamiento preventivo si el indice consultado excede los limites asignados al inventario
             if (i >= inventoryLogic.Inventory.Count)
             {
                 itemIcons[i].sprite = null;
-                SetIconAlpha(itemIcons[i], 0f); // Invisible
+                SetIconAlpha(itemIcons[i], 0f);
                 continue;
             }
 
             IInventoryItem item = inventoryLogic.Inventory[i];
 
-            // 🔥 COMPARACIÓN CLAVE: Si el ítem es null o es exactamente el defaultItem, el slot está VACÍO
+            // NOTA DE CONTROL: Si el elemento recuperado es nulo o equivalente a la instancia base por defecto,
+            // el contenedor de interfaz se interpreta como vacio y se limpia el mapa de bits residual.
             if (item == null || item == (IInventoryItem)inventoryLogic.defaultItem)
             {
-                itemIcons[i].sprite = null;     // Borramos la imagen vieja del objeto usado
-                SetIconAlpha(itemIcons[i], 0f); // Volvemos el slot 100% invisible
+                itemIcons[i].sprite = null;
+                SetIconAlpha(itemIcons[i], 0f);
             }
             else
             {
-                // Si hay un objeto real, intentamos leer su icono
+                // Asignacion del recurso grafico asignado al item polimorfico
                 if (item.InventoryIcon != null)
                 {
-                    itemIcons[i].sprite = item.InventoryIcon; // Asignamos el dibujo
-                    SetIconAlpha(itemIcons[i], 1f);          // Lo mostramos (100% opaco)
+                    itemIcons[i].sprite = item.InventoryIcon;
+                    SetIconAlpha(itemIcons[i], 1f);
                 }
                 else
                 {
-                    // Si el objeto no tiene icono configurado, lo ocultamos para que no salga el cuadro blanco
+                    // Control de error visual: Evita el despliegue del recuadro blanco por defecto de Unity si falta el Sprite
                     itemIcons[i].sprite = null;
                     SetIconAlpha(itemIcons[i], 0f);
                 }
@@ -109,14 +110,13 @@ public class InventoryUI : MonoBehaviour
         }
     }
 
-    // Función auxiliar (recuerda mantenerla al final de tu InventoryUI)
+    // Modifica de forma segura el canal alpha del componente Image sin alterar los flags de activacion del Canvas Renderer
     private void SetIconAlpha(Image img, float alpha)
     {
         if (img == null) return;
         Color c = img.color;
         c.a = alpha;
         img.color = c;
-        img.enabled = true; // Lo dejamos encendido para evitar bugs de canvas de Unity
+        img.enabled = true;
     }
 }
-    

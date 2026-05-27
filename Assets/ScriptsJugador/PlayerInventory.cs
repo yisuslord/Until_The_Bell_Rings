@@ -11,29 +11,27 @@ public class PlayerInventory : MonoBehaviour
     [Header("Estado del Inventario")]
     public List<IInventoryItem> Inventory = new List<IInventoryItem>();
 
-    
     void Awake()
     {
-        // Inicializamos con espacios vacíos
+        // Al arrancar, llenamos la lista con el item vacio por defecto
         for (int i = 0; i < maxItems; i++)
         {
             Inventory.Add(defaultItem);
-
         }
     }
 
     void Update()
     {
-        // 1. Selección de Slots (1-5)
+        // 1. Controlamos el cambio de slot activo (Teclas 1-5 o botones)
         ManejarSeleccion();
 
-        // 2. Usar Item (Tecla Q)
+        // 2. Usar Item (Tecla Q o boton asignado)
         if (Input.GetKeyDown(KeyCode.Q) || Input.GetButtonDown("Use"))
         {
             UsarItemActual();
         }
 
-        // 3. Soltar Item (Tecla R)
+        // 3. Soltar Item (Tecla R o boton asignado)
         if (Input.GetKeyDown(KeyCode.R) || Input.GetButtonDown("Drop"))
         {
             SoltarItemActual();
@@ -42,18 +40,18 @@ public class PlayerInventory : MonoBehaviour
 
     private void ManejarSeleccion()
     {
+        // Cambios directos usando los numeros del teclado
         if (Input.GetKeyDown(KeyCode.Alpha1)) actItemIndex = 0;
         if (Input.GetKeyDown(KeyCode.Alpha2)) actItemIndex = 1;
         if (Input.GetKeyDown(KeyCode.Alpha3)) actItemIndex = 2;
         if (Input.GetKeyDown(KeyCode.Alpha4)) actItemIndex = 3;
         if (Input.GetKeyDown(KeyCode.Alpha5)) actItemIndex = 4;
 
-        if (Input.GetButtonDown("ObjL")) actItemIndex -= 1; Debug.Log(actItemIndex); ;
-        if (Input.GetButtonDown("ObjR")) actItemIndex += 1; Debug.Log(actItemIndex); ;
+        // Cambios graduales (por ejemplo, usando los gatillos o flechas)
+        if (Input.GetButtonDown("ObjL")) actItemIndex -= 1;
+        if (Input.GetButtonDown("ObjR")) actItemIndex += 1;
 
-        
-
-        // Limitar el índice por seguridad
+        // Nos aseguramos de que el indice no se salga de los limites del inventario
         actItemIndex = Mathf.Clamp(actItemIndex, 0, maxItems - 1);
     }
 
@@ -61,9 +59,9 @@ public class PlayerInventory : MonoBehaviour
     {
         IInventoryItem item = Inventory[actItemIndex];
 
+        // Si hay un objeto real en el slot, activa su funcion de uso y lo quita del inventario
         if (item != null && item != (IInventoryItem)defaultItem)
         {
-
             item.Use();
             RemoverItemActual();
         }
@@ -79,36 +77,37 @@ public class PlayerInventory : MonoBehaviour
 
             if (itemComponent != null)
             {
-                // 1. Lo liberamos: deja de ser hijo del jugador
+                // 1. Desvinculamos el objeto del jugador para que vuelva a ser independiente
                 itemComponent.transform.SetParent(null);
 
-                // 2. Lo posicionamos cerca de los pies del jugador con un ligero desfase
+                // 2. Lo dejamos en el suelo cerca del jugador con una posicion un poco aleatoria
                 Vector3 posicionSoltado = transform.position + (Vector3)Random.insideUnitCircle * 0.5f;
                 itemComponent.transform.position = posicionSoltado;
 
-                // 3. ¡Lo reactivamos! Al encenderse, volverá a activar sus Triggers y su SpriteRenderer
+                // 3. Volvemos a prender el objeto para que se vea y se pueda volver a recoger
                 itemComponent.gameObject.SetActive(true);
 
-                // 4. Si el objeto original usa físicas, las reseteamos al tocar el suelo
+                // 4. Si el objeto tiene fisicas, las frenamos para que no salga disparado
                 if (itemComponent.TryGetComponent(out Rigidbody2D rb))
                 {
                     rb.linearVelocity = Vector2.zero;
                     rb.angularVelocity = 0f;
                 }
 
-                Debug.Log($"<color=orange>{item.ItemName} devuelto al mundo real.</color>");
+                Debug.Log($"[Inventario] {item.ItemName} devuelto al mundo real.");
             }
 
-            // Limpiamos el slot y refrescamos la UI
+            // Vaciamos el slot donde estaba el objeto
             RemoverItemActual();
         }
     }
 
     public void RemoverItemActual()
     {
+        // Reemplazamos el objeto por el elemento vacio por defecto
         Inventory[actItemIndex] = defaultItem;
 
-        // 🔥 NUEVO: Forzamos a la UI a enterarse INMEDIATAMENTE de que este slot se vació
+        // Buscamos la UI y le avisamos de inmediato que actualice los iconos en pantalla
         InventoryUI ui = Object.FindFirstObjectByType<InventoryUI>();
         if (ui != null)
         {
@@ -120,19 +119,20 @@ public class PlayerInventory : MonoBehaviour
     {
         for (int i = 0; i < Inventory.Count; i++)
         {
-            // 🔥 Buscamos el primer slot vacío (ya sea null o el defaultItem)
+            // Buscamos el primer hueco que este vacio o que tenga el item por defecto
             if (Inventory[i] == null || Inventory[i] == (IInventoryItem)defaultItem)
             {
+                // Guardamos el nuevo item en ese espacio
                 Inventory[i] = newItem;
-                Debug.Log($"<color=green>Objeto colocado en el slot libre: {i}</color>");
+                Debug.Log($"[Inventario] Objeto colocado en el slot libre: {i}");
 
-                // Forzamos a la UI a dibujar el nuevo ícono que acaba de entrar en ese hueco
+                // Buscamos la UI para que dibuje el nuevo icono en su lugar correspondiente
                 InventoryUI ui = Object.FindFirstObjectByType<InventoryUI>();
                 if (ui != null) ui.UpdateInventoryIcons();
 
-                return; // Cortamos el método para que no lo duplique en otros slots
+                return; // Cortamos la funcion para evitar que el objeto se duplique en otros slots
             }
         }
-        Debug.Log("<color=red>Inventario lleno, no hay huecos vacíos.</color>");
+        Debug.Log("[Inventario] Inventario lleno, no hay huecos vacíos.");
     }
 }

@@ -3,6 +3,6 @@
 public interface IInventoryItem
 {
     string ItemName { get; }
-    Sprite InventoryIcon { get; } // 🔥 AÑADE ESTO
+    Sprite InventoryIcon { get; } 
     void Use();
 }
