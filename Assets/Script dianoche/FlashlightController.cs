@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using UnityEngine.UI; // Obligatorio para detectar el componente Image
+using UnityEngine.UI;
 
 public class FlashlightController : MonoBehaviour
 {
@@ -7,21 +7,24 @@ public class FlashlightController : MonoBehaviour
 
     [Header("Ajustes de Batería")]
     [SerializeField] private float maxEnergy = 100f;
-    [SerializeField] private float drainRate = 5f; // Cuánta energía gasta por segundo
-    [SerializeField] private Image batteryBarImage; // 🔥 Cambiado de Slider a Image
+    [SerializeField] private float drainRate = 5f;
+    [SerializeField] private Image batteryBarImage;
 
     private float currentEnergy;
     public bool IsOn { get; private set; }
 
+    // Establece el valor inicial de la energia de la linterna a su capacidad maxima y sincroniza la UI del HUD al iniciar el juego.
     void Start()
     {
         currentEnergy = maxEnergy;
         ActualizarUI();
     }
 
+    // Escucha las pulsaciones de teclado del jugador y procesa el desgaste continuo de la bateria.
+    // Se conecta con la variable global de estado del LevelManager para restringir su encendido.
+    // Evita que el jugador pueda encender la linterna durante el dia, controla la activacion de las luces visuales y consume la energia frame a frame basandose en el tiempo transcurrido, forzando el apagado si la bateria llega a cero.
     void Update()
     {
-        // Control de encendido/apagado por el jugador
         if (LevelManager.Instance.currentState == GameState.Night)
         {
             if ((Input.GetKeyDown(KeyCode.F) || Input.GetButtonDown("Light")) && currentEnergy > 0)
@@ -35,7 +38,6 @@ public class FlashlightController : MonoBehaviour
             ApagarLinterna();
         }
 
-        // Gasto de batería mientras está encendida
         if (IsOn)
         {
             currentEnergy -= drainRate * Time.deltaTime;
@@ -49,13 +51,17 @@ public class FlashlightController : MonoBehaviour
         }
     }
 
+    // Forzar el apagado logico y visual de la linterna en el juego.
+    // Desactiva el booleano de control de estado y oculta el objeto del renderizador de luz adjunto.
     private void ApagarLinterna()
     {
         IsOn = false;
         lightVisuals.SetActive(false);
     }
 
-    // Método público que llamará la batería (ItemBattery.cs) al usarse con Q
+    // Incrementa el nivel de la energia de la linterna segun un valor especifico recibido.
+    // Pensado para conectarse externamente con el metodo de uso de objetos consumibles del inventario (como ItemBattery.cs al presionar la tecla Q).
+    // Restringe el valor de la energia mediante un limite maximo para evitar desbordamientos de la variable y actualiza los graficos del HUD.
     public void RechargeBattery(float amount)
     {
         currentEnergy += amount;
@@ -64,11 +70,13 @@ public class FlashlightController : MonoBehaviour
         Debug.Log($"Linterna recargada. Energía actual: {currentEnergy}");
     }
 
+    // Modifica de manera directa la barra visual de la interfaz del jugador.
+    // Se conecta con la propiedad fillAmount del componente de tipo Image de Unity UI.
+    // Transforma el valor de la energia a un rango flotante normalizado entre 0.0 y 1.0 exigido por el componente grafico para representar de forma fiel el remanente de bateria en pantalla.
     private void ActualizarUI()
     {
         if (batteryBarImage != null)
         {
-            // 🔥 Modificamos el fillAmount (acepta valores de 0.0f a 1.0f)
             batteryBarImage.fillAmount = currentEnergy / maxEnergy;
         }
     }

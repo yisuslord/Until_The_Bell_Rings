@@ -4,30 +4,32 @@ using System.Collections;
 public class Sensible : EnemyBase
 {
     [Header("Detection Settings")]
-    [SerializeField] private float detectionRadius = 4f;
-    [SerializeField] private AltarZone altarZone;
+    [SerializeField] private float detectionRadius = 4f; // Rango visual/físico para enganchar al jugador en persecución.
+    [SerializeField] private AltarZone altarZone; // Conexión con la zona del altar para heredar sus reglas de zona segura.
 
     [Header("Combat Settings")]
-    [SerializeField] private float cooldownTime = 3f;
+    [SerializeField] private float cooldownTime = 3f; // Tiempo que el enemigo permanece vulnerable/aturdido tras lanzar un golpe.
     public Animator anim;
     private bool moving;
     private bool isStunned = false;
-    private bool isAttacking = false; // Candado para la animación de ataque
+    private bool isAttacking = false;
 
     [Header("Audio System")]
     [SerializeField] private AudioClip clipAtaque;
     [SerializeField] private AudioClip clipGolpe;
 
-
-    private bool yaSonóPersecucion = false; // 🔥 Candado para que el audio no se repita en bucle
+    // Candado lógico para evitar que el grito de persecución se reproduzca infinitamente en bucle durante cada frame del Update.
+    private bool yaSonóPersecucion = false;
 
     private void Update()
     {
+        // Control de estados de movimiento para asegurar que las animaciones de caminado no se activen si el enemigo está aturdido o atacando.
         moving = !isStunned && !isAttacking && agent.velocity.magnitude > 0.1f;
         Animate();
 
         if (isStunned || isAttacking) return;
 
+        // Decisión de diseño: Si el jugador ingresa al Altar, el enemigo pierde el rastro de forma inmediata por motivos de balance de juego.
         if (altarZone != null && altarZone.IsPlayerInside)
         {
             if (currentState != State.Wandering)
@@ -38,10 +40,11 @@ public class Sensible : EnemyBase
             if (agent.isOnNavMesh)
             {
                 agent.ResetPath();
-                SetRandomDestination(); // Función heredada de EnemyBase para que camine a otro lado
+                SetRandomDestination();
             }
         }
 
+        // Ejecución de la máquina de estados específica de este monstruo.
         switch (currentState)
         {
             case State.Wandering: HandleWandering(); break;
@@ -52,7 +55,7 @@ public class Sensible : EnemyBase
 
     private void HandleChasing()
     {
-        // 🔥 EL CANDADO: Suena exactamente una vez al iniciar esta persecución
+        // Interconexión con AudioManager para alertar acústicamente al jugador usando el candado de una sola reproducción.
         if (!yaSonóPersecucion)
         {
             if (AudioManager.Instance != null && clipAtaque != null)
@@ -64,46 +67,45 @@ public class Sensible : EnemyBase
 
         if (PlayerController.Instance != null)
         {
-            // CASO 1: El jugador entra al altar
+            // Condición de ruptura 1: El jugador entró a la zona protegida del altar en plena persecución.
             if (altarZone != null && altarZone.IsPlayerInside)
             {
-                yaSonóPersecucion = false; // 🔄 Reseteamos
-                currentState = State.Wandering; // Asegúrate de cambiar el estado aquí si se salva
+                yaSonóPersecucion = false;
+                currentState = State.Wandering;
                 return;
             }
 
-            // CASO 2: El jugador se esconde
+            // Condición de ruptura 2: Interconexión con el sistema de sigilo (PlayerHide) para perder el rastro si el jugador se esconde.
             PlayerHide playerHide = PlayerController.Instance.GetComponent<PlayerHide>();
             if (playerHide != null && playerHide.IsHidden)
             {
-                yaSonóPersecucion = false; // 🔄 Reseteamos
+                yaSonóPersecucion = false;
                 currentState = State.Wandering;
                 return;
             }
 
-            // CASO 3: Verificación de distancia (Por si el jugador lo pierde corriendo normal)
-            // Ajusta el "15f" por la distancia máxima de visión/pérdida de tu juego
+            // Condición de ruptura 3: El jugador logró alejarse lo suficiente corriendo para romper la visión del monstruo.
             float distanciaAlJugador = Vector3.Distance(transform.position, PlayerController.Instance.transform.position);
             if (distanciaAlJugador > 15f)
             {
-                yaSonóPersecucion = false; // 🔄 Reseteamos porque lo perdió de vista
+                yaSonóPersecucion = false;
                 currentState = State.Wandering;
                 return;
             }
 
-            // Si no se cumple ninguna de las anteriores, lo sigue persiguiendo
+            // Si pasa todos los filtros de escape, actualiza la posición del NavMeshAgent persiguiendo las coordenadas del jugador.
             MoveTo(PlayerController.Instance.transform.position);
             CheckAttack();
         }
     }
 
-    // Sobreescribimos CheckAttack para controlar el frenado suave previo al golpe
     protected override void CheckAttack()
     {
         if (PlayerController.Instance == null) return;
 
         Collider2D hit = Physics2D.OverlapCircle(transform.position, attackDistance, playerLayer);
 
+        // Control de flujo: Si detecta colisión con el jugador, inicia la secuencia de ataque por corrutina para controlar tiempos con precisión.
         if (hit != null && !isAttacking && !isStunned)
         {
             StartCoroutine(SensibleAttackRoutine());
@@ -115,18 +117,19 @@ public class Sensible : EnemyBase
         isAttacking = true;
         anim.SetBool("Atack", true);
         Debug.Log("<color=red>¡Sensible inicia su ataque!</color>");
-        agent.isStopped = true; // Se detiene antes de atacar
 
-        // Tiempo que tarda el monstruo en estirar los brazos o hacer la animación
+        // Decisión de diseño: Se congela el movimiento del agente para que el ataque sea estático y dé oportunidad de esquivarlo.
+        agent.isStopped = true;
+
+        // Tiempo de anticipación sincronizado con el cuadro de la animación donde se asesta el golpe físico.
         yield return new WaitForSeconds(0.5f);
 
-        // 🔥 REPRODUCCIÓN BLINDADA: El sonido se ejecuta al completarse el golpe (Volumen subido a 1f)
         if (AudioManager.Instance != null && clipGolpe != null)
         {
             AudioManager.Instance.PlaySFX2D(clipGolpe, 2f);
         }
 
-        // Verificación doble por si el jugador esquivó en ese microsegundo
+        // Segunda validación de colisión: Comprueba si el jugador sigue ahí o si esquivó exitosamente en el último instante.
         Collider2D hit = Physics2D.OverlapCircle(transform.position, attackDistance, playerLayer);
         if (hit != null && hit.TryGetComponent(out IDamageable damageable))
         {
@@ -138,13 +141,13 @@ public class Sensible : EnemyBase
             Debug.Log("<color=yellow>¡Sensible falló el ataque, el jugador esquivó!</color>");
         }
 
-        // Breve espera para terminar de reproducir el golpe antes del aturdimiento completo
+        // Breve pausa para asimilar el impacto antes de transicionar a la rutina de aturdimiento.
         yield return new WaitForSeconds(0.5f);
 
         isAttacking = false;
         anim.SetBool("Atack", false);
         Debug.Log("<color=blue>Sensible se aturde después de atacar.</color>");
-        StartCoroutine(AttackCooldown()); // Pasa a su descanso regular
+        StartCoroutine(AttackCooldown());
     }
 
     private IEnumerator AttackCooldown()
@@ -152,6 +155,7 @@ public class Sensible : EnemyBase
         isStunned = true;
         agent.isStopped = true;
 
+        // Estado de vulnerabilidad temporal que premia al jugador por esquivar con éxito el ataque del monstruo.
         Debug.Log($"Sensible descansando por {cooldownTime} segundos...");
         yield return new WaitForSeconds(cooldownTime);
 
@@ -162,14 +166,14 @@ public class Sensible : EnemyBase
 
     public override void OnStimulusReceived(Vector2 position, StimulusType type)
     {
+        // Restricción lógica: Este enemigo ignora estímulos de tipo corruptible debido a que su diseño está enfocado únicamente en la persecución directa del jugador.
         if (type == StimulusType.Corruptible) return;
         base.OnStimulusReceived(position, type);
     }
 
-
     private void HandleInvestigation()
     {
-        // Si el monstruo está patrullando, el candado de audio DEBE estar listo para la próxima persecución
+        // Si el enemigo fue distraído o regresó a investigar, liberamos el candado de sonido de caza para dejarlo listo para un futuro encuentro.
         if (yaSonóPersecucion)
         {
             yaSonóPersecucion = false;
@@ -185,6 +189,7 @@ public class Sensible : EnemyBase
 
     private void CheckForPlayerProximity()
     {
+        // Escaneo radial constante en el punto investigado para ver si encuentra al jugador escondido cerca de la perturbación.
         Collider2D hit = Physics2D.OverlapCircle(transform.position, detectionRadius, playerLayer);
         if (hit != null) currentState = State.Chasing;
     }

@@ -19,14 +19,16 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
     private bool isAttempting = false;
 
     [Header("Audio System")]
-    [SerializeField] private AudioClip clipCorromper; // Sonido al sabotear con éxito
-    [SerializeField] private AudioClip clipBusqueda;  // 🔥 Sonido cuando el radar localiza una vela válida
+    [SerializeField] private AudioClip clipCorromper;
+    [SerializeField] private AudioClip clipBusqueda;
 
     private Vector2 currentTargetPosition;
 
-    // 🔥 CANDADO DE AUDIO: Evita que el sonido de búsqueda se solape si encuentra estímulos seguidos
     private bool yaSonoBusqueda = false;
 
+    // Se conecta con el sistema de estimulos global.
+    // Revisa si la posicion del estimulo recibido contiene un objeto corruptible para guardarlo en memoria y activar la busqueda base.
+    // Esto evita que el enemigo pierda tiempo persiguiendo un objetivo que ya saboteo hace poco.
     public override void OnStimulusReceived(Vector2 position, StimulusType type)
     {
         if (type != StimulusType.Corruptible) return;
@@ -36,7 +38,7 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
         {
             if (memoryList.Contains(target))
             {
-                return; // 🛑 CANDADO 1: Rechazado si ya lo recuerda
+                return;
             }
         }
 
@@ -44,6 +46,9 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
         base.OnStimulusReceived(position, type);
     }
 
+    // Controla el bucle de comportamiento del enemigo frame a frame.
+    // Si esta de vago, ejecuta su patrullaje y descuenta el temporizador para realizar escaneos de area repetitivos.
+    // Si esta investigando, verifica si llego al destino para detenerse e iniciar la corrutina de sabotaje.
     private void Update()
     {
         if (isAttempting) return;
@@ -70,6 +75,9 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
         }
     }
 
+    // Corrutina que maneja la secuencia de interaccion con el objetivo.
+    // Se conecta con los componentes fisicos cercanos y con el AudioManager.
+    // Detiene al agente, busca un objetivo valido en un radio cercano que no este en su memoria, aplica un tiempo de espera simulando una canalizacion y realiza un calculo probabilistico para determinar si corrompe el objeto o falla, reproduciendo el sonido correspondiente si tiene exito.
     private System.Collections.IEnumerator CorruptionProcess()
     {
         agent.isStopped = true;
@@ -105,16 +113,13 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
             yield break;
         }
 
-        // Espera los segundos de canalización/animación del sabotaje
         yield return new WaitForSeconds(waitBeforeAttempt);
 
-        // Tirada de dados para el éxito de la corrupción
         if (Random.Range(0f, 100f) <= successChance)
         {
-            // 🔥 IMPACTO ÚNICO DE SABOTAJE: Suena en el frame exacto del éxito
             if (AudioManager.Instance != null && clipCorromper != null)
             {
-                AudioManager.Instance.PlaySFX2D(clipCorromper, 0.4f); // Volumen calibrado para dar un buen susto ambiental
+                AudioManager.Instance.PlaySFX2D(clipCorromper, 0.4f);
             }
             target.Corrupt();
             Debug.Log("<color=purple>¡SABOTAJE EXITOSO!</color>");
@@ -127,10 +132,13 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
         FinishAction();
     }
 
+    // Restablece las variables de control de accion y el candado de audio de busqueda.
+    // Reactiva el movimiento del componente NavMeshAgent y regresa al estado de patrullaje eligiendo un punto nuevo.
+    // Su proposito es limpiar el estado del enemigo para que pueda volver a buscar objetivos de forma limpia sin quedarse trabado.
     private void FinishAction()
     {
         isAttempting = false;
-        yaSonoBusqueda = false; // 🔄 RESETEO DEL RADAR: Al terminar una acción, su radar vuelve a estar listo para pitar
+        yaSonoBusqueda = false;
 
         if (agent != null)
         {
@@ -142,6 +150,8 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
         ForceNewWanderPoint();
     }
 
+    // Fuerza la busqueda inmediata de un nuevo punto de patrullaje.
+    // Llama al metodo heredado de la IA de movimiento si se encuentra en el estado correcto.
     private void ForceNewWanderPoint()
     {
         if (currentState == State.Wandering)
@@ -150,6 +160,9 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
         }
     }
 
+    // Realiza un escaneo radial constante para detectar velas en el entorno.
+    // Se conecta con el componente Candle de los objetos detectados y con el AudioManager.
+    // Filtra las velas que ya esten apagadas, corrompidas o en memoria. Si encuentra una vela encendida valida, reproduce el sonido de alerta una sola vez mediante su candado booleano y manda la posicion al sistema de estimulos para iniciar la persecucion.
     private void PassiveScan()
     {
         Collider2D[] objects = Physics2D.OverlapCircleAll(transform.position, 15f);
@@ -168,13 +181,11 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
                 currentTargetPosition = obj.transform.position;
                 Debug.Log($"<color=green>Radar: Objetivo válido encontrado -> {obj.name}</color>");
 
-                // 🔥 CONEXIÓN DEL AUDIO DE BÚSQUEDA:
-                // Suena una sola vez en el instante donde el radar bloquea una vela encendida para perseguirla
                 if (!yaSonoBusqueda)
                 {
                     if (AudioManager.Instance != null && clipBusqueda != null)
                     {
-                        AudioManager.Instance.PlaySFX2D(clipBusqueda, 0.25f); // Un sonido sutil (un click mecánico o un pulso)
+                        AudioManager.Instance.PlaySFX2D(clipBusqueda, 0.25f);
                     }
                     yaSonoBusqueda = true;
                 }
@@ -185,6 +196,9 @@ public class CorruptorEnemy : EnemyBase, IStimulusReceiver
         }
     }
 
+    // Registra un objeto en la lista de memoria del enemigo.
+    // Controla que el tamano de la lista no supere la capacidad maxima establecida. Si se excede, elimina el registro mas antiguo.
+    // Esto sirve para que el enemigo no se quede estancado saboteando el mismo objeto infinitamente, permitiendo que eventualmente olvide una vela y pueda volver a atacarla si el jugador la repara.
     private void AddToMemory(ICorruptible newObject)
     {
         if (memoryList.Contains(newObject)) return;

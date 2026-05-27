@@ -1,14 +1,13 @@
 using UnityEngine;
 using System.Collections;
-// Nos aseguramos de incluir el namespace de luces si usas el pipeline 2D (URP)
 using UnityEngine.Rendering.Universal;
 
 public class Manifestado : EnemyBase
 {
     [Header("Manifestado Logic")]
-    [SerializeField] private AltarZone altarZone;
-    [SerializeField] public float darknessThreshold = 3f;
-    [SerializeField] private float attackCooldown = 4f;
+    [SerializeField] private AltarZone altarZone; // Enlace al área segura para que el enemigo se disipe instantáneamente si el jugador entra allí.
+    [SerializeField] public float darknessThreshold = 3f; // Tiempo en segundos que el jugador debe permanecer a oscuras antes de que este enemigo aparezca.
+    [SerializeField] private float attackCooldown = 4f; // Tiempo de espera en las sombras tras realizar una acción de ataque.
 
     [Header("Audio System")]
     [SerializeField] private AudioClip clipAwake;
@@ -23,40 +22,41 @@ public class Manifestado : EnemyBase
     private bool moving;
     private bool yaSonoPersecucion = false;
 
+    // Conexiones de lectura directa hacia los componentes lógicos del jugador para analizar su linterna y aspecto visual.
     private FlashlightController playerFlashlight;
     private SpriteRenderer spriteRenderer;
 
-    // 🔥 NUEVA COMPONENTE DE LUZ
+    // Iluminación interna 2D propia asignada a la presencia fantasmal de este monstruo.
     private Light2D miLuz;
 
     protected override void Awake()
     {
         base.Awake();
+        // Localización automática de referencias cruzadas entre objetos de la escena para independizar el prefab.
         playerFlashlight = Object.FindFirstObjectByType<FlashlightController>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-
-        // 🔍 Buscamos la luz de forma automática en el mismo objeto o en sus hijos
         miLuz = GetComponentInChildren<Light2D>();
 
-        // La apagamos por defecto al iniciar el juego por si acaso comenzó encendida en el inspector
+        // El enemigo inicia completamente oculto e intangible en el escenario.
         ControlarLuz(false);
     }
 
     private void Update()
     {
+        // Control riguroso de movimiento: Solo se considera que se desplaza si el agente está activo, posicionado en la malla de navegación y con velocidad física real.
         moving = !isAturdido && !isAttacking && agent.enabled && agent.isOnNavMesh && agent.velocity.magnitude > 0.1f;
         Animate();
 
         if (!agent.enabled || !agent.isOnNavMesh) return;
 
-        // 1. ZONA SEGURA: Altar
+        // Mecánica de Zona de Altar: Desvanece al enemigo por completo si el jugador logra refugiarse a tiempo en la luz sagrada.
         if (altarZone != null && altarZone.IsPlayerInside)
         {
             if (isHunting || spriteRenderer.enabled)
             {
                 StopHunting();
                 spriteRenderer.enabled = false;
-                ControlarLuz(false); // 🔥 ALTARES: Se apaga la luz al desvanecerse
+                ControlarLuz(false);
                 if (agent.isOnNavMesh) agent.ResetPath();
             }
             return;
@@ -64,9 +64,10 @@ public class Manifestado : EnemyBase
 
         if (isAttacking || isAturdido) return;
 
-        // 2. LÓGICA DE LINTERNA (Controla si puede empezar a cazar)
+        // Conexión lógica con el controlador de la linterna: Evaluamos si el jugador tiene la luz encendida.
         bool isLightOn = (playerFlashlight != null && playerFlashlight.IsOn);
 
+        // Mecánica de Oscuridad: Si el jugador apaga la linterna, este enemigo acumula tiempo de carga para manifestarse físicamente.
         if (!isLightOn && !isAturdido)
         {
             darknessTimer += Time.deltaTime;
@@ -74,17 +75,17 @@ public class Manifestado : EnemyBase
             {
                 isHunting = true;
                 spriteRenderer.enabled = true;
-                ControlarLuz(true); // 🔥 APARICIÓN: Se enciende la luz al manifestarse desde la oscuridad
+                ControlarLuz(true); // Al manifestarse visualmente, enciende su luz espectral de acompañamiento.
             }
         }
         else
         {
-            // 🔥 ESPANTADO: Si el jugador lo alumbra con la linterna, el método StopHunting() se encargará de apagar su luz
+            // Decisión de diseño: La linterna directa del jugador actúa como repelente natural, forzando al enemigo a volver a ocultarse.
             StopHunting();
             if (!isHunting && !isAturdido) spriteRenderer.enabled = false;
         }
 
-        // 3. ACCIÓN DE CAZA 
+        // Gestión de la secuencia de persecución una vez manifestado.
         if (isHunting)
         {
             if (!yaSonoPersecucion)
@@ -108,6 +109,7 @@ public class Manifestado : EnemyBase
     {
         if (PlayerController.Instance != null)
         {
+            // Comprobación secundaria: Si el jugador usa mecánicas de sigilo para esconderse en armarios u objetos interactivos.
             PlayerHide playerHide = PlayerController.Instance.GetComponent<PlayerHide>();
             if (playerHide != null && playerHide.IsHidden)
             {
@@ -122,6 +124,7 @@ public class Manifestado : EnemyBase
                 return;
             }
 
+            // Comprobación por distancia máxima para desactivar el comportamiento si el jugador se alejó demasiado de la zona.
             float distanciaAlJugador = Vector3.Distance(transform.position, PlayerController.Instance.transform.position);
             if (distanciaAlJugador > 15f)
             {
@@ -166,6 +169,7 @@ public class Manifestado : EnemyBase
         Collider2D hit = Physics2D.OverlapCircle(transform.position, attackDistance, playerLayer);
         if (hit != null && hit.TryGetComponent(out IDamageable damageable))
         {
+            // Aplica daño al jugador y simula un desvanecimiento inmediato en la oscuridad por motivos de ambientación y terror.
             damageable.TakeDamage(attackDamage);
             Debug.Log("<color=purple>El Manifestado te golpeó y se fundió en las sombras.</color>");
         }
@@ -180,12 +184,13 @@ public class Manifestado : EnemyBase
     private IEnumerator AturdimientoRoutine()
     {
         isAturdido = true;
-        StopHunting(); // 🔄 Esto reinicia parámetros y apaga la luz automáticamente por seguridad
+        StopHunting();
 
         spriteRenderer.enabled = false;
 
         if (agent.isOnNavMesh) agent.isStopped = true;
 
+        // Cooldown obligatorio ajustable que dicta cuánto tiempo pasará antes de que pueda volver a materializarse en el mapa.
         yield return new WaitForSeconds(attackCooldown);
 
         isAturdido = false;
@@ -193,15 +198,15 @@ public class Manifestado : EnemyBase
 
     private void StopHunting()
     {
+        // Reseteo interno de parámetros lógicos y temporizadores para asegurar un apagado limpio del comportamiento agresivo.
         isHunting = false;
         darknessTimer = 0;
         yaSonoPersecucion = false;
-        ControlarLuz(false); // 🔥 ESPANTADO / DORMIDO: Apagamos la luz de inmediato en cualquier reseteo del monstruo
+        ControlarLuz(false);
 
         if (agent.isOnNavMesh && !isAturdido && !isAttacking) agent.isStopped = true;
     }
 
-    // 🔥 MÉTODO AUXILIAR ANTICRASHEO: Controla el encendido seguro de la luz
     private void ControlarLuz(bool encender)
     {
         if (miLuz != null)
@@ -221,5 +226,6 @@ public class Manifestado : EnemyBase
         }
     }
 
+    // Decisión de diseño: Sobrescribimos el método heredado dejándolo en blanco para inmunizar a este monstruo contra las ondas de repulsión mientras sea intangible.
     public override void GetRepelled(Vector2 shockwaveSource, float force) { }
 }
